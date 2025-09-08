@@ -160,9 +160,9 @@
                         'link' => 'leves.php'
                     ],
                     [
-                        'name' => 'Prêmio',
-                        'model' => 'Faça a aquisição do seu carro prêmio de forma inteligente sem descapitalizar',
-                        'description' => 'O prêmio que você merece a passos de você.',
+                        'name' => 'Premium',
+                        'model' => 'Faça a aquisição do seu carro Premium de forma inteligente sem descapitalizar',
+                        'description' => 'O Premium que você merece a passos de você.',
                         'image' => 'assets/images/mercedes.jpg',
                         'features' => ['Planos personalizados', 'Lance troca de chaves', 'Contemplação programada'],
                         'link' => 'premio.php'
