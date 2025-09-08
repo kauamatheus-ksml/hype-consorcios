@@ -236,12 +236,6 @@
                 <?php
                 $features = [
                     [
-                        'icon' => 'fas fa-users',
-                        'number' => '700 mil+',
-                        'label' => 'Carros Entregues pela Embracon',
-                        'description' => 'Mais de 700 mil famílias realizaram o sonho através da Embracon'
-                    ],
-                    [
                         'icon' => 'fas fa-calendar',
                         'number' => '40+ anos',
                         'label' => 'No Mercado',
