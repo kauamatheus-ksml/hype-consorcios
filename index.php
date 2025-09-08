@@ -29,7 +29,7 @@
                 <div class="logo">
                     <img src="assets/images/logo.png" alt="Hype Consórcios Logo">
                     <div class="logo-text">
-                        <div class="company-name">Hype Consórcios</div>
+                        
                     </div>
                 </div>
 
@@ -434,7 +434,7 @@
                     </p>
                     <div class="footer-badges">
                         <span class="badge">Parceiro Autorizado VW</span>
-                        <span class="badge">CNPJ: 00.000.000/0001-00</span>
+                        <span class="badge">CNPJ: 53.170.406/0001-89</span>
                     </div>
                 </div>
             </div>
