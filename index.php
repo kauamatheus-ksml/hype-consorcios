@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hype Consórcios - Você tem sonhos nós temos a chave</title>
     <meta name="description" content="Realize o sonho do carro novo com o Consórcio Volkswagen. Parceiro autorizado com as melhores condições e 40+ anos de tradição. Simule agora!">
-    
+    <link rel="icon" type="image/x-icon" href="assets/images/logo.ico">
+
     <!-- Open Graph -->
     <meta property="og:title" content="Hype Consórcios - Você tem sonhos nós temos a chave">
     <meta property="og:description" content="Realize o sonho do carro novo com o Consórcio Volkswagen. Parceiro autorizado com as melhores condições e 40+ anos de tradição.">
@@ -42,17 +43,7 @@
                     <a href="#contato">Contato</a>
                 </nav>
 
-                <!-- Contact Buttons -->
-                <div class="header-buttons">
-                    <a href="https://instagram.com/hype.consorcios" target="_blank" class="btn btn-outline">
-                        <i class="fab fa-instagram"></i>
-                        Instagram
-                    </a>
-                    <a href="https://api.whatsapp.com/send/?phone=5547996862997" target="_blank" class="btn btn-cta">
-                        <i class="fab fa-whatsapp"></i>
-                        WhatsApp
-                    </a>
-                </div>
+                
 
                 <!-- Mobile Menu Button -->
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
@@ -92,7 +83,7 @@
             <div class="hero-content">
                 <div class="hero-badge">
                     <img src="assets/images/vw-logo.png" alt="Volkswagen" style="height: 24px; margin-right: 8px;">
-                    <span>Volkswagen</span>
+                    <span>Parceiro Autorizado Volkswagen</span>
                 </div>
                 
                 <h1 class="hero-title">
@@ -113,21 +104,7 @@
                     </a>
                 </div>
 
-                <!-- Features -->
-                <div class="hero-features">
-                    <div class="feature-item">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>40+ anos de tradição</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-award"></i>
-                        <span>Parceiro autorizado VW</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-car"></i>
-                        <span>Toda linha Volkswagen</span>
-                    </div>
-                </div>
+                
             </div>
         </div>
 
@@ -204,7 +181,7 @@
                 <p class="disclaimer">*Consulte condições</p>
                 <div class="stats-badge">
                     <i class="fas fa-check"></i>
-                    <span>Parceiro da Embracon - Mais de 700 mil carros entregues</span>
+                    <span>Parceiro da Embracon</span>
                 </div>
             </div>
         </div>
@@ -268,12 +245,7 @@
                 <?php endforeach; ?>
             </div>
 
-            <div class="about-cta">
-                <div class="cta-badge">
-                    <i class="fas fa-award"></i>
-                    <span>Conheça nossa história →</span>
-                </div>
-            </div>
+            
         </div>
     </section>
 
@@ -325,15 +297,11 @@
             <div class="faq-cta">
                 <h3>Ainda tem dúvidas?</h3>
                 <p>Nossa equipe está pronta para te ajudar!</p>
-                <div class="faq-buttons">
-                    <a href="https://api.whatsapp.com/send/?phone=5547996862997" target="_blank" class="btn btn-success">
-                        <i class="fab fa-whatsapp"></i>
-                        Falar via WhatsApp
-                    </a>
-                    <a href="https://instagram.com/hype.consorcios" target="_blank" class="btn btn-outline">
-                        <i class="fab fa-instagram"></i>
-                        Seguir no Instagram
-                    </a>
+                <div class="hero-buttons-dwn">
+                    <button class="btn btn-hero" onclick="openSimulationModal()">
+                        Simular agora
+                    </button>
+                    
                 </div>
             </div>
         </div>
@@ -457,7 +425,7 @@
                 </div>
                 <h3>Preencha os dados e receba uma simulação personalizada</h3>
                 
-                <form class="simulation-form" id="simulationForm">
+                <form class="simulation-form" id="simulationForm" onsubmit="submitLeadForm(event)">
                     <div class="form-group">
                         <label for="name">Nome completo *</label>
                         <input type="text" id="name" name="name" placeholder="Seu nome completo" required>
@@ -465,16 +433,7 @@
 
                     <div class="form-group">
                         <label for="vehicle">Qual carro é do seu interesse? *</label>
-                        <select id="vehicle" name="vehicle" required>
-                            <option value="">Selecione o veículo</option>
-                            <option value="Polo">Volkswagen Polo</option>
-                            <option value="Nivus">Volkswagen Nivus</option>
-                            <option value="Virtus">Volkswagen Virtus</option>
-                            <option value="T-Cross">Volkswagen T-Cross</option>
-                            <option value="Jetta">Volkswagen Jetta</option>
-                            <option value="Tiguan">Volkswagen Tiguan</option>
-                            <option value="Amarok">Volkswagen Amarok</option>
-                        </select>
+                        <input type="text" id="vehicle" name="vehicle" placeholder="Ex: Volkswagen Polo, Honda Civic, Toyota Corolla..." required>
                     </div>
 
                     <div class="form-group">
@@ -506,9 +465,10 @@
                         <input type="email" id="email" name="email" placeholder="seu@email.com">
                     </div>
 
-                    <button type="submit" class="btn btn-hero btn-full">
+                    <button type="submit" class="btn btn-hero1 btn-full" id="submitBtn">
                         <i class="fas fa-calculator"></i>
-                        Simular Agora
+                        <span id="btnText">Simular Agora</span>
+                        <i class="fas fa-spinner fa-spin" id="btnSpinner" style="display: none;"></i>
                     </button>
                 </form>
             </div>
@@ -517,5 +477,100 @@
 
     <!-- Scripts -->
     <script src="assets/js/script.js"></script>
+    
+    <script>
+        // Função para enviar dados do lead
+        async function submitLeadForm(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+            
+            // Desabilitar botão e mostrar loading
+            submitBtn.disabled = true;
+            btnText.textContent = 'Enviando...';
+            btnSpinner.style.display = 'inline-block';
+            
+            try {
+                // Obter dados do formulário
+                const formData = new FormData(form);
+                const data = {
+                    name: formData.get('name'),
+                    phone: formData.get('phone'),
+                    email: formData.get('email'),
+                    vehicle: formData.get('vehicle'),
+                    hasDownPayment: formData.get('hasDownPayment'),
+                    downPayment: formData.get('downPayment'),
+                    source: 'index'
+                };
+                
+                // Enviar para API
+                const response = await fetch('subsystem/api/capture_lead.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Fechar modal
+                    closeSimulationModal();
+                    
+                    // Mostrar mensagem de sucesso
+                    alert('✅ Dados enviados com sucesso! Redirecionando para WhatsApp...');
+                    
+                    // Redirecionar para WhatsApp
+                    if (result.redirect_whatsapp) {
+                        window.open(result.redirect_whatsapp, '_blank');
+                    }
+                    
+                    // Limpar formulário
+                    form.reset();
+                    
+                } else {
+                    alert('❌ Erro: ' + result.message);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao enviar lead:', error);
+                alert('❌ Erro ao enviar dados. Tente novamente.');
+            } finally {
+                // Reabilitar botão
+                submitBtn.disabled = false;
+                btnText.textContent = 'Simular Agora';
+                btnSpinner.style.display = 'none';
+            }
+        }
+        
+        // Máscara para telefone
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length >= 11) {
+                value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            } else if (value.length >= 7) {
+                value = value.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+            } else if (value.length >= 3) {
+                value = value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+            }
+            
+            e.target.value = value;
+        });
+        
+        // Máscara para valor da entrada
+        document.getElementById('downPayment').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = (value / 100).toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            });
+            e.target.value = value;
+        });
+    </script>
 </body>
 </html>
