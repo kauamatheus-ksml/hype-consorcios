@@ -58,16 +58,7 @@
                 <a href="#consorcio">Consórcio</a>
                 <a href="#simulacao">Simulação</a>
                 <a href="#contato">Contato</a>
-                <div class="mobile-buttons">
-                    <a href="https://instagram.com/hype.consorcios" target="_blank" class="btn btn-outline">
-                        <i class="fab fa-instagram"></i>
-                        Instagram
-                    </a>
-                    <a href="https://api.whatsapp.com/send/?phone=5547996862997" target="_blank" class="btn btn-cta">
-                        <i class="fab fa-whatsapp"></i>
-                        WhatsApp
-                    </a>
-                </div>
+                
             </nav>
         </div>
     </header>
@@ -129,27 +120,27 @@
                 <?php
                 $cars = [
                     [
-                        'name' => 'Leves',
-                        'model' => 'Conquiste seu veículo novo em até 10 anos de uso',
-                        'description' => 'De qualquer marca e modelo da sua preferência. Aqui, seu sonho sai do papel.',
+                        'name' => 'Veículos Leves',
+                        'price' => 'Parcelas a partir de 811,25',
+                        'description' => 'Realize o sonho do seu carro novo ou seminovo (até 10 anos de uso), da marca e modelo que você escolher. Aqui, seu plano cabe no bolso e seu sonho sai do papel!',
                         'image' => 'assets/images/polo-blue.jpg',
-                        'features' => ['Entrada sem juros', 'Aceita carro usado como lance', 'Lance embutido até 25% da própria carta'],
+                        'features' => ['Sem entrada', 'Sem juros', 'Usar seu carro usado como lance', 'Lance embutido de até 25% da própria carta'],
                         'link' => 'leves.php'
                     ],
                     [
-                        'name' => 'Premium',
-                        'model' => 'Faça a aquisição do seu carro Premium de forma inteligente sem descapitalizar',
-                        'description' => 'O Premium que você merece a passos de você.',
+                        'name' => 'Veículos Premium',
+                        'price' => 'Parcelas a partir de 1.960,00',
+                        'description' => 'Adquira seu carro premium de forma inteligente, sem comprometer seu patrimônio. O veículo dos seus sonhos está mais próximo do que você imagina!',
                         'image' => 'assets/images/mercedes.jpg',
-                        'features' => ['Planos personalizados', 'Lance troca de chaves', 'Contemplação programada'],
+                        'features' => ['Planos personalizados', 'Opção de lance "troca de chaves"', 'Contemplação programada'],
                         'link' => 'premio.php'
                     ],
                     [
-                        'name' => 'Pesados',
-                        'model' => 'Adquira seu caminhão/carreta novo ou renove sua frota',
-                        'description' => 'Com o consórcio você acelera muito mais. Descubra como carta de crédito para pesados pode alavancar seu negócio.',
+                        'name' => 'Veículos Pesados',
+                        'price' => 'Parcelas a partir de 2.530,00',
+                        'description' => 'Invista no crescimento do seu negócio com a aquisição de caminhões e carretas novos ou seminovos. Com a carta de crédito para pesados, sua frota ganha mais força para acelerar resultados.',
                         'image' => 'assets/images/caminhao.jpg',
-                        'features' => ['Pesados até 8 anos de uso', 'Aceita seu caminhão usado na troca', 'Lance de 25% embutido da própria carta'],
+                        'features' => ['Veículos pesados com até 8 anos de uso', 'Aceitamos seu caminhão usado como parte de pagamento', 'Lance embutido de até 25% da própria carta'],
                         'link' => 'pesados.php'
                     ]
                 ];
@@ -161,12 +152,12 @@
                         <img src="<?= $car['image'] ?>" alt="<?= $car['name'] ?>">
                     </div>
                     <div class="car-content">
-                        <h3 class="car-name">Consórcio <?= $car['name'] ?></h3>
-                        <h4 class="car-model"><?= $car['model'] ?></h4>
+                        <h3 class="car-name">Consórcio para <?= $car['name'] ?></h3>
+                        <div class="car-price"><?= $car['price'] ?></div>
                         <p class="car-description"><?= $car['description'] ?></p>
                         <ul class="car-features">
                             <?php foreach($car['features'] as $feature): ?>
-                                <li><i class="fas fa-check"></i> <?= $feature ?></li>
+                                <li>• <?= $feature ?></li>
                             <?php endforeach; ?>
                         </ul>
                         <a href="<?= $car['link'] ?>" class="btn btn-primary">
@@ -214,9 +205,9 @@
                 $features = [
                     [
                         'icon' => 'fas fa-calendar',
-                        'number' => '40+ anos',
-                        'label' => 'No Mercado',
-                        'description' => 'Mais de quatro décadas de experiência e confiança'
+                        'number' => 'Muitos sonhos realizados',
+                        'label' => '',
+                        'description' => 'Mais clientes, mais experiência e confiança'
                     ],
                     [
                         'icon' => 'fas fa-shield-alt',

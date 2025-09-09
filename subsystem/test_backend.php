@@ -511,7 +511,7 @@
 
         // === LEADS ===
         async function captureLead() {
-            const result = await apiRequest('api/capture_lead.php', 'POST', {
+            const result = await apiRequest('api/capture_lead_debug.php', 'POST', {
                 name: document.getElementById('leadName').value,
                 phone: document.getElementById('leadPhone').value,
                 email: document.getElementById('leadEmail').value,
@@ -638,7 +638,7 @@
             const workflow = [];
             
             // 1. Capturar lead
-            const leadResult = await apiRequest('api/capture_lead.php', 'POST', {
+            const leadResult = await apiRequest('api/capture_lead_debug.php', 'POST', {
                 name: 'Cliente Simulação',
                 phone: '47987654321',
                 email: 'simulacao@teste.com',
