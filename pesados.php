@@ -23,9 +23,7 @@
                 <!-- Logo -->
                 <div class="logo">
                     <img src="assets/images/logo.png" alt="Hype Consórcios Logo">
-                    <div class="logo-text">
-                        <div class="company-name">Hype Consórcios</div>
-                    </div>
+                    
                 </div>
 
                 <!-- Desktop Navigation -->
@@ -37,17 +35,7 @@
                     <a href="index.php#contato">Contato</a>
                 </nav>
 
-                <!-- Contact Buttons -->
-                <div class="header-buttons">
-                    <a href="https://instagram.com/hype.consorcios" target="_blank" class="btn btn-outline">
-                        <i class="fab fa-instagram"></i>
-                        Instagram
-                    </a>
-                    <a href="https://api.whatsapp.com/send/?phone=5547996862997" target="_blank" class="btn btn-cta">
-                        <i class="fab fa-whatsapp"></i>
-                        WhatsApp
-                    </a>
-                </div>
+                
 
                 <!-- Mobile Menu Button -->
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
@@ -62,16 +50,7 @@
                 <a href="index.php#consorcio">Consórcio</a>
                 <a href="index.php#simulacao">Simulação</a>
                 <a href="index.php#contato">Contato</a>
-                <div class="mobile-buttons">
-                    <a href="https://instagram.com/hype.consorcios" target="_blank" class="btn btn-outline">
-                        <i class="fab fa-instagram"></i>
-                        Instagram
-                    </a>
-                    <a href="https://api.whatsapp.com/send/?phone=5547996862997" target="_blank" class="btn btn-cta">
-                        <i class="fab fa-whatsapp"></i>
-                        WhatsApp
-                    </a>
-                </div>
+                
             </nav>
         </div>
     </header>
@@ -103,9 +82,7 @@
                     <button class="btn btn-hero" onclick="openSimulationModal()">
                         Simular agora
                     </button>
-                    <a href="https://api.whatsapp.com/send/?phone=5547996862997" target="_blank" class="btn btn-outline-white">
-                        Falar com especialista
-                    </a>
+                    
                 </div>
             </div>
         </div>
@@ -197,14 +174,8 @@
                 <h3>Pronto para expandir seu negócio?</h3>
                 <p>Faça uma simulação personalizada e descubra como crescer com segurança!</p>
                 <div class="hero-buttons">
-                    <button class="btn btn-hero" onclick="openSimulationModal()">
-                        <i class="fas fa-calculator"></i>
-                        Simular Consórcio
-                    </button>
-                    <a href="https://api.whatsapp.com/send/?phone=5547996862997&text=Olá! Tenho interesse no consórcio de veículos pesados. Gostaria de mais informações." target="_blank" class="btn btn-success">
-                        <i class="fab fa-whatsapp"></i>
-                        Falar no WhatsApp
-                    </a>
+                    
+                    
                 </div>
             </div>
         </div>
@@ -226,14 +197,7 @@
                         Hype Consórcios E Investimentos Ltda oferece as melhores condições 
                         para você realizar o sonho do veículo novo.
                     </p>
-                    <div class="social-links">
-                        <a href="https://instagram.com/hype.consorcios" target="_blank" class="social-link">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="https://api.whatsapp.com/send/?phone=5547996862997" target="_blank" class="social-link">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                    </div>
+                    
                 </div>
 
                 <!-- Quick Links -->
