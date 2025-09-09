@@ -1144,6 +1144,55 @@ $userId = $user['id'] ?? null;
             }
         }
 
+        function addActionButtonListeners() {
+            // Event listeners para botões de visualização
+            const viewButtons = document.querySelectorAll('.btn-sm[title="Ver detalhes"]');
+            console.log('Found view buttons:', viewButtons.length);
+            
+            viewButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const leadId = btn.getAttribute('data-lead-id');
+                    console.log('View button clicked, lead ID:', leadId);
+                    if (leadId) {
+                        viewLead(leadId);
+                    }
+                });
+            });
+
+            // Event listeners para botões de edição
+            const editButtons = document.querySelectorAll('.btn-sm[title="Editar"]');
+            console.log('Found edit buttons:', editButtons.length);
+            
+            editButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const leadId = btn.getAttribute('data-lead-id');
+                    console.log('Edit button clicked, lead ID:', leadId);
+                    if (leadId) {
+                        editLead(leadId);
+                    }
+                });
+            });
+
+            // Event listeners para botões do WhatsApp
+            const whatsappButtons = document.querySelectorAll('.btn-sm[title="WhatsApp"]');
+            console.log('Found WhatsApp buttons:', whatsappButtons.length);
+            
+            whatsappButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const leadId = btn.getAttribute('data-lead-id');
+                    const phone = btn.getAttribute('data-phone');
+                    const name = btn.getAttribute('data-name');
+                    console.log('WhatsApp button clicked:', { leadId, phone, name });
+                    if (phone && name) {
+                        openWhatsApp(phone, name, leadId);
+                    }
+                });
+            });
+        }
+
         function renderLeadsTable(leads) {
             const tbody = document.getElementById('leadsTableBody');
             
@@ -1189,13 +1238,13 @@ $userId = $user['id'] ?? null;
                     </td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn-sm" onclick="viewLead(${lead.id})" title="Ver detalhes">
+                            <button class="btn-sm" title="Ver detalhes" data-lead-id="${lead.id}">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button class="btn-sm" onclick="editLead(${lead.id})" title="Editar">
+                            <button class="btn-sm" title="Editar" data-lead-id="${lead.id}">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn-sm btn-whatsapp" onclick="openWhatsApp('${lead.phone}', '${lead.name}')" title="WhatsApp">
+                            <button class="btn-sm btn-whatsapp" title="WhatsApp" data-lead-id="${lead.id}" data-phone="${lead.phone}" data-name="${lead.name}">
                                 <i class="fab fa-whatsapp"></i>
                             </button>
                         </div>
@@ -1204,6 +1253,12 @@ $userId = $user['id'] ?? null;
             `).join('');
 
             tbody.innerHTML = html;
+            
+            // Adicionar event listeners aos botões de ação
+            console.log('Renderized table, adding listeners...');
+            setTimeout(() => {
+                addActionButtonListeners();
+            }, 100);
         }
 
         function renderPagination(pagination) {
@@ -1317,7 +1372,8 @@ $userId = $user['id'] ?? null;
             return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         }
 
-        function openWhatsApp(phone, name) {
+        function openWhatsApp(phone, name, id) {
+            console.log('openWhatsApp called:', { phone, name, id });
             const cleanPhone = phone.replace(/\D/g, '');
             const message = `Olá ${name}, aqui é da Hype Consórcios. Estamos entrando em contato sobre seu interesse em consórcio de veículos.`;
             const url = `https://api.whatsapp.com/send/?phone=55${cleanPhone}&text=${encodeURIComponent(message)}`;
@@ -1325,6 +1381,7 @@ $userId = $user['id'] ?? null;
         }
 
         async function viewLead(id) {
+            console.log('viewLead called:', id);
             try {
                 // Open modal
                 document.getElementById('leadDetailsModal').style.display = 'flex';
@@ -1359,6 +1416,7 @@ $userId = $user['id'] ?? null;
         }
 
         async function editLead(id) {
+            console.log('editLead called:', id);
             try {
                 // Fetch lead data first
                 const response = await fetch(`api/leads.php?action=details&id=${id}`);
