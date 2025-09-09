@@ -616,6 +616,129 @@ body {
     }
 }
 
+/* Career Section */
+.career-section {
+    padding: var(--section-padding);
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.career-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.career-header {
+    margin-bottom: 3rem;
+}
+
+.career-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    align-items: center;
+}
+
+@media (min-width: 768px) {
+    .career-grid {
+        grid-template-columns: 1fr 1.5fr;
+        gap: 4rem;
+    }
+}
+
+.career-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.career-image img {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border-radius: 16px;
+    box-shadow: var(--shadow-elegant);
+    object-fit: cover;
+    aspect-ratio: 1414/1599;
+}
+
+.career-description {
+    text-align: left;
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-card);
+}
+
+.career-description > p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--muted-foreground);
+    margin-bottom: 2rem;
+}
+
+.career-benefits,
+.career-requirements {
+    margin-bottom: 2rem;
+}
+
+.career-benefits h3,
+.career-requirements h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+}
+
+.career-benefits ul,
+.career-requirements ul {
+    list-style: none;
+    padding: 0;
+}
+
+.career-benefits ul li,
+.career-requirements ul li {
+    padding: 0.5rem 0;
+    color: var(--muted-foreground);
+    font-size: 1rem;
+}
+
+.career-cta {
+    text-align: center;
+    padding: 2rem 0 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.career-highlight {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 1.5rem;
+}
+
+.btn-career {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.btn-career:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-elegant);
+}
+
+.career-note {
+    font-size: 0.9rem;
+    color: var(--muted-foreground);
+    margin-top: 1rem;
+    font-style: italic;
+}
+
 /* About Section */
 .about-section {
     padding: var(--section-padding);
@@ -991,7 +1114,7 @@ body {
 
 @media (min-width: 1024px) {
     .footer-content {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 

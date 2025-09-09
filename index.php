@@ -129,7 +129,7 @@
                     ],
                     [
                         'name' => 'Veículos Premium',
-                        'price' => 'Parcelas a partir de 1.960,00',
+                        'price' => 'Parcelas a partir de 1.480,00',
                         'description' => 'Adquira seu carro premium de forma inteligente, sem comprometer seu patrimônio. O veículo dos seus sonhos está mais próximo do que você imagina!',
                         'image' => 'assets/images/mercedes.jpg',
                         'features' => ['Planos personalizados', 'Opção de lance "troca de chaves"', 'Contemplação programada'],
@@ -188,55 +188,73 @@
                         <span class="gradient-text">Hype Consórcios?</span>
                     </h2>
                     <p class="section-subtitle">
-                        Nossa empresa tem uma assessoria exclusiva em contemplação desde o ato do contato até a entrega do veículo, 
-                        representamos uma marca forte nacionalmente, sócio Volkswagen com a EMBRACON.
+                        Na Hype Consórcios, oferecemos uma assessoria exclusiva em todo o processo de contemplação — desde a assinatura do contrato até a entrega do seu veículo.
                     </p>
                     <p class="section-text">
-                        Especialista em entrega de veículos com mais de 700 mil bens entregues desde 1960. 
-                        A Hyper se destaca pelo ótimo desempenho no atendimento ágil e personalizado, 
-                        focando na necessidade de cada cliente. Nosso propósito não é apenas de comercializar consórcio, 
-                        e sim de realizar sonho.
+                        Somos representantes de uma marca consolidada nacionalmente: o Consórcio Volkswagen, administrado pela Embracon, especialista em consórcios e responsável pela entrega de mais de 700 mil bens desde 1960.
+                    </p>
+                    <p class="section-text">
+                        Nosso diferencial está no atendimento ágil, transparente e personalizado, sempre focado nas necessidades de cada cliente. Afinal, nosso propósito vai muito além de comercializar consórcios: queremos realizar o seu sonho.
                     </p>
                 </div>
-            </div>
-
-            <div class="features-grid">
-                <?php
-                $features = [
-                    [
-                        'icon' => 'fas fa-calendar',
-                        'number' => 'Muitos sonhos realizados',
-                        'label' => '',
-                        'description' => 'Mais clientes, mais experiência e confiança'
-                    ],
-                    [
-                        'icon' => 'fas fa-shield-alt',
-                        'number' => '100%',
-                        'label' => 'Seguro',
-                        'description' => 'Parceiro autorizado com total segurança jurídica'
-                    ],
-                    [
-                        'icon' => 'fas fa-star',
-                        'number' => '#1',
-                        'label' => 'Melhor Escolha',
-                        'description' => 'Referência em consórcios automotivos no Brasil'
-                    ]
-                ];
-
-                foreach($features as $feature):
-                ?>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="<?= $feature['icon'] ?>"></i>
-                    </div>
-                    <div class="feature-number"><?= $feature['number'] ?></div>
-                    <div class="feature-label"><?= $feature['label'] ?></div>
-                    <p class="feature-description"><?= $feature['description'] ?></p>
-                </div>
-                <?php endforeach; ?>
             </div>
 
             
+
+            
+        </div>
+    </section>
+
+    <!-- Career Section -->
+    <section class="career-section">
+        <div class="container">
+            <div class="career-content">
+                <div class="career-header">
+                    <h2 class="section-title">
+                        Trabalhe com a <span class="gradient-text">Hype Consórcios</span>
+                    </h2>
+                    <p class="section-subtitle">
+                        A Hype Consórcios está em constante crescimento e buscamos profissionais que queiram crescer junto com a gente! 🚀
+                    </p>
+                </div>
+
+                <div class="career-grid">
+                    <div class="career-image">
+                        <img src="assets/images/contarte.jpeg" alt="Trabalhe conosco">
+                    </div>
+                    <div class="career-description">
+                        <p>Se você é comunicativo, tem espírito empreendedor e gosta de ajudar pessoas a realizarem sonhos, venha fazer parte do nosso time de consultores de consórcio.</p>
+                        
+                        <div class="career-benefits">
+                            <h3>O que oferecemos:</h3>
+                            <ul>
+                                <li>• Treinamento completo e suporte constante.</li>
+                                <li>• Comissões atrativas e possibilidade de altos ganhos.</li>
+                                <li>• Reconhecimento e plano de crescimento na empresa.</li>
+                            </ul>
+                        </div>
+
+                        <div class="career-requirements">
+                            <h3>O que buscamos em você:</h3>
+                            <ul>
+                                <li>• Vontade de aprender e se desenvolver.</li>
+                                <li>• Perfil comercial e boa comunicação.</li>
+                                <li>• Determinação e foco em resultados.</li>
+                                <li>• Experiência em vendas (desejável, mas não obrigatória).</li>
+                            </ul>
+                        </div>
+
+                        <div class="career-cta">
+                            <p class="career-highlight">👉 Faça parte da equipe que está transformando sonhos em realidade.</p>
+                            <a href="https://api.whatsapp.com/send/?phone=5547996862997&text=Oi!%20Quero%20enviar%20meu%20curr%C3%ADculo%20para%20trabalhar%20na%20Hype%20Cons%C3%B3rcios!" target="_blank" class="btn btn-primary btn-career">
+                                <i class="fab fa-whatsapp"></i>
+                                Envie seu Currículo
+                            </a>
+                            <p class="career-note">Envie sua mensagem e depois mande seu currículo!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -338,19 +356,7 @@
                     </ul>
                 </div>
 
-                <!-- Vehicles -->
-                <div class="footer-section">
-                    <h3 class="footer-title">Veículos Disponíveis</h3>
-                    <ul class="footer-links">
-                        <li>Volkswagen Polo</li>
-                        <li>Volkswagen Nivus</li>
-                        <li>Volkswagen Virtus</li>
-                        <li>Volkswagen T-Cross</li>
-                        <li>Volkswagen Jetta</li>
-                        <li>Volkswagen Tiguan</li>
-                        <li>Volkswagen Amarok</li>
-                    </ul>
-                </div>
+                
 
                 <!-- Contact -->
                 <div class="footer-section">
