@@ -245,6 +245,10 @@
                 <i class="fas fa-download"></i>
                 Instalador
             </a>
+            <a href="create_sample_data.php" class="test-link">
+                <i class="fas fa-database"></i>
+                Dados Exemplo
+            </a>
         </div>
 
         <div class="back-link">

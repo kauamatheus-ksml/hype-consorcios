@@ -56,7 +56,7 @@ try {
         SELECT 
             u.full_name,
             COUNT(s.id) as sales_count,
-            COALESCE(SUM(s.commission_amount), 0) as total_commission
+            COALESCE(SUM(s.commission_value), 0) as total_commission
         FROM users u
         LEFT JOIN sales s ON u.id = s.seller_id 
             AND MONTH(s.created_at) = MONTH(CURRENT_DATE())
@@ -73,12 +73,12 @@ try {
     // Leads por fonte
     $stmt = $conn->prepare("
         SELECT 
-            COALESCE(source, 'Não informado') as source,
+            COALESCE(source_page, 'Não informado') as source,
             COUNT(*) as count
         FROM leads 
         WHERE MONTH(created_at) = MONTH(CURRENT_DATE())
         AND YEAR(created_at) = YEAR(CURRENT_DATE())
-        GROUP BY source
+        GROUP BY source_page
         ORDER BY count DESC
         LIMIT 10
     ");
@@ -116,7 +116,7 @@ try {
         SELECT 
             l.name as lead_name,
             l.phone,
-            l.source,
+            l.source_page as source,
             l.status,
             l.created_at,
             u.full_name as assigned_to

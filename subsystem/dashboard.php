@@ -388,7 +388,7 @@ $userName = $user['full_name'] ?? 'Usuário';
                 </div>
                 
                 <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="loadSection('leads')">
+                    <a href="leads.php" class="nav-link">
                         <i class="fas fa-users nav-icon"></i>
                         Leads
                     </a>
@@ -499,8 +499,8 @@ $userName = $user['full_name'] ?? 'Usuário';
             <div class="quick-actions">
                 <h3>Ações Rápidas</h3>
                 <div class="actions-grid">
-                    <a href="#" class="action-btn" onclick="loadSection('leads')">
-                        <i class="fas fa-plus"></i>
+                    <a href="leads.php" class="action-btn">
+                        <i class="fas fa-users"></i>
                         Ver Leads
                     </a>
                     
@@ -627,7 +627,7 @@ $userName = $user['full_name'] ?? 'Usuário';
                         </div>
                         <div style="text-align: right;">
                             <span style="background: ${statusColor}; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">
-                                ${lead.status || 'novo'}
+                                ${getStatusLabel(lead.status) || 'Novo'}
                             </span>
                             <br>
                             <small style="color: var(--muted-foreground); margin-top: 0.25rem; display: block;">
@@ -654,7 +654,7 @@ $userName = $user['full_name'] ?? 'Usuário';
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
                             <span style="width: 12px; height: 12px; background: ${statusColor}; border-radius: 50%; display: block;"></span>
-                            <span style="text-transform: capitalize;">${item.status || 'Não definido'}</span>
+                            <span>${getStatusLabel(item.status) || 'Não definido'}</span>
                         </div>
                         <strong style="color: var(--foreground);">${item.count}</strong>
                     </div>
@@ -697,16 +697,24 @@ $userName = $user['full_name'] ?? 'Usuário';
         
         function getStatusColor(status) {
             const colors = {
-                'novo': '#3b82f6',
-                'contatado': '#f59e0b',
-                'interessado': '#10b981',
-                'proposta_enviada': '#8b5cf6',
-                'negociacao': '#f97316',
-                'fechado': '#22c55e',
-                'perdido': '#ef4444',
-                'sem_interesse': '#6b7280'
+                'new': '#3b82f6',
+                'contacted': '#f59e0b',
+                'negotiating': '#f97316',
+                'converted': '#22c55e',
+                'lost': '#ef4444'
             };
             return colors[status?.toLowerCase()] || '#6b7280';
+        }
+        
+        function getStatusLabel(status) {
+            const labels = {
+                'new': 'Novo',
+                'contacted': 'Contatado',
+                'negotiating': 'Negociando',
+                'converted': 'Convertido',
+                'lost': 'Perdido'
+            };
+            return labels[status?.toLowerCase()] || status;
         }
 
         function showStatsError(message) {
