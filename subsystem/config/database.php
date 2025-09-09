@@ -4,6 +4,9 @@
  * Hype Consórcios
  */
 
+// Configurar timezone do PHP para Brasil
+date_default_timezone_set('America/Sao_Paulo');
+
 class Database {
     private $host = 'srv406.hstgr.io';
     private $db_name = 'u383946504_hypeconsorcio';
@@ -29,6 +32,9 @@ class Database {
             ];
 
             $this->conn = new PDO($dsn, $this->username, $this->password, $options);
+            
+            // Configurar fuso horário para -3 horas (Brasil)
+            $this->conn->exec("SET time_zone = '-03:00'");
             
         } catch(PDOException $e) {
             echo "Erro na conexão: " . $e->getMessage();

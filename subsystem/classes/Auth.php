@@ -24,9 +24,9 @@ class Auth {
             $stmt = $this->conn->prepare("
                 SELECT id, username, email, password_hash, full_name, role, status 
                 FROM users 
-                WHERE (username = :username OR email = :username) AND status = 'active'
+                WHERE (username = ? OR email = ?) AND status = 'active'
             ");
-            $stmt->execute(['username' => $username]);
+            $stmt->execute([$username, $username]);
             $user = $stmt->fetch();
             
             if (!$user || !password_verify($password, $user['password_hash'])) {

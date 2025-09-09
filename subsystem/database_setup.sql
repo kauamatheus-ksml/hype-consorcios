@@ -39,8 +39,8 @@ CREATE TABLE IF NOT EXISTS leads (
     priority ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'medium',
     notes TEXT,
     assigned_to INT NULL,
-    created_at TIMESTAMP DEFAULT (CURRENT_TIMESTAMP - INTERVAL 3 HOUR),
-    updated_at TIMESTAMP DEFAULT (CURRENT_TIMESTAMP - INTERVAL 3 HOUR) ON UPDATE (CURRENT_TIMESTAMP - INTERVAL 3 HOUR),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     contacted_at TIMESTAMP NULL,
     INDEX idx_name (name),
     INDEX idx_phone (phone),
@@ -68,9 +68,9 @@ CREATE TABLE IF NOT EXISTS sales (
     contract_number VARCHAR(50),
     notes TEXT,
     status ENUM('pending', 'confirmed', 'cancelled') DEFAULT 'pending',
-    sale_date TIMESTAMP DEFAULT (CURRENT_TIMESTAMP - INTERVAL 3 HOUR),
-    created_at TIMESTAMP DEFAULT (CURRENT_TIMESTAMP - INTERVAL 3 HOUR),
-    updated_at TIMESTAMP DEFAULT (CURRENT_TIMESTAMP - INTERVAL 3 HOUR) ON UPDATE (CURRENT_TIMESTAMP - INTERVAL 3 HOUR),
+    sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     created_by INT,
     INDEX idx_lead_id (lead_id),
     INDEX idx_seller_id (seller_id),
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS lead_interactions (
     description TEXT,
     result ENUM('positive', 'neutral', 'negative', 'no_answer') NULL,
     next_contact_date DATE NULL,
-    created_at TIMESTAMP DEFAULT (CURRENT_TIMESTAMP - INTERVAL 3 HOUR),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_lead_id (lead_id),
     INDEX idx_user_id (user_id),
     INDEX idx_interaction_type (interaction_type),
@@ -105,9 +105,9 @@ CREATE TABLE IF NOT EXISTS user_sessions (
     user_id INT NOT NULL,
     ip_address VARCHAR(45),
     user_agent TEXT,
-    created_at TIMESTAMP DEFAULT (CURRENT_TIMESTAMP - INTERVAL 3 HOUR),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP NOT NULL,
-    last_activity TIMESTAMP DEFAULT (CURRENT_TIMESTAMP - INTERVAL 3 HOUR),
+    last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_user_id (user_id),
     INDEX idx_expires_at (expires_at),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS system_settings (
     setting_key VARCHAR(50) UNIQUE NOT NULL,
     setting_value TEXT,
     description VARCHAR(200),
-    updated_at TIMESTAMP DEFAULT (CURRENT_TIMESTAMP - INTERVAL 3 HOUR) ON UPDATE (CURRENT_TIMESTAMP - INTERVAL 3 HOUR),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     updated_by INT,
     INDEX idx_setting_key (setting_key),
     FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
@@ -129,9 +129,9 @@ CREATE TABLE IF NOT EXISTS system_settings (
 -- DADOS INICIAIS
 -- ====================================
 
--- Usuário administrador padrão
+-- Usuário administrador padrão (senha: password)
 INSERT INTO users (username, email, password_hash, full_name, role, status) 
-VALUES ('admin', 'admin@hypeconsorcios.com.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Administrador', 'admin', 'active')
+VALUES ('admin', 'admin@hypeconsorcios.com.br', '$2y$10$8K1p/wjAZsCR4WOQfMVrdOb0SJmQOi5DPF.D6/VQVKhSFFLQOJFrm', 'Administrador', 'admin', 'active')
 ON DUPLICATE KEY UPDATE username = username;
 
 -- Configurações iniciais do sistema
