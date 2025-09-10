@@ -316,6 +316,11 @@ $userName = $user['full_name'] ?? 'Usuário';
         }
 
         /* Mobile Responsive */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -401,7 +406,7 @@ $userName = $user['full_name'] ?? 'Usuário';
                 
                 <?php if (in_array($userRole, ['admin', 'manager', 'seller'])): ?>
                 <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="loadSection('sales')">
+                    <a href="sales.php" class="nav-link">
                         <i class="fas fa-handshake nav-icon"></i>
                         Vendas
                     </a>
@@ -410,14 +415,14 @@ $userName = $user['full_name'] ?? 'Usuário';
                 
                 <?php if (in_array($userRole, ['admin', 'manager'])): ?>
                 <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="loadSection('reports')">
+                    <a href="#" class="nav-link" onclick="showComingSoon('Relatórios')">
                         <i class="fas fa-chart-bar nav-icon"></i>
                         Relatórios
                     </a>
                 </div>
                 
                 <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="loadSection('users')">
+                    <a href="#" class="nav-link" onclick="showComingSoon('Usuários')">
                         <i class="fas fa-user-cog nav-icon"></i>
                         Usuários
                     </a>
@@ -425,7 +430,7 @@ $userName = $user['full_name'] ?? 'Usuário';
                 <?php endif; ?>
 
                 <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="loadSection('profile')">
+                    <a href="#" class="nav-link" onclick="showComingSoon('Perfil')">
                         <i class="fas fa-user nav-icon"></i>
                         Perfil
                     </a>
@@ -510,19 +515,19 @@ $userName = $user['full_name'] ?? 'Usuário';
                     </a>
                     
                     <?php if (in_array($userRole, ['admin', 'manager', 'seller'])): ?>
-                    <a href="#" class="action-btn" onclick="loadSection('sales')">
+                    <a href="sales.php" class="action-btn">
                         <i class="fas fa-handshake"></i>
-                        Registrar Venda
+                        Gerenciar Vendas
                     </a>
                     <?php endif; ?>
                     
                     <?php if (in_array($userRole, ['admin', 'manager'])): ?>
-                    <a href="#" class="action-btn" onclick="loadSection('reports')">
+                    <a href="#" class="action-btn" onclick="showComingSoon('Relatórios')">
                         <i class="fas fa-chart-line"></i>
                         Ver Relatórios
                     </a>
                     
-                    <a href="#" class="action-btn" onclick="loadSection('users')">
+                    <a href="#" class="action-btn" onclick="showComingSoon('Usuários')">
                         <i class="fas fa-user-plus"></i>
                         Gerenciar Usuários
                     </a>
@@ -573,10 +578,16 @@ $userName = $user['full_name'] ?? 'Usuário';
         document.addEventListener('DOMContentLoaded', function() {
             loadDashboardStats();
             
+            // Auto-refresh stats every 5 minutes
+            setInterval(loadDashboardStats, 5 * 60 * 1000);
+            
             // Check mobile
             if (window.innerWidth <= 768) {
                 document.querySelector('.mobile-menu-btn').style.display = 'block';
             }
+            
+            // Add refresh button to dashboard
+            addRefreshButton();
         });
 
         async function loadDashboardStats() {
@@ -600,6 +611,9 @@ $userName = $user['full_name'] ?? 'Usuário';
                     updateLeadsByStatus(data.stats.leads_by_status || []);
                     updateTopSellers(data.stats.top_sellers || []);
                     
+                    // Atualizar horário da última atualização
+                    updateLastUpdateTime();
+                    
                     console.log('Estatísticas carregadas com sucesso!');
                 } else {
                     console.error('Erro na resposta:', data.message);
@@ -622,12 +636,24 @@ $userName = $user['full_name'] ?? 'Usuário';
                 const date = new Date(lead.created_at).toLocaleDateString('pt-BR');
                 const statusColor = getStatusColor(lead.status);
                 return `
-                    <div style="padding: 0.75rem 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="
+                        padding: 0.75rem 0; 
+                        border-bottom: 1px solid var(--border); 
+                        display: flex; 
+                        justify-content: space-between; 
+                        align-items: center;
+                        transition: background-color 0.2s ease;
+                        cursor: pointer;
+                        border-radius: 4px;
+                        margin: 0 -0.5rem;
+                        padding-left: 0.5rem;
+                        padding-right: 0.5rem;
+                    " onmouseover="this.style.backgroundColor='var(--muted)'" onmouseout="this.style.backgroundColor='transparent'" onclick="window.location.href='leads.php'">
                         <div>
-                            <strong style="color: var(--foreground);">${lead.lead_name || 'Nome não informado'}</strong>
+                            <strong style="color: var(--foreground);">${lead.lead_name || lead.name || 'Nome não informado'}</strong>
                             <br>
                             <small style="color: var(--muted-foreground);">
-                                ${lead.phone || 'Tel. não informado'} • ${lead.source || 'Origem não informada'}
+                                ${lead.phone || 'Tel. não informado'} • ${lead.source || lead.source_page || 'Origem não informada'}
                             </small>
                         </div>
                         <div style="text-align: right;">
@@ -643,7 +669,25 @@ $userName = $user['full_name'] ?? 'Usuário';
                 `;
             }).join('');
             
-            container.innerHTML = html;
+            // Adicionar link para ver todos os leads
+            const viewAllHtml = `
+                <div style="text-align: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                    <a href="leads.php" style="
+                        color: var(--primary);
+                        text-decoration: none;
+                        font-weight: 500;
+                        font-size: 0.875rem;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                    ">
+                        Ver todos os leads
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            `;
+            
+            container.innerHTML = html + viewAllHtml;
         }
         
         function updateLeadsByStatus(statusData) {
@@ -747,9 +791,165 @@ $userName = $user['full_name'] ?? 'Usuário';
             statsGrid.appendChild(errorDiv);
         }
 
-        function loadSection(section) {
-            // Placeholder para carregamento de seções
-            alert('Seção "' + section + '" em desenvolvimento');
+        function showComingSoon(sectionName) {
+            // Criar modal de "Em breve"
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    padding: 2rem;
+                    border-radius: 12px;
+                    text-align: center;
+                    max-width: 400px;
+                    margin: 1rem;
+                    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+                    animation: slideUp 0.3s ease;
+                ">
+                    <div style="
+                        width: 64px;
+                        height: 64px;
+                        background: linear-gradient(135deg, #3be1c9, #2dd4bf);
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0 auto 1.5rem;
+                        font-size: 2rem;
+                        color: white;
+                    ">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 style="
+                        margin: 0 0 1rem 0;
+                        color: var(--foreground);
+                        font-size: 1.5rem;
+                        font-weight: 600;
+                    ">Em Breve!</h3>
+                    <p style="
+                        margin: 0 0 2rem 0;
+                        color: var(--muted-foreground);
+                        line-height: 1.5;
+                    ">A seção "<strong>${sectionName}</strong>" está sendo desenvolvida e estará disponível em breve. Continue acompanhando as atualizações!</p>
+                    <button onclick="this.closest('[style*=position]').remove()" style="
+                        background: var(--primary);
+                        color: var(--primary-foreground);
+                        border: none;
+                        padding: 0.75rem 2rem;
+                        border-radius: 8px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                    " onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
+                        Entendi
+                    </button>
+                </div>
+            `;
+            
+            // Adicionar animações CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes slideUp {
+                    from { 
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to { 
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            document.body.appendChild(modal);
+            
+            // Fechar ao clicar fora
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                    style.remove();
+                }
+            });
+        }
+
+        function addRefreshButton() {
+            // Adicionar botão de atualização no header do dashboard
+            const dashboardHeader = document.querySelector('.dashboard-header');
+            
+            const refreshContainer = document.createElement('div');
+            refreshContainer.style.cssText = `
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-end;
+                margin-top: 1rem;
+            `;
+            
+            const lastUpdateDiv = document.createElement('div');
+            lastUpdateDiv.id = 'lastUpdate';
+            lastUpdateDiv.style.cssText = `
+                color: var(--muted-foreground);
+                font-size: 0.875rem;
+            `;
+            lastUpdateDiv.textContent = 'Última atualização: Carregando...';
+            
+            const refreshButton = document.createElement('button');
+            refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Atualizar';
+            refreshButton.style.cssText = `
+                background: var(--primary);
+                color: var(--primary-foreground);
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 6px;
+                font-size: 0.875rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            `;
+            
+            refreshButton.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                icon.style.animation = 'spin 1s linear infinite';
+                
+                loadDashboardStats().then(() => {
+                    icon.style.animation = '';
+                });
+            });
+            
+            refreshContainer.appendChild(lastUpdateDiv);
+            refreshContainer.appendChild(refreshButton);
+            dashboardHeader.appendChild(refreshContainer);
+        }
+
+        function updateLastUpdateTime() {
+            const lastUpdateDiv = document.getElementById('lastUpdate');
+            if (lastUpdateDiv) {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('pt-BR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                });
+                lastUpdateDiv.textContent = `Última atualização: ${timeString}`;
+            }
         }
 
         function toggleSidebar() {

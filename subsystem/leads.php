@@ -631,14 +631,14 @@ $userId = $user['id'] ?? null;
 
             <nav class="sidebar-nav">
                 <div class="nav-item">
-                    <a href="dashboard.php" class="nav-link">
+                    <a href="dashboard.php" class="nav-link active">
                         <i class="fas fa-home nav-icon"></i>
                         Dashboard
                     </a>
                 </div>
                 
                 <div class="nav-item">
-                    <a href="leads.php" class="nav-link active">
+                    <a href="leads.php" class="nav-link">
                         <i class="fas fa-users nav-icon"></i>
                         Leads
                     </a>
@@ -646,7 +646,7 @@ $userId = $user['id'] ?? null;
                 
                 <?php if (in_array($userRole, ['admin', 'manager', 'seller'])): ?>
                 <div class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="sales.php" class="nav-link">
                         <i class="fas fa-handshake nav-icon"></i>
                         Vendas
                     </a>
@@ -655,14 +655,14 @@ $userId = $user['id'] ?? null;
                 
                 <?php if (in_array($userRole, ['admin', 'manager'])): ?>
                 <div class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link" onclick="showComingSoon('Relatórios')">
                         <i class="fas fa-chart-bar nav-icon"></i>
                         Relatórios
                     </a>
                 </div>
                 
                 <div class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link" onclick="showComingSoon('Usuários')">
                         <i class="fas fa-user-cog nav-icon"></i>
                         Usuários
                     </a>
@@ -670,7 +670,7 @@ $userId = $user['id'] ?? null;
                 <?php endif; ?>
 
                 <div class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link" onclick="showComingSoon('Perfil')">
                         <i class="fas fa-user nav-icon"></i>
                         Perfil
                     </a>
