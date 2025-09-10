@@ -508,6 +508,29 @@ $userId = $user['id'] ?? null;
             to { transform: rotate(360deg); }
         }
 
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Status badges inline */
+        .status-new { background-color: #dbeafe; color: #1d4ed8; }
+        .status-contacted { background-color: #fef3c7; color: #d97706; }
+        .status-negotiating { background-color: #fed7d7; color: #c53030; }
+        .status-converted { background-color: #d1fae5; color: #065f46; }
+        .status-lost { background-color: #f3f4f6; color: #6b7280; }
+
+        .priority-low { background-color: #f3f4f6; color: #6b7280; }
+        .priority-medium { background-color: #fef3c7; color: #d97706; }
+        .priority-high { background-color: #fed7d7; color: #c53030; }
+        .priority-urgent { background-color: #fee2e2; color: #991b1b; }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .sidebar {
@@ -1095,6 +1118,16 @@ $userId = $user['id'] ?? null;
             loadLeads();
             loadStats();
             
+            // Add debug info to console after initialization
+            setTimeout(() => {
+                console.log('=== DEBUG INFO ===');
+                console.log('Para testar o modal, digite no console:');
+                console.log('debugTest() - Teste completo');
+                console.log('debugModal() - Teste apenas do modal');
+                console.log('window.viewLead(4) - Teste com um ID específico');
+                console.log('==================');
+            }, 3000);
+            
             // Initialize table event delegation early
             addTableEventDelegation();
             
@@ -1186,11 +1219,19 @@ $userId = $user['id'] ?? null;
                     switch (title) {
                         case 'Ver detalhes':
                             console.log('Calling viewLead from delegation');
-                            viewLead(leadId);
+                            if (typeof window.viewLead === 'function') {
+                                window.viewLead(leadId);
+                            } else {
+                                console.error('window.viewLead not found');
+                            }
                             break;
                         case 'Editar':
                             console.log('Calling editLead from delegation');
-                            editLead(leadId);
+                            if (typeof window.editLead === 'function') {
+                                window.editLead(leadId);
+                            } else {
+                                console.error('window.editLead not found');
+                            }
                             break;
                         case 'WhatsApp':
                             console.log('Calling openWhatsApp from delegation');
@@ -1335,7 +1376,7 @@ $userId = $user['id'] ?? null;
             }
 
             const html = leads.map(lead => `
-                <tr>
+                <tr data-lead-id="${lead.id}">
                     <td>
                         <div style="font-weight: 600; color: var(--foreground);">${lead.name}</div>
                         ${lead.assigned_to_name ? `<small style="color: var(--muted-foreground);">Atribuído: ${lead.assigned_to_name}</small>` : ''}
@@ -1509,6 +1550,67 @@ $userId = $user['id'] ?? null;
             window.open(url, '_blank');
         }
 
+        // Quick test function - call debugTest() from console
+        window.debugTest = function() {
+            console.log('=== QUICK DEBUG TEST ===');
+            
+            // Test 1: Check if functions exist
+            console.log('window.viewLead exists:', typeof window.viewLead);
+            console.log('window.editLead exists:', typeof window.editLead);
+            console.log('window.debugModal exists:', typeof window.debugModal);
+            
+            // Test 2: Check modal elements
+            const modal = document.getElementById('leadDetailsModal');
+            const content = document.getElementById('leadDetailsContent');
+            console.log('Modal exists:', !!modal);
+            console.log('Content exists:', !!content);
+            
+            // Test 3: Check if leads are loaded
+            const leadsTable = document.querySelector('#leadsTableBody');
+            const tableRows = leadsTable ? leadsTable.querySelectorAll('tr') : [];
+            console.log('Leads table body exists:', !!leadsTable);
+            console.log('Table rows found:', tableRows.length);
+            
+            // Test 4: Find view buttons
+            const viewButtons = document.querySelectorAll('.btn-sm[title="Ver detalhes"]');
+            const allButtons = document.querySelectorAll('.btn-sm');
+            console.log('View buttons found:', viewButtons.length);
+            console.log('All .btn-sm buttons found:', allButtons.length);
+            
+            // Test 5: Show button details if any exist
+            if (allButtons.length > 0) {
+                console.log('Button details:');
+                allButtons.forEach((btn, idx) => {
+                    console.log(`  Button ${idx}: title="${btn.title}", data-lead-id="${btn.getAttribute('data-lead-id')}"`);
+                });
+            }
+            
+            // Test 6: Get first lead ID if available
+            const firstButton = viewButtons[0];
+            if (firstButton) {
+                const leadId = firstButton.getAttribute('data-lead-id');
+                console.log('First button lead ID:', leadId);
+                
+                // Test 7: Try to call viewLead with first ID
+                if (leadId) {
+                    console.log('Testing viewLead with first lead ID...');
+                    window.viewLead(leadId);
+                }
+            } else if (allButtons.length > 0) {
+                // Try with any button that has a lead ID
+                const buttonWithId = Array.from(allButtons).find(btn => btn.getAttribute('data-lead-id'));
+                if (buttonWithId) {
+                    const leadId = buttonWithId.getAttribute('data-lead-id');
+                    console.log('Testing viewLead with any available ID:', leadId);
+                    window.viewLead(leadId);
+                }
+            } else {
+                console.log('No buttons found - leads may not be loaded yet. Try running debugTest() again in a few seconds.');
+            }
+            
+            console.log('=== END QUICK TEST ===');
+        };
+
         // Debug function to test modal elements
         window.debugModal = function() {
             console.log('=== MODAL DEBUG ===');
@@ -1565,54 +1667,81 @@ $userId = $user['id'] ?? null;
             console.log('viewLead called with ID:', id);
             
             try {
-                // Check if modal exists
-                const modal = document.getElementById('leadDetailsModal');
-                const content = document.getElementById('leadDetailsContent');
-                
-                console.log('Modal element found:', !!modal);
-                console.log('Content element found:', !!content);
-                
-                if (!modal || !content) {
-                    console.error('Modal elements not found!');
-                    console.log('Available elements with "modal" in ID:', 
-                        Array.from(document.querySelectorAll('[id*="modal"]')).map(el => el.id)
-                    );
-                    throw new Error('Modal elements not found');
+                // Remove any existing detail rows first
+                const existingDetailRow = document.querySelector(`#leadDetails-${id}`);
+                if (existingDetailRow) {
+                    existingDetailRow.remove();
+                    return; // Toggle off if already open
                 }
                 
-                console.log('Setting modal display to flex...');
-                modal.style.display = 'flex';
+                // Remove any other open detail rows
+                const allDetailRows = document.querySelectorAll('[id^="leadDetails-"]');
+                allDetailRows.forEach(row => row.remove());
                 
-                console.log('Modal display after setting:', modal.style.display);
-                console.log('Modal is visible:', modal.offsetWidth > 0 && modal.offsetHeight > 0);
+                // Find the lead row
+                const leadRow = document.querySelector(`tr[data-lead-id="${id}"]`);
+                if (!leadRow) {
+                    throw new Error('Lead row not found');
+                }
                 
-                content.innerHTML = `
-                    <div class="loading" style="background: white; padding: 2rem; border-radius: 8px; text-align: center;">
-                        <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #3be1c9; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
-                        <p>Carregando detalhes...</p>
-                    </div>
+                console.log('Found lead row, inserting details...');
+                
+                // Create details row
+                const detailsRow = document.createElement('tr');
+                detailsRow.id = `leadDetails-${id}`;
+                detailsRow.innerHTML = `
+                    <td colspan="8" style="background: #f8fafc; border: none; padding: 0;">
+                        <div class="lead-details-container" style="padding: 1.5rem; animation: slideDown 0.3s ease;">
+                            <div class="loading-inline" style="text-align: center; padding: 2rem;">
+                                <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #3be1c9; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+                                <p style="color: #6b7280;">Carregando detalhes do lead...</p>
+                            </div>
+                        </div>
+                    </td>
                 `;
-
+                
+                // Insert after the lead row
+                leadRow.parentNode.insertBefore(detailsRow, leadRow.nextSibling);
+                
                 // Fetch lead details
+                console.log('Fetching lead details from API...');
                 const response = await fetch(`api/leads.php?action=details&id=${id}`);
+                console.log('API response status:', response.status);
+                
                 const data = await response.json();
+                console.log('API response data:', data);
 
                 if (data.success) {
-                    renderLeadDetails(data);
+                    console.log('Lead data received, rendering inline details...');
+                    renderInlineLeadDetails(data, detailsRow);
+                    console.log('=== viewLead SUCCESS ===');
                 } else {
+                    console.error('API returned error:', data.message);
                     throw new Error(data.message || 'Erro ao carregar detalhes');
                 }
             } catch (error) {
-                console.error('Erro ao visualizar lead:', error);
-                document.getElementById('leadDetailsContent').innerHTML = `
-                    <div style="text-align: center; color: #dc2626; padding: 2rem;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                        <p>Erro ao carregar detalhes: ${error.message}</p>
-                        <button class="btn btn-primary" onclick="viewLead(${id})" style="margin-top: 1rem;">
-                            Tentar Novamente
-                        </button>
-                    </div>
-                `;
+                console.error('=== viewLead ERROR ===');
+                console.error('Error details:', error);
+                
+                // Show error in inline format
+                const leadRow = document.querySelector(`tr[data-lead-id="${id}"]`);
+                if (leadRow) {
+                    const errorRow = document.createElement('tr');
+                    errorRow.id = `leadDetails-${id}`;
+                    errorRow.innerHTML = `
+                        <td colspan="8" style="background: #fef2f2; border: none; padding: 0;">
+                            <div style="padding: 1.5rem; text-align: center; color: #dc2626;">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                                <h4 style="margin: 0.5rem 0;">Erro ao carregar detalhes</h4>
+                                <p style="margin: 0.5rem 0;">${error.message}</p>
+                                <button onclick="window.viewLead(${id})" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #3be1c9; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                    Tentar Novamente
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    leadRow.parentNode.insertBefore(errorRow, leadRow.nextSibling);
+                }
             }
         }
 
@@ -1633,6 +1762,124 @@ $userId = $user['id'] ?? null;
                 console.error('Erro ao carregar lead para edição:', error);
                 alert('Erro ao carregar dados do lead: ' + error.message);
             }
+        }
+
+        function renderInlineLeadDetails(data, detailsRow) {
+            const { lead, interactions, sales } = data;
+            
+            const detailsContainer = detailsRow.querySelector('.lead-details-container');
+            detailsContainer.innerHTML = `
+                <div class="inline-lead-details" style="background: white; border-radius: 8px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                    <!-- Header -->
+                    <div style="padding: 1.5rem; border-bottom: 1px solid #e5e7eb; background: #f9fafb; border-radius: 8px 8px 0 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3 style="margin: 0 0 0.5rem 0; color: var(--foreground); font-size: 1.25rem;">
+                                    ${lead.name}
+                                </h3>
+                                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                    <span class="status-badge status-${lead.status}" style="padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 500;">
+                                        ${getStatusLabel(lead.status)}
+                                    </span>
+                                    <span class="priority-badge priority-${lead.priority}" style="padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 500;">
+                                        ${getPriorityLabel(lead.priority)}
+                                    </span>
+                                </div>
+                            </div>
+                            <button onclick="window.viewLead(${lead.id})" style="background: #f3f4f6; border: 1px solid #d1d5db; padding: 0.5rem; border-radius: 4px; cursor: pointer; color: #6b7280;" title="Fechar detalhes">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Content Grid -->
+                    <div style="padding: 1.5rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                            <!-- Informações Básicas -->
+                            <div>
+                                <h4 style="margin: 0 0 1rem 0; color: var(--primary); font-size: 1rem;">Informações de Contato</h4>
+                                <div style="space-y: 0.75rem;">
+                                    <div style="margin-bottom: 0.75rem;">
+                                        <strong style="color: var(--muted-foreground); font-size: 0.875rem;">Telefone:</strong>
+                                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                            <span>${lead.phone || 'Não informado'}</span>
+                                            ${lead.phone ? `<a href="https://api.whatsapp.com/send/?phone=55${lead.phone.replace(/\D/g, '')}" target="_blank" style="color: #25d366; text-decoration: none;" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>` : ''}
+                                        </div>
+                                    </div>
+                                    <div style="margin-bottom: 0.75rem;">
+                                        <strong style="color: var(--muted-foreground); font-size: 0.875rem;">Email:</strong>
+                                        <div>${lead.email || 'Não informado'}</div>
+                                    </div>
+                                    <div style="margin-bottom: 0.75rem;">
+                                        <strong style="color: var(--muted-foreground); font-size: 0.875rem;">Origem:</strong>
+                                        <div>${lead.source_page || 'Não informado'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Interesse -->
+                            <div>
+                                <h4 style="margin: 0 0 1rem 0; color: var(--primary); font-size: 1rem;">Interesse</h4>
+                                <div style="space-y: 0.75rem;">
+                                    <div style="margin-bottom: 0.75rem;">
+                                        <strong style="color: var(--muted-foreground); font-size: 0.875rem;">Veículo:</strong>
+                                        <div>${lead.vehicle_interest || 'Não especificado'}</div>
+                                    </div>
+                                    <div style="margin-bottom: 0.75rem;">
+                                        <strong style="color: var(--muted-foreground); font-size: 0.875rem;">Possui entrada:</strong>
+                                        <div>${lead.has_down_payment === 'yes' ? 'Sim' : 'Não'}</div>
+                                    </div>
+                                    ${lead.down_payment_value ? `
+                                    <div style="margin-bottom: 0.75rem;">
+                                        <strong style="color: var(--muted-foreground); font-size: 0.875rem;">Valor da entrada:</strong>
+                                        <div>R$ ${parseFloat(lead.down_payment_value || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${lead.notes ? `
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="margin: 0 0 0.75rem 0; color: var(--primary); font-size: 1rem;">Observações</h4>
+                            <div style="background: #f9fafb; padding: 1rem; border-radius: 6px; border: 1px solid #e5e7eb;">
+                                ${lead.notes}
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <!-- Histórico de Interações -->
+                        ${interactions && interactions.length > 0 ? `
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="margin: 0 0 1rem 0; color: var(--primary); font-size: 1rem;">Histórico de Interações (${interactions.length})</h4>
+                            <div style="max-height: 200px; overflow-y: auto;">
+                                ${interactions.map(interaction => `
+                                    <div style="border: 1px solid #e5e7eb; border-radius: 6px; padding: 1rem; margin-bottom: 0.5rem; background: white;">
+                                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                            <span style="font-weight: 500; color: var(--foreground);">${interaction.user_name || 'Sistema'}</span>
+                                            <span style="font-size: 0.75rem; color: var(--muted-foreground);">${formatDate(interaction.created_at)}</span>
+                                        </div>
+                                        <div style="font-size: 0.875rem; color: var(--muted-foreground);">
+                                            ${interaction.description}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <!-- Informações do Sistema -->
+                        <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; font-size: 0.75rem; color: var(--muted-foreground);">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div>Criado em: ${formatDate(lead.created_at)}</div>
+                                <div>Atualizado em: ${formatDate(lead.updated_at)}</div>
+                                ${lead.assigned_to_name ? `<div>Atribuído para: ${lead.assigned_to_name}</div>` : ''}
+                                ${lead.ip_address ? `<div>IP: ${lead.ip_address}</div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function renderLeadDetails(data) {
