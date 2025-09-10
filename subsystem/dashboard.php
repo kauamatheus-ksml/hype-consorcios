@@ -42,7 +42,7 @@ $userName = $user['full_name'] ?? 'Usuário';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Hype Consórcios CRM</title>
+    <title>Dashboard - Hype Consórcios</title>
     <link rel="icon" type="image/x-icon" href="../assets/images/logo.ico">
     
     <!-- Styles -->
@@ -92,13 +92,18 @@ $userName = $user['full_name'] ?? 'Usuário';
         .sidebar-logo-icon {
             width: 40px;
             height: 40px;
-            background: var(--gradient-primary);
+            background: #242328;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.25rem;
-            color: var(--primary-foreground);
+            padding: 6px;
+        }
+
+        .sidebar-logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .sidebar-title {
@@ -373,9 +378,9 @@ $userName = $user['full_name'] ?? 'Usuário';
             <div class="sidebar-header">
                 <div class="sidebar-logo">
                     <div class="sidebar-logo-icon">
-                        <i class="fas fa-chart-line"></i>
+                        <img src="../assets/images/logo.png" alt="Hype Consórcios Logo">
                     </div>
-                    <h1 class="sidebar-title">CRM Hype</h1>
+                    <h1 class="sidebar-title">Hype Consórcios</h1>
                 </div>
             </div>
 

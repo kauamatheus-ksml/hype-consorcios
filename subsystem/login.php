@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Hype Consórcios CRM</title>
+    <title>Sistema - Hype Consórcios</title>
     <link rel="icon" type="image/x-icon" href="../assets/images/logo.ico">
     
     <!-- Styles -->
@@ -17,7 +17,7 @@
     
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, #242328 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -41,16 +41,22 @@
         }
 
         .login-logo {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             margin: 0 auto 1rem;
-            background: linear-gradient(135deg, #3be1c9 0%, #3be1c9 100%);
-            border-radius: 50%;
+            background: #242328;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
-            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .login-logo img {
+            width: 80px;
+            height: auto;
+            max-height: 80px;
+            object-fit: contain;
         }
 
         .login-title {
@@ -116,7 +122,7 @@
         .btn-login {
             width: 100%;
             padding: 0.875rem;
-            background: var(--gradient-primary);
+            background: var(--primary);
             border: none;
             border-radius: 8px;
             color: var(--primary-foreground);
@@ -200,10 +206,10 @@
     <div class="login-container">
         <div class="login-header">
             <div class="login-logo">
-                <i class="fas fa-user-shield"></i>
+                <img src="../assets/images/logo.png" alt="Hype Consórcios Logo">
             </div>
-            <h1 class="login-title">Acesso ao Sistema</h1>
-            <p class="login-subtitle">Faça login para acessar o CRM</p>
+            <h1 class="login-title">Hype Consórcios</h1>
+            <p class="login-subtitle">Sistema de Gerenciamento</p>
         </div>
 
         <div id="alertContainer"></div>

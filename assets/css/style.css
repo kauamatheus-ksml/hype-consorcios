@@ -1101,6 +1101,21 @@ body {
     font-weight: 500;
 }
 
+.badge-link {
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.badge-link:hover {
+    background: rgba(37, 99, 235, 0.2);
+    transform: translateY(-1px);
+}
+
+.badge-link i {
+    margin-right: 0.25rem;
+    font-size: 0.7rem;
+}
+
 @media (min-width: 768px) {
     .footer-content {
         grid-template-columns: repeat(2, 1fr);

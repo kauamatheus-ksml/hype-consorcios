@@ -44,7 +44,7 @@ $userId = $user['id'] ?? null;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leads - Hype Consórcios CRM</title>
+    <title>Leads - Hype Consórcios</title>
     <link rel="icon" type="image/x-icon" href="../assets/images/logo.ico">
     
     <!-- Styles -->
@@ -94,13 +94,18 @@ $userId = $user['id'] ?? null;
         .sidebar-logo-icon {
             width: 40px;
             height: 40px;
-            background: var(--gradient-primary);
+            background: #242328;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.25rem;
-            color: var(--primary-foreground);
+            padding: 6px;
+        }
+
+        .sidebar-logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .sidebar-title {
@@ -572,9 +577,9 @@ $userId = $user['id'] ?? null;
             <div class="sidebar-header">
                 <div class="sidebar-logo">
                     <div class="sidebar-logo-icon">
-                        <i class="fas fa-chart-line"></i>
+                        <img src="../assets/images/logo.png" alt="Hype Consórcios Logo">
                     </div>
-                    <h1 class="sidebar-title">CRM Hype</h1>
+                    <h1 class="sidebar-title">Hype Consórcios</h1>
                 </div>
             </div>
 
@@ -1085,8 +1090,13 @@ $userId = $user['id'] ?? null;
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing page...');
+            
             loadLeads();
             loadStats();
+            
+            // Initialize table event delegation early
+            addTableEventDelegation();
             
             // Check mobile
             if (window.innerWidth <= 768) {
@@ -1144,18 +1154,110 @@ $userId = $user['id'] ?? null;
             }
         }
 
+        function addTableEventDelegation() {
+            const tbody = document.getElementById('leadsTableBody');
+            if (!tbody) return;
+            
+            // Remove existing delegation listeners to avoid duplicates
+            const existingHandler = tbody._eventHandler;
+            if (existingHandler) {
+                tbody.removeEventListener('click', existingHandler);
+            }
+            
+            // Create new event handler
+            const eventHandler = (e) => {
+                const button = e.target.closest('.btn-sm');
+                if (!button) return;
+                
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const leadId = button.getAttribute('data-lead-id');
+                const title = button.getAttribute('title');
+                
+                console.log('Table delegation - button clicked:', { leadId, title, button });
+                
+                if (!leadId) {
+                    console.error('No lead ID found on button');
+                    return;
+                }
+                
+                try {
+                    switch (title) {
+                        case 'Ver detalhes':
+                            console.log('Calling viewLead from delegation');
+                            viewLead(leadId);
+                            break;
+                        case 'Editar':
+                            console.log('Calling editLead from delegation');
+                            editLead(leadId);
+                            break;
+                        case 'WhatsApp':
+                            console.log('Calling openWhatsApp from delegation');
+                            const phone = button.getAttribute('data-phone');
+                            const name = button.getAttribute('data-name');
+                            if (phone && name) {
+                                openWhatsApp(phone, name, leadId);
+                            }
+                            break;
+                        default:
+                            console.log('Unknown button title:', title);
+                    }
+                } catch (error) {
+                    console.error('Error in table delegation:', error);
+                }
+            };
+            
+            // Add event listener and store reference
+            tbody.addEventListener('click', eventHandler);
+            tbody._eventHandler = eventHandler;
+            
+            console.log('Table event delegation added');
+            
+            // Debug: check if functions are available
+            console.log('Functions available:', {
+                viewLead: typeof window.viewLead,
+                editLead: typeof window.editLead,
+                openWhatsApp: typeof window.openWhatsApp
+            });
+        }
+
         function addActionButtonListeners() {
             // Event listeners para botões de visualização
             const viewButtons = document.querySelectorAll('.btn-sm[title="Ver detalhes"]');
             console.log('Found view buttons:', viewButtons.length);
             
-            viewButtons.forEach(btn => {
+            viewButtons.forEach((btn, index) => {
+                console.log(`Adding listener to view button ${index}:`, btn);
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     const leadId = btn.getAttribute('data-lead-id');
                     console.log('View button clicked, lead ID:', leadId);
+                    console.log('Button element:', btn);
                     if (leadId) {
-                        viewLead(leadId);
+                        // Prevent multiple calls
+                        if (btn.disabled) return;
+                        btn.disabled = true;
+                        
+                        try {
+                            if (typeof window.viewLead === 'function') {
+                                window.viewLead(leadId).finally(() => {
+                                    // Re-enable button after operation
+                                    setTimeout(() => {
+                                        btn.disabled = false;
+                                    }, 1000);
+                                });
+                            } else {
+                                console.error('viewLead function not found');
+                                btn.disabled = false;
+                            }
+                        } catch (error) {
+                            console.error('Error calling viewLead:', error);
+                            btn.disabled = false;
+                        }
+                    } else {
+                        console.error('No lead ID found on button');
                     }
                 });
             });
@@ -1164,13 +1266,37 @@ $userId = $user['id'] ?? null;
             const editButtons = document.querySelectorAll('.btn-sm[title="Editar"]');
             console.log('Found edit buttons:', editButtons.length);
             
-            editButtons.forEach(btn => {
+            editButtons.forEach((btn, index) => {
+                console.log(`Adding listener to edit button ${index}:`, btn);
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     const leadId = btn.getAttribute('data-lead-id');
                     console.log('Edit button clicked, lead ID:', leadId);
+                    console.log('Button element:', btn);
                     if (leadId) {
-                        editLead(leadId);
+                        // Prevent multiple calls
+                        if (btn.disabled) return;
+                        btn.disabled = true;
+                        
+                        try {
+                            if (typeof window.editLead === 'function') {
+                                window.editLead(leadId).finally(() => {
+                                    // Re-enable button after operation
+                                    setTimeout(() => {
+                                        btn.disabled = false;
+                                    }, 1000);
+                                });
+                            } else {
+                                console.error('editLead function not found');
+                                btn.disabled = false;
+                            }
+                        } catch (error) {
+                            console.error('Error calling editLead:', error);
+                            btn.disabled = false;
+                        }
+                    } else {
+                        console.error('No lead ID found on button');
                     }
                 });
             });
@@ -1259,6 +1385,9 @@ $userId = $user['id'] ?? null;
             setTimeout(() => {
                 addActionButtonListeners();
             }, 100);
+            
+            // Adicionar event delegation como backup
+            addTableEventDelegation();
         }
 
         function renderPagination(pagination) {
@@ -1372,7 +1501,7 @@ $userId = $user['id'] ?? null;
             return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         }
 
-        function openWhatsApp(phone, name, id) {
+        window.openWhatsApp = function(phone, name, id) {
             console.log('openWhatsApp called:', { phone, name, id });
             const cleanPhone = phone.replace(/\D/g, '');
             const message = `Olá ${name}, aqui é da Hype Consórcios. Estamos entrando em contato sobre seu interesse em consórcio de veículos.`;
@@ -1380,12 +1509,24 @@ $userId = $user['id'] ?? null;
             window.open(url, '_blank');
         }
 
-        async function viewLead(id) {
+        // Make functions globally available for debugging
+        window.viewLead = async function(id) {
             console.log('viewLead called:', id);
             try {
+                // Check if modal exists
+                const modal = document.getElementById('leadDetailsModal');
+                const content = document.getElementById('leadDetailsContent');
+                
+                console.log('Modal element:', modal);
+                console.log('Content element:', content);
+                
+                if (!modal || !content) {
+                    throw new Error('Modal elements not found');
+                }
+                
                 // Open modal
-                document.getElementById('leadDetailsModal').style.display = 'flex';
-                document.getElementById('leadDetailsContent').innerHTML = `
+                modal.style.display = 'flex';
+                content.innerHTML = `
                     <div class="loading">
                         <div class="spinner"></div>
                         <p>Carregando detalhes...</p>
@@ -1415,7 +1556,7 @@ $userId = $user['id'] ?? null;
             }
         }
 
-        async function editLead(id) {
+        window.editLead = async function(id) {
             console.log('editLead called:', id);
             try {
                 // Fetch lead data first

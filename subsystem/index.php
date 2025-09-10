@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM Hype Consórcios</title>
+    <title>Sistema - Hype Consórcios</title>
     <link rel="icon" type="image/x-icon" href="../assets/images/logo.ico">
     
     <!-- Styles -->
@@ -17,7 +17,7 @@
     
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, #242328 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -42,16 +42,22 @@
         }
 
         .crm-logo {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             margin: 0 auto 1.5rem;
-            background: linear-gradient(135deg, #3be1c9 0%, #3be1c9 100%);
-            border-radius: 50%;
+            background: white;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
-            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 20px;
+        }
+
+        .crm-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .crm-title {
@@ -195,9 +201,9 @@
     <div class="crm-container">
         <div class="crm-header">
             <div class="crm-logo">
-                <i class="fas fa-chart-line"></i>
+                <img src="../assets/images/logo.png" alt="Hype Consórcios Logo">
             </div>
-            <h1 class="crm-title">CRM Hype Consórcios</h1>
+            <h1 class="crm-title">Hype Consórcios</h1>
             <p class="crm-subtitle">Sistema de Gestão de Leads e Vendas</p>
         </div>
 

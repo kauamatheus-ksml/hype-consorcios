@@ -394,6 +394,9 @@
                     <div class="footer-badges">
                         <span class="badge">Parceiro Autorizado VW</span>
                         <span class="badge">CNPJ: 53.170.406/0001-89</span>
+                        <a href="subsystem/login.php" class="badge badge-link" title="Acesso ao Sistema">
+                            <i class="fas fa-cog"></i> Sistema
+                        </a>
                     </div>
                 </div>
             </div>
