@@ -1,0 +1,55 @@
+# Robots.txt para Hype Consórcios - Consórcio de Veículos Jaraguá do Sul
+# hypeconsorcios.com.br
+
+User-agent: *
+Allow: /
+Allow: /assets/
+Allow: /leves.php
+Allow: /premio.php  
+Allow: /pesados.php
+Allow: /sitemap.xml
+
+# Proteger área administrativa
+Disallow: /subsystem/
+Disallow: /subsystem/api/
+Disallow: /subsystem/config/
+Disallow: /subsystem/classes/
+Disallow: /admin/
+Disallow: /backup/
+
+# Permitir acesso às imagens para SEO
+Allow: /assets/images/
+Allow: /assets/css/
+Allow: /assets/js/
+
+# Sitemap
+Sitemap: https://hypeconsorcios.com.br/sitemap.xml
+
+# Crawl-delay para bots mais agressivos
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: MJ12bot
+Crawl-delay: 10
+
+User-agent: DotBot
+Crawl-delay: 10
+
+# Google bots - permissão total
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /assets/images/
+
+# Bing
+User-agent: Bingbot
+Allow: /
+
+# Facebook
+User-agent: facebookexternalhit
+Allow: /
+
+# Twitter
+User-agent: Twitterbot
+Allow: /

@@ -184,12 +184,12 @@
             <div class="footer-content">
                 <!-- Company Info -->
                 <div class="footer-section">
-                    <div class="footer-logo">
-                        <div class="logo-text">
-                            <div class="company-name gradient-text">Hype</div>
-                            <div class="subtitle">Consórcios</div>
-                        </div>
-                    </div>
+                    <div class="logo">
+                            <img src="assets/images/logo.png" alt="Hype Consórcios Logo">
+                            <div class="logo-text">
+                                
+                            </div>
+                        </div> <br>
                     <p class="footer-description">
                         Hype Consórcios E Investimentos Ltda oferece as melhores condições 
                         para você realizar o sonho do veículo novo.
