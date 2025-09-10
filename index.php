@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consórcio de Veículos Jaraguá do Sul SC - Hype Consórcios | Melhores Condições</title>
-    <meta name="description" content="🚗 Consórcio de veículos em Jaraguá do Sul SC - Sem juros, sem entrada! Volkswagen, carros leves, premium e pesados. Parceiro Embracon. Simule grátis hoje!">
-    <meta name="keywords" content="consórcio veículos Jaraguá do Sul, consórcio carros Jaraguá do Sul SC, consórcio volkswagen jaraguá do sul, consórcio sem juros jaraguá do sul, embracon jaraguá do sul, carta contemplada jaraguá do sul">
+    <title>Hype Consórcios - Você tem sonhos nós temos a chave</title>
+    <meta name="description" content="Realize o sonho do carro novo com o Consórcio Volkswagen. Parceiro autorizado com as melhores condições e 40+ anos de tradição. Simule agora!">
+    <meta name="keywords" content="consórcio de veículos, consórcio volkswagen, consórcio carros, consórcio sem juros, embracon, carta contemplada, consórcio leves premium pesados">
     <link rel="canonical" href="https://hypeconsorcios.com.br/">
     <link rel="icon" type="image/x-icon" href="assets/images/logo.ico">
 
@@ -18,8 +18,8 @@
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 
     <!-- Open Graph - SEO Social -->
-    <meta property="og:title" content="Consórcio de Veículos Jaraguá do Sul SC - Hype Consórcios">
-    <meta property="og:description" content="🚗 Consórcio de veículos em Jaraguá do Sul SC - Sem juros, sem entrada! Volkswagen, carros leves, premium e pesados. Parceiro Embracon. Simule grátis!">
+    <meta property="og:title" content="Hype Consórcios - Você tem sonhos nós temos a chave">
+    <meta property="og:description" content="Realize o sonho do carro novo com o Consórcio Volkswagen. Parceiro autorizado com as melhores condições e 40+ anos de tradição.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://hypeconsorcios.com.br/">
     <meta property="og:image" content="https://hypeconsorcios.com.br/assets/images/consorcio-jaragua-do-sul-og.jpg">
@@ -31,8 +31,8 @@
     
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Consórcio de Veículos Jaraguá do Sul SC - Hype Consórcios">
-    <meta name="twitter:description" content="🚗 Consórcio de veículos em Jaraguá do Sul SC - Sem juros, sem entrada! Volkswagen, carros leves, premium e pesados. Parceiro Embracon.">
+    <meta name="twitter:title" content="Hype Consórcios - Você tem sonhos nós temos a chave">
+    <meta name="twitter:description" content="Realize o sonho do carro novo com o Consórcio Volkswagen. Parceiro autorizado com as melhores condições e 40+ anos de tradição.">
     <meta name="twitter:image" content="https://hypeconsorcios.com.br/assets/images/consorcio-jaragua-do-sul-og.jpg">
 
     <!-- Schema.org LocalBusiness - Dados Estruturados -->
@@ -43,7 +43,7 @@
         "@id": "https://hypeconsorcios.com.br/#organization",
         "name": "Hype Consórcios E Investimentos Ltda",
         "alternateName": "Hype Consórcios",
-        "description": "Consórcio de veículos em Jaraguá do Sul SC. Parceiro autorizado Volkswagen e Embracon. Sem juros, sem entrada. Carros leves, premium e pesados.",
+        "description": "Hype Consórcios - Parceiro autorizado Volkswagen e Embracon. Sem juros, sem entrada. Carros leves, premium e pesados. Realizando sonhos há mais de 15 anos.",
         "url": "https://hypeconsorcios.com.br/",
         "telephone": "+55 47 99686-2997",
         "priceRange": "$$",
@@ -131,10 +131,10 @@
         "mainEntity": [
             {
                 "@type": "Question",
-                "name": "Como funciona o consórcio de veículos em Jaraguá do Sul?",
+                "name": "Como funciona o consórcio de veículos?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "O consórcio é um sistema de autofinanciamento onde um grupo de pessoas se une para adquirir bens. Mensalmente, cada participante paga uma parcela e alguns são contemplados por sorteio ou lance. Em Jaraguá do Sul, trabalhamos com o Consórcio Volkswagen administrado pela Embracon."
+                    "text": "O consórcio é um sistema de autofinanciamento onde um grupo de pessoas se une para adquirir bens. Mensalmente, cada participante paga uma parcela e alguns são contemplados por sorteio ou lance."
                 }
             },
             {
@@ -142,7 +142,7 @@
                 "name": "Quais são as vantagens do consórcio de veículos?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "As principais vantagens são: sem juros, parcelas menores, sem consulta ao SPC/Serasa, possibilidade de usar FGTS, e você pode ser contemplado a qualquer momento. Ideal para quem busca consórcio em Jaraguá do Sul SC."
+                    "text": "As principais vantagens são: sem juros, parcelas menores, sem consulta ao SPC/Serasa, possibilidade de usar FGTS, e você pode ser contemplado a qualquer momento."
                 }
             },
             {
@@ -150,7 +150,7 @@
                 "name": "Posso usar o FGTS para pagamento do consórcio?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Sim! Você pode usar o FGTS tanto para dar lance quanto para amortizar parcelas do seu consórcio, seguindo as regras da Caixa Econômica Federal. Atendemos clientes de Jaraguá do Sul e região."
+                    "text": "Sim! Você pode usar o FGTS tanto para dar lance quanto para amortizar parcelas do seu consórcio, seguindo as regras da Caixa Econômica Federal."
                 }
             }
         ]
@@ -223,12 +223,12 @@
                 </div>
                 
                 <h1 class="hero-title">
-                    <span class="gradient-text">Consórcio de Veículos</span> em
-                    Jaraguá do Sul SC
+                    Você tem sonhos 
+                    <span class="gradient-text">nós temos a chave</span>
                 </h1>
                 
                 <p class="hero-subtitle">
-                    🚗 Sem juros, sem entrada! Parceiro Volkswagen e Embracon. Carros leves, premium e pesados. Simulação gratuita para moradores de Jaraguá do Sul e região.
+                    Com parcelas que você nunca imaginou. Seu carro novo há clique de você.
                 </p>
 
                 <div class="hero-buttons">
@@ -257,11 +257,8 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">
-                    <span class="gradient-text">Consórcio de Veículos</span> em Jaraguá do Sul - Todas as Categorias
+                    Descubra nossa <span class="gradient-text">linha completa de crédito veicular</span>
                 </h2>
-                <p class="section-subtitle" style="margin-top: 1rem; color: var(--muted-foreground); font-size: 1.1rem;">
-                    🏆 Melhor opção de consórcio em Jaraguá do Sul SC. Parceiro oficial Volkswagen e Embracon com mais de 40 anos de tradição no mercado.
-                </p>
             </div>
 
             <div class="cars-grid">
@@ -420,28 +417,20 @@
                 <?php
                 $faqs = [
                     [
-                        'question' => 'Como funciona o consórcio de veículos em Jaraguá do Sul?',
-                        'answer' => 'O consórcio é um sistema de autofinanciamento onde um grupo de pessoas se une para adquirir bens. Em Jaraguá do Sul, trabalhamos com o Consórcio Volkswagen administrado pela Embracon. Mensalmente, cada participante paga uma parcela e alguns são contemplados por sorteio ou lance.'
+                        'question' => 'Como funciona o consórcio de veículos?',
+                        'answer' => 'O consórcio é um sistema de autofinanciamento onde um grupo de pessoas se une para adquirir bens. Mensalmente, cada participante paga uma parcela e alguns são contemplados por sorteio ou lance.'
                     ],
                     [
-                        'question' => 'Por que escolher consórcio em Jaraguá do Sul SC?',
-                        'answer' => 'O consórcio em Jaraguá do Sul oferece vantagens únicas: sem juros, parcelas menores, sem consulta ao SPC/Serasa, possibilidade de usar FGTS, contemplação a qualquer momento, e atendimento personalizado local. Somos parceiros Volkswagen e Embracon.'
+                        'question' => 'Quais são as vantagens do consórcio?',
+                        'answer' => 'As principais vantagens são: sem juros, parcelas menores, sem consulta ao SPC/Serasa, possibilidade de usar FGTS, e você pode ser contemplado a qualquer momento.'
                     ],
                     [
-                        'question' => 'Consórcio Volkswagen está disponível em Jaraguá do Sul?',
-                        'answer' => 'Sim! Somos parceiros oficiais do Consórcio Volkswagen em Jaraguá do Sul. Oferecemos todas as modalidades: carros leves, premium e pesados, com as melhores condições da região e atendimento especializado.'
+                        'question' => 'Posso usar o FGTS para pagamento?',
+                        'answer' => 'Sim! Você pode usar o FGTS tanto para dar lance quanto para amortizar parcelas do seu consórcio, seguindo as regras da Caixa Econômica Federal.'
                     ],
                     [
-                        'question' => 'Como usar FGTS no consórcio em Jaraguá do Sul?',
-                        'answer' => 'Em Jaraguá do Sul, você pode usar o FGTS tanto para dar lance quanto para amortizar parcelas do seu consórcio. Ajudamos com toda documentação necessária seguindo as regras da Caixa Econômica Federal.'
-                    ],
-                    [
-                        'question' => 'Qual o melhor consórcio de carros em Jaraguá do Sul?',
-                        'answer' => 'A Hype Consórcios é referência em consórcio de veículos em Jaraguá do Sul. Parceiros Volkswagen e Embracon, oferecemos atendimento personalizado, melhores condições e suporte completo desde a contratação até a entrega do seu veículo.'
-                    ],
-                    [
-                        'question' => 'Consórcio contemplado em Jaraguá do Sul - como funciona?',
-                        'answer' => 'A contemplação em Jaraguá do Sul pode acontecer por sorteio mensal (gratuito) ou por lance. Temos cartas contempladas disponíveis para entrega imediata. Nossa equipe local acompanha todo processo até a retirada do veículo.'
+                        'question' => 'Como funciona a contemplação?',
+                        'answer' => 'A contemplação pode acontecer por sorteio mensal (gratuito) ou por lance (oferta de valor). Quanto maior o lance, maiores as chances de contemplação.'
                     ]
                 ];
 
@@ -487,10 +476,8 @@
                         </div>
                     </div>
                     <p class="footer-description">
-                        🏆 <strong>Hype Consórcios E Investimentos Ltda</strong> - Líder em consórcio de veículos em Jaraguá do Sul SC. 
-                        Parceiro autorizado Volkswagen e Embracon, oferecendo as melhores condições da região para você realizar o sonho do carro novo.
-                        <br><br>
-                        📍 <strong>Atendemos Jaraguá do Sul e região:</strong> Corupá, Massaranduba, Guaramirim, Schroeder e toda Grande Florianópolis.
+                        Hype Consórcios E Investimentos Ltda é parceiro autorizado do Consórcio Volkswagen, 
+                        oferecendo as melhores condições para você realizar o sonho do carro novo.
                     </p>
                     <div class="social-links">
                         <a href="https://instagram.com/hype.consorcios" target="_blank" class="social-link">
@@ -534,17 +521,8 @@
                         <div class="contact-item">
                             <i class="fas fa-map-marker-alt"></i>
                             <span>
-                                📍 <strong>Jaraguá do Sul, SC</strong><br>
-                                Atendimento presencial e online<br>
-                                Parceiro Autorizado VW & Embracon
-                            </span>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-clock"></i>
-                            <span>
-                                🕐 <strong>Horário de Atendimento:</strong><br>
-                                Seg a Sex: 8h às 18h<br>
-                                Sáb: 8h às 12h
+                                Atendimento em todo o Brasil<br>
+                                Parceiro Autorizado VW
                             </span>
                         </div>
                     </div>
