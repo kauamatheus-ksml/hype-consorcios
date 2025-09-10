@@ -1509,26 +1509,86 @@ $userId = $user['id'] ?? null;
             window.open(url, '_blank');
         }
 
+        // Debug function to test modal elements
+        window.debugModal = function() {
+            console.log('=== MODAL DEBUG ===');
+            const modal = document.getElementById('leadDetailsModal');
+            const content = document.getElementById('leadDetailsContent');
+            
+            console.log('Modal element:', modal);
+            console.log('Modal computed style:', modal ? getComputedStyle(modal) : 'N/A');
+            console.log('Content element:', content);
+            
+            if (modal) {
+                console.log('Modal current display:', modal.style.display);
+                console.log('Modal offsetWidth:', modal.offsetWidth);
+                console.log('Modal offsetHeight:', modal.offsetHeight);
+                console.log('Modal position:', {
+                    top: modal.offsetTop,
+                    left: modal.offsetLeft
+                });
+            }
+            
+            // Test modal display
+            if (modal && content) {
+                console.log('Testing modal display...');
+                modal.style.display = 'flex';
+                modal.style.position = 'fixed';
+                modal.style.top = '0';
+                modal.style.left = '0';
+                modal.style.right = '0';
+                modal.style.bottom = '0';
+                modal.style.zIndex = '9999';
+                modal.style.background = 'rgba(0, 0, 0, 0.8)';
+                
+                content.innerHTML = `
+                    <div style="background: white; padding: 2rem; border-radius: 8px; margin: auto;">
+                        <h2>Debug Modal Test</h2>
+                        <p>Se você está vendo isto, o modal está funcionando!</p>
+                        <button onclick="closeLeadDetailsModal()" style="padding: 0.5rem 1rem; background: #3be1c9; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            Fechar
+                        </button>
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    console.log('Modal after 1s - display:', modal.style.display);
+                    console.log('Modal visible:', modal.offsetWidth > 0 && modal.offsetHeight > 0);
+                }, 1000);
+            }
+            console.log('=== END DEBUG ===');
+        };
+
         // Make functions globally available for debugging
         window.viewLead = async function(id) {
-            console.log('viewLead called:', id);
+            console.log('=== viewLead START ===');
+            console.log('viewLead called with ID:', id);
+            
             try {
                 // Check if modal exists
                 const modal = document.getElementById('leadDetailsModal');
                 const content = document.getElementById('leadDetailsContent');
                 
-                console.log('Modal element:', modal);
-                console.log('Content element:', content);
+                console.log('Modal element found:', !!modal);
+                console.log('Content element found:', !!content);
                 
                 if (!modal || !content) {
+                    console.error('Modal elements not found!');
+                    console.log('Available elements with "modal" in ID:', 
+                        Array.from(document.querySelectorAll('[id*="modal"]')).map(el => el.id)
+                    );
                     throw new Error('Modal elements not found');
                 }
                 
-                // Open modal
+                console.log('Setting modal display to flex...');
                 modal.style.display = 'flex';
+                
+                console.log('Modal display after setting:', modal.style.display);
+                console.log('Modal is visible:', modal.offsetWidth > 0 && modal.offsetHeight > 0);
+                
                 content.innerHTML = `
-                    <div class="loading">
-                        <div class="spinner"></div>
+                    <div class="loading" style="background: white; padding: 2rem; border-radius: 8px; text-align: center;">
+                        <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #3be1c9; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
                         <p>Carregando detalhes...</p>
                     </div>
                 `;
