@@ -531,6 +531,29 @@ $userId = $user['id'] ?? null;
         .priority-high { background-color: #fed7d7; color: #c53030; }
         .priority-urgent { background-color: #fee2e2; color: #991b1b; }
 
+        /* Notification animations */
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .sidebar {
@@ -678,14 +701,8 @@ $userId = $user['id'] ?? null;
             <div class="page-header">
                 <h1 class="page-title">Gerenciamento de Leads</h1>
                 <div class="page-actions">
-                    <button class="btn btn-secondary" onclick="exportLeads()">
-                        <i class="fas fa-download"></i>
-                        Exportar
-                    </button>
-                    <button class="btn btn-primary" onclick="openNewLeadModal()">
-                        <i class="fas fa-plus"></i>
-                        Novo Lead
-                    </button>
+                    
+                    
                 </div>
             </div>
 
@@ -1746,22 +1763,370 @@ $userId = $user['id'] ?? null;
         }
 
         window.editLead = async function(id) {
-            console.log('editLead called:', id);
+            console.log('=== editLead START ===');
+            console.log('editLead called with ID:', id);
+            
             try {
-                // Fetch lead data first
+                // Remove any existing edit rows first
+                const existingEditRow = document.querySelector(`#leadEdit-${id}`);
+                if (existingEditRow) {
+                    existingEditRow.remove();
+                    return; // Toggle off if already open
+                }
+                
+                // Remove any other open edit rows
+                const allEditRows = document.querySelectorAll('[id^="leadEdit-"]');
+                allEditRows.forEach(row => row.remove());
+                
+                // Remove any detail rows too
+                const allDetailRows = document.querySelectorAll('[id^="leadDetails-"]');
+                allDetailRows.forEach(row => row.remove());
+                
+                // Find the lead row
+                const leadRow = document.querySelector(`tr[data-lead-id="${id}"]`);
+                if (!leadRow) {
+                    throw new Error('Lead row not found');
+                }
+                
+                console.log('Found lead row, inserting edit form...');
+                
+                // Create edit row with loading first
+                const editRow = document.createElement('tr');
+                editRow.id = `leadEdit-${id}`;
+                editRow.innerHTML = `
+                    <td colspan="8" style="background: #fffbeb; border: none; padding: 0;">
+                        <div class="lead-edit-container" style="padding: 1.5rem; animation: slideDown 0.3s ease;">
+                            <div class="loading-inline" style="text-align: center; padding: 2rem;">
+                                <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #3be1c9; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+                                <p style="color: #6b7280;">Carregando formulário de edição...</p>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                
+                // Insert after the lead row
+                leadRow.parentNode.insertBefore(editRow, leadRow.nextSibling);
+                
+                // Fetch lead data
+                console.log('Fetching lead data from API...');
                 const response = await fetch(`api/leads.php?action=details&id=${id}`);
+                console.log('API response status:', response.status);
+                
                 const data = await response.json();
+                console.log('API response data:', data);
 
                 if (data.success) {
-                    populateEditForm(data.lead);
-                    document.getElementById('editLeadModal').style.display = 'flex';
+                    console.log('Lead data received, rendering edit form...');
+                    renderInlineEditForm(data, editRow);
+                    console.log('=== editLead SUCCESS ===');
                 } else {
+                    console.error('API returned error:', data.message);
                     throw new Error(data.message || 'Erro ao carregar dados');
                 }
             } catch (error) {
-                console.error('Erro ao carregar lead para edição:', error);
-                alert('Erro ao carregar dados do lead: ' + error.message);
+                console.error('=== editLead ERROR ===');
+                console.error('Error details:', error);
+                
+                // Show error in inline format
+                const leadRow = document.querySelector(`tr[data-lead-id="${id}"]`);
+                if (leadRow) {
+                    const errorRow = document.createElement('tr');
+                    errorRow.id = `leadEdit-${id}`;
+                    errorRow.innerHTML = `
+                        <td colspan="8" style="background: #fef2f2; border: none; padding: 0;">
+                            <div style="padding: 1.5rem; text-align: center; color: #dc2626;">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                                <h4 style="margin: 0.5rem 0;">Erro ao carregar formulário</h4>
+                                <p style="margin: 0.5rem 0;">${error.message}</p>
+                                <button onclick="window.editLead(${id})" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #3be1c9; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                    Tentar Novamente
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    leadRow.parentNode.insertBefore(errorRow, leadRow.nextSibling);
+                }
             }
+        }
+
+        function renderInlineEditForm(data, editRow) {
+            const { lead } = data;
+            
+            const editContainer = editRow.querySelector('.lead-edit-container');
+            editContainer.innerHTML = `
+                <div class="inline-edit-form" style="background: white; border-radius: 8px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                    <!-- Header -->
+                    <div style="padding: 1.5rem; border-bottom: 1px solid #e5e7eb; background: #fef3c7; border-radius: 8px 8px 0 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3 style="margin: 0 0 0.5rem 0; color: var(--foreground); font-size: 1.25rem;">
+                                    <i class="fas fa-edit" style="margin-right: 0.5rem; color: #d97706;"></i>
+                                    Editando: ${lead.name}
+                                </h3>
+                                <p style="margin: 0; color: var(--muted-foreground); font-size: 0.875rem;">
+                                    Modifique os dados do lead e clique em Salvar para confirmar
+                                </p>
+                            </div>
+                            <button onclick="window.editLead(${lead.id})" style="background: #f3f4f6; border: 1px solid #d1d5db; padding: 0.5rem; border-radius: 4px; cursor: pointer; color: #6b7280;" title="Cancelar edição">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Form Content -->
+                    <form id="inlineEditForm-${lead.id}" style="padding: 1.5rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                            <!-- Coluna 1: Informações Básicas -->
+                            <div>
+                                <h4 style="margin: 0 0 1rem 0; color: var(--primary); font-size: 1rem;">Informações Básicas</h4>
+                                
+                                <div style="margin-bottom: 1rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground);">
+                                        Nome Completo *
+                                    </label>
+                                    <input type="text" id="editName-${lead.id}" value="${lead.name || ''}" required 
+                                           style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 0.875rem;">
+                                </div>
+                                
+                                <div style="margin-bottom: 1rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground);">
+                                        Telefone *
+                                    </label>
+                                    <input type="tel" id="editPhone-${lead.id}" value="${lead.phone || ''}" required
+                                           style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 0.875rem;">
+                                </div>
+                                
+                                <div style="margin-bottom: 1rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground);">
+                                        Email
+                                    </label>
+                                    <input type="email" id="editEmail-${lead.id}" value="${lead.email || ''}"
+                                           style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 0.875rem;">
+                                </div>
+                                
+                                <div style="margin-bottom: 1rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground);">
+                                        Veículo de Interesse
+                                    </label>
+                                    <input type="text" id="editVehicle-${lead.id}" value="${lead.vehicle_interest || ''}"
+                                           style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 0.875rem;">
+                                </div>
+                            </div>
+                            
+                            <!-- Coluna 2: Status e Configurações -->
+                            <div>
+                                <h4 style="margin: 0 0 1rem 0; color: var(--primary); font-size: 1rem;">Status e Configurações</h4>
+                                
+                                <div style="margin-bottom: 1rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground);">
+                                        Status
+                                    </label>
+                                    <select id="editStatus-${lead.id}" style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 0.875rem;">
+                                        <option value="new" ${lead.status === 'new' ? 'selected' : ''}>Novo</option>
+                                        <option value="contacted" ${lead.status === 'contacted' ? 'selected' : ''}>Contatado</option>
+                                        <option value="negotiating" ${lead.status === 'negotiating' ? 'selected' : ''}>Negociando</option>
+                                        <option value="converted" ${lead.status === 'converted' ? 'selected' : ''}>Convertido</option>
+                                        <option value="lost" ${lead.status === 'lost' ? 'selected' : ''}>Perdido</option>
+                                    </select>
+                                </div>
+                                
+                                <div style="margin-bottom: 1rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground);">
+                                        Prioridade
+                                    </label>
+                                    <select id="editPriority-${lead.id}" style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 0.875rem;">
+                                        <option value="low" ${lead.priority === 'low' ? 'selected' : ''}>Baixa</option>
+                                        <option value="medium" ${lead.priority === 'medium' ? 'selected' : ''}>Média</option>
+                                        <option value="high" ${lead.priority === 'high' ? 'selected' : ''}>Alta</option>
+                                        <option value="urgent" ${lead.priority === 'urgent' ? 'selected' : ''}>Urgente</option>
+                                    </select>
+                                </div>
+                                
+                                <div style="margin-bottom: 1rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground);">
+                                        Possui Entrada?
+                                    </label>
+                                    <select id="editHasDownPayment-${lead.id}" style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 0.875rem;" 
+                                            onchange="toggleDownPaymentField(${lead.id}, this.value)">
+                                        <option value="no" ${lead.has_down_payment === 'no' ? 'selected' : ''}>Não</option>
+                                        <option value="yes" ${lead.has_down_payment === 'yes' ? 'selected' : ''}>Sim</option>
+                                    </select>
+                                </div>
+                                
+                                <div id="downPaymentField-${lead.id}" style="margin-bottom: 1rem; ${lead.has_down_payment !== 'yes' ? 'display: none;' : ''}">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground);">
+                                        Valor da Entrada (R$)
+                                    </label>
+                                    <input type="number" id="editDownPaymentValue-${lead.id}" value="${lead.down_payment_value || ''}" 
+                                           step="0.01" min="0" placeholder="0,00"
+                                           style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 0.875rem;">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Observações (Full Width) -->
+                        <div style="margin-bottom: 2rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground);">
+                                Observações
+                            </label>
+                            <textarea id="editNotes-${lead.id}" rows="3" placeholder="Adicione observações sobre o lead..."
+                                      style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 0.875rem; resize: vertical;">${lead.notes || ''}</textarea>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div style="border-top: 1px solid #e5e7eb; padding-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button type="button" onclick="window.editLead(${lead.id})" 
+                                    style="padding: 0.75rem 1.5rem; background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; border-radius: 6px; font-weight: 500; cursor: pointer;">
+                                Cancelar
+                            </button>
+                            <button type="submit" id="saveBtn-${lead.id}"
+                                    style="padding: 0.75rem 1.5rem; background: var(--primary); color: var(--primary-foreground); border: none; border-radius: 6px; font-weight: 500; cursor: pointer;">
+                                <i class="fas fa-save" style="margin-right: 0.5rem;"></i>
+                                Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            // Add form submit handler
+            const form = editRow.querySelector(`#inlineEditForm-${lead.id}`);
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveInlineEditForm(lead.id);
+            });
+        }
+
+        function toggleDownPaymentField(leadId, hasDownPayment) {
+            const field = document.getElementById(`downPaymentField-${leadId}`);
+            if (field) {
+                field.style.display = hasDownPayment === 'yes' ? 'block' : 'none';
+            }
+        }
+
+        async function saveInlineEditForm(leadId) {
+            console.log('=== saveInlineEditForm START ===');
+            console.log('Saving lead ID:', leadId);
+            
+            try {
+                const saveBtn = document.getElementById(`saveBtn-${leadId}`);
+                const originalText = saveBtn.innerHTML;
+                
+                // Show loading state
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 0.5rem;"></i>Salvando...';
+                
+                // Get form data
+                const formData = {
+                    id: leadId,
+                    name: document.getElementById(`editName-${leadId}`).value,
+                    phone: document.getElementById(`editPhone-${leadId}`).value,
+                    email: document.getElementById(`editEmail-${leadId}`).value,
+                    vehicle_interest: document.getElementById(`editVehicle-${leadId}`).value,
+                    status: document.getElementById(`editStatus-${leadId}`).value,
+                    priority: document.getElementById(`editPriority-${leadId}`).value,
+                    has_down_payment: document.getElementById(`editHasDownPayment-${leadId}`).value,
+                    down_payment_value: document.getElementById(`editDownPaymentValue-${leadId}`).value,
+                    notes: document.getElementById(`editNotes-${leadId}`).value
+                };
+                
+                console.log('Form data:', formData);
+                
+                // Validate required fields
+                if (!formData.name.trim() || !formData.phone.trim()) {
+                    throw new Error('Nome e telefone são obrigatórios');
+                }
+                
+                // Send to API
+                const response = await fetch('api/leads.php', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                console.log('API response status:', response.status);
+                const result = await response.json();
+                console.log('API response data:', result);
+                
+                if (result.success) {
+                    console.log('Lead saved successfully');
+                    
+                    // Show success message
+                    saveBtn.innerHTML = '<i class="fas fa-check" style="margin-right: 0.5rem;"></i>Salvo!';
+                    saveBtn.style.background = '#10b981';
+                    
+                    // Close edit form after delay
+                    setTimeout(() => {
+                        window.editLead(leadId); // This will close the edit form
+                        
+                        // Reload leads to show updated data
+                        loadLeads(currentPage);
+                        
+                        // Show success notification
+                        showNotification('Lead atualizado com sucesso!', 'success');
+                    }, 1000);
+                    
+                    console.log('=== saveInlineEditForm SUCCESS ===');
+                } else {
+                    throw new Error(result.message || 'Erro ao salvar lead');
+                }
+                
+            } catch (error) {
+                console.error('=== saveInlineEditForm ERROR ===');
+                console.error('Error details:', error);
+                
+                const saveBtn = document.getElementById(`saveBtn-${leadId}`);
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fas fa-save" style="margin-right: 0.5rem;"></i>Salvar Alterações';
+                    saveBtn.style.background = 'var(--primary)';
+                }
+                
+                showNotification(error.message, 'error');
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                max-width: 400px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            `;
+            
+            if (type === 'success') {
+                notification.style.background = '#10b981';
+                notification.innerHTML = `<i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>${message}`;
+            } else if (type === 'error') {
+                notification.style.background = '#ef4444';
+                notification.innerHTML = `<i class="fas fa-exclamation-circle" style="margin-right: 0.5rem;"></i>${message}`;
+            } else {
+                notification.style.background = '#3b82f6';
+                notification.innerHTML = `<i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>${message}`;
+            }
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 4 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 4000);
         }
 
         function renderInlineLeadDetails(data, detailsRow) {
@@ -2172,15 +2537,9 @@ $userId = $user['id'] ?? null;
             }
         });
 
-        function openNewLeadModal() {
-            // Placeholder for new lead modal
-            alert('Novo lead - Em desenvolvimento');
-        }
+        
 
-        function exportLeads() {
-            // Placeholder for export function
-            alert('Exportar leads - Em desenvolvimento');
-        }
+        
 
         function showError(message) {
             const tbody = document.getElementById('leadsTableBody');
