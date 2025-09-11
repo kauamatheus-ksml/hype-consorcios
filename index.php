@@ -568,12 +568,7 @@
                             <i class="fas fa-directions"></i>
                             Como Chegar
                         </a>
-                        <a href="https://api.whatsapp.com/send/?phone=5547996862997" 
-                           target="_blank" 
-                           class="btn btn-primary">
-                            <i class="fab fa-whatsapp"></i>
-                            Falar Conosco
-                        </a>
+                        
                     </div>
                 </div>
 
