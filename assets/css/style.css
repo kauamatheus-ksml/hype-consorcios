@@ -1675,7 +1675,7 @@ body {
 
 @media (max-width: 480px) {
     .contemplados-carousel-container {
-        padding: 0 15px;
+        padding: 0px;
     }
     
     .cliente-card {
