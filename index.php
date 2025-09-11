@@ -216,6 +216,11 @@
                 <source src="assets/videos/test-drive-hero.webm" type="video/webm">
             </video>
             <div class="hero-overlay"></div>
+            
+            <!-- Hero Logo Floating -->
+            <div class="hero-logo-float">
+                <img src="assets/images/logo.png" alt="Hype Consórcios" class="hero-logo">
+            </div>
         </div>
         
         <div class="container">
