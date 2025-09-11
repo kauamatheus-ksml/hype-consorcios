@@ -564,6 +564,98 @@ class ContempladosGridCarousel {
     }
 }
 
+// Google Maps Integration
+class GoogleMapsLoader {
+    constructor() {
+        this.mapPlaceholder = document.getElementById('mapPlaceholder');
+        this.googleMap = document.getElementById('googleMap');
+        this.mapOverlay = document.querySelector('.map-overlay');
+        this.isLoaded = false;
+        
+        this.init();
+    }
+    
+    init() {
+        if (!this.mapPlaceholder) return;
+        
+        // Add click event to load map
+        this.mapPlaceholder.addEventListener('click', () => this.loadMap());
+        
+        // Optional: Load map on scroll into view
+        this.observeMapSection();
+    }
+    
+    loadMap() {
+        if (this.isLoaded) return;
+        
+        // Show loading state
+        this.mapPlaceholder.innerHTML = `
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Carregando mapa...</p>
+        `;
+        
+        // Google Maps Embed URL (no API key required)
+        const address = 'Rua José Narloch, 1953, Tifa Martins, Jaraguá do Sul, SC';
+        const encodedAddress = encodeURIComponent(address);
+        
+        // Use Google Maps Embed without API key
+        const mapSrc = `https://maps.google.com/maps?q=${encodedAddress}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+        
+        // Set the map source
+        this.googleMap.src = mapSrc;
+        
+        // Wait for map to load
+        this.googleMap.onload = () => {
+            setTimeout(() => {
+                this.showMap();
+            }, 500);
+        };
+        
+        // Fallback timeout
+        setTimeout(() => {
+            if (!this.isLoaded) {
+                this.showMap();
+            }
+        }, 3000);
+    }
+    
+    showMap() {
+        if (this.isLoaded) return;
+        
+        this.isLoaded = true;
+        
+        // Fade out overlay and show map
+        this.mapOverlay.style.opacity = '0';
+        this.googleMap.style.display = 'block';
+        
+        setTimeout(() => {
+            this.mapOverlay.style.display = 'none';
+            this.googleMap.style.opacity = '1';
+        }, 300);
+        
+        // Add loaded class for any additional styling
+        document.querySelector('.google-maps-container').classList.add('map-loaded');
+    }
+    
+    observeMapSection() {
+        const mapContainer = document.querySelector('.google-maps-container');
+        if (!mapContainer) return;
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !this.isLoaded) {
+                    // Optional: Auto-load when map comes into view
+                    // this.loadMap();
+                }
+            });
+        }, {
+            threshold: 0.5
+        });
+        
+        observer.observe(mapContainer);
+    }
+}
+
 // Initialize grid carousel when DOM loads
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize existing functionality
@@ -574,4 +666,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize grid carousel
     new ContempladosGridCarousel();
+    
+    // Initialize Google Maps
+    new GoogleMapsLoader();
 });

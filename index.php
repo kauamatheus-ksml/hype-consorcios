@@ -516,6 +516,97 @@
         </div>
     </section>
 
+    <!-- Localização Section -->
+    <section class="location-section">
+        <div class="container">
+            <div class="location-header">
+                <h2 class="section-title">
+                    Nossa <span class="gradient-text">Localização</span>
+                </h2>
+                <p class="section-subtitle">
+                    Visite nossa sede em Jaraguá do Sul e conheça nossos especialistas pessoalmente! 📍
+                </p>
+            </div>
+
+            <div class="location-content">
+                <div class="location-info-card">
+                    <div class="info-header">
+                        <div class="info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h3 class="info-title">Hype Consórcios</h3>
+                        <p class="info-subtitle">Seu parceiro em realizações</p>
+                    </div>
+
+                    <div class="address-details">
+                        <div class="address-item">
+                            <i class="fas fa-map-pin"></i>
+                            <div class="address-text">
+                                <strong>Endereço:</strong><br>
+                                Rua José Narloch, 1953<br>
+                                Bairro Tifa Martins<br>
+                                Jaraguá do Sul - SC
+                            </div>
+                        </div>
+
+                        <div class="address-item">
+                            <i class="fas fa-clock"></i>
+                            <div class="address-text">
+                                <strong>Horário de Atendimento:</strong><br>
+                                Segunda a Sexta: 8h às 18h<br>
+                                Sábado: 8h às 12h
+                            </div>
+                        </div>
+
+                        <div class="address-item">
+                            <i class="fas fa-phone"></i>
+                            <div class="address-text">
+                                <strong>Contato:</strong><br>
+                                (47) 99686-2997<br>
+                                WhatsApp disponível
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="location-actions">
+                        <a href="https://maps.google.com/?q=Rua+José+Narloch,+1953,+Tifa+Martins,+Jaraguá+do+Sul,+SC" 
+                           target="_blank" 
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-directions"></i>
+                            Como Chegar
+                        </a>
+                        <a href="https://api.whatsapp.com/send/?phone=5547996862997" 
+                           target="_blank" 
+                           class="btn btn-primary">
+                            <i class="fab fa-whatsapp"></i>
+                            Falar Conosco
+                        </a>
+                    </div>
+                </div>
+
+                <div class="google-maps-container">
+                    <div class="map-overlay">
+                        <div class="map-placeholder" id="mapPlaceholder">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <p>Clique para carregar o mapa</p>
+                        </div>
+                    </div>
+                    <iframe 
+                        id="googleMap"
+                        class="google-map"
+                        src="" 
+                        style="display: none; border: 0; opacity: 0; transition: opacity 0.3s ease;"
+                        width="100%" 
+                        height="400" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer id="contato" class="footer">
         <div class="container">
