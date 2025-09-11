@@ -1,6 +1,8 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
+    <link rel="icon" type="image/x-icon" href="../assets/images/logo.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teste Backend Completo - Hype Consórcios CRM</title>

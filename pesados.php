@@ -7,9 +7,11 @@
     <meta name="description" content="Renove sua frota com parcelas a partir de R$ 2.530,00. Caminhões e carretas até 8 anos de uso.">
     
     <!-- Styles -->
+
+    
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link rel="icon" type="image/x-icon" href="assets/images/logo.ico">
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

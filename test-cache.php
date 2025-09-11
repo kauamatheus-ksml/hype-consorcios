@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="icon" type="image/x-icon" href="../assets/images/logo.ico">
     <title>Teste Cache Buster</title>
 </head>
 <body>

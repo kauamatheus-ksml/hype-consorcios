@@ -6,6 +6,8 @@
     <title>Consórcio para Veículos Premium - Hype Consórcios</title>
     <meta name="description" content="Conquiste seu carro premium com parcelas a partir de R$ 1.480,00. Planos personalizados e contemplação programada.">
     
+    <link rel="icon" type="image/x-icon" href="assets/images/logo.ico">
+
     <!-- Styles -->
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

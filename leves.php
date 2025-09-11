@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consórcio para Veículos Leves - Hype Consórcios</title>
     <meta name="description" content="Conquiste seu carro novo ou seminovo (até 10 anos de uso) com parcelas a partir de R$ 811,25. Sem entrada e sem juros.">
-    
+    <link rel="icon" type="image/x-icon" href="assets/images/logo.ico">
     <!-- Styles -->
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
