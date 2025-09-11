@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hype Consórcios - Você tem sonhos nós temos a chave</title>
-    <meta name="description" content="Realize o sonho do carro novo com o Consórcio Volkswagen. Parceiro autorizado com as melhores condições e 40+ anos de tradição. Simule agora!">
+    <meta name="description" content="Realize o sonho do carro novo com o Consórcio Volkswagen. Parceiro autorizado com as melhores condições. Simule agora!">
     <meta name="keywords" content="consórcio de veículos, consórcio volkswagen, consórcio carros, consórcio sem juros, embracon, carta contemplada, consórcio leves premium pesados">
     <link rel="canonical" href="https://hypeconsorcios.com.br/">
     <link rel="icon" type="image/x-icon" href="assets/images/logo.ico">
