@@ -346,8 +346,8 @@ body {
 /* Hero Logo Float */
 .hero-logo-float {
     position: absolute;
-    top: 30px;
-    right: 30px;
+    top: 650px;
+    right: 120px;
     z-index: 5;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
