@@ -149,25 +149,7 @@
                 </div>
             </div>
 
-            <!-- Success Story Section -->
-            <div class="success-story">
-                <div class="success-content">
-                    <div class="success-image">
-                        <img src="assets/images/cliente-premium.jpg" alt="Cliente conquistando veículo premium">
-                    </div>
-                    <div class="success-text">
-                        <h3>Histórias de sucesso</h3>
-                        <p>
-                            "Sempre sonhei com um carro premium, mas achava que seria impossível sem comprometer meu patrimônio. 
-                            Com o consórcio da Hype, consegui meu BMW sem me descapitalizar. O atendimento foi excepcional!"
-                        </p>
-                        <div class="success-author">
-                            <strong>Carlos Eduardo</strong>
-                            <span>Contemplado em 12 meses</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
 
             <!-- CTA Section -->
             <div class="about-cta">

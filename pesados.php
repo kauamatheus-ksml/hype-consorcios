@@ -149,25 +149,7 @@
                 </div>
             </div>
 
-            <!-- Success Story Section -->
-            <div class="success-story">
-                <div class="success-content">
-                    <div class="success-image">
-                        <img src="assets/images/cliente-pesados.jpg" alt="Cliente conquistando veículo pesado">
-                    </div>
-                    <div class="success-text">
-                        <h3>Histórias de sucesso</h3>
-                        <p>
-                            "Precisava expandir minha frota mas não queria comprometer o capital de giro da empresa. 
-                            Com o consórcio da Hype, consegui meu segundo caminhão e meu faturamento dobrou. Excelente investimento!"
-                        </p>
-                        <div class="success-author">
-                            <strong>Roberto Santos</strong>
-                            <span>Contemplado em 6 meses</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
 
             <!-- CTA Section -->
             <div class="about-cta">

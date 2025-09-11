@@ -149,25 +149,7 @@
                 </div>
             </div>
 
-            <!-- Success Story Section -->
-            <div class="success-story">
-                <div class="success-content">
-                    <div class="success-image">
-                        <img src="assets/images/cliente-leves.jpg" alt="Cliente conquistando veículo leve">
-                    </div>
-                    <div class="success-text">
-                        <h3>Histórias de sucesso</h3>
-                        <p>
-                            "Consegui meu primeiro carro através do consórcio da Hype. Sem entrada, sem juros e com parcelas que cabem no meu orçamento. 
-                            Foi muito mais fácil do que eu imaginava!"
-                        </p>
-                        <div class="success-author">
-                            <strong>Maria Silva</strong>
-                            <span>Contemplada em 8 meses</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
 
             <!-- CTA Section -->
             <div class="about-cta">
