@@ -6,7 +6,7 @@
     <!-- Página Principal - Consórcio Jaraguá do Sul -->
     <url>
         <loc>https://hypeconsorcios.com.br/</loc>
-        <lastmod><?= date('Y-m-d') ?></lastmod>
+        <lastmod>2024-12-15</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
         <image:image>
@@ -19,7 +19,7 @@
     <!-- Consórcio Veículos Leves -->
     <url>
         <loc>https://hypeconsorcios.com.br/leves.php</loc>
-        <lastmod><?= date('Y-m-d') ?></lastmod>
+        <lastmod>2024-12-15</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
         <image:image>
@@ -31,7 +31,7 @@
     <!-- Consórcio Veículos Premium -->
     <url>
         <loc>https://hypeconsorcios.com.br/premio.php</loc>
-        <lastmod><?= date('Y-m-d') ?></lastmod>
+        <lastmod>2024-12-15</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
         <image:image>
@@ -43,7 +43,7 @@
     <!-- Consórcio Veículos Pesados -->
     <url>
         <loc>https://hypeconsorcios.com.br/pesados.php</loc>
-        <lastmod><?= date('Y-m-d') ?></lastmod>
+        <lastmod>2024-12-15</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
         <image:image>
@@ -55,7 +55,7 @@
     <!-- Página de Sistema -->
     <url>
         <loc>https://hypeconsorcios.com.br/subsystem/login.php</loc>
-        <lastmod><?= date('Y-m-d') ?></lastmod>
+        <lastmod>2024-12-15</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.3</priority>
     </url>
