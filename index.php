@@ -350,6 +350,164 @@
         </div>
     </section>
 
+    <!-- Clientes Contemplados Section -->
+    <section class="clientes-contemplados-section">
+        <div class="container">
+            <div class="contemplados-header">
+                <h2 class="section-title">
+                    Clientes <span class="gradient-text">Contemplados</span>
+                </h2>
+                <p class="section-subtitle">
+                    Veja alguns dos nossos clientes que realizaram o sonho do carro novo! 🚗✨
+                </p>
+            </div>
+
+            <div class="contemplados-carousel-container">
+                <div class="contemplados-carousel" id="contempladosCarousel">
+                    <!-- Slide 1 -->
+                    <div class="carousel-slide active">
+                        <div class="cliente-card">
+                            <img src="assets/images/clientes/cliente-1.jpg" alt="Cliente contemplado 1" class="cliente-foto">
+                            <div class="cliente-info">
+                                <h3 class="cliente-nome">João Silva</h3>
+                                <p class="cliente-veiculo">Volkswagen Polo 2024</p>
+                                <p class="cliente-cidade">Jaraguá do Sul - SC</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 2 -->
+                    <div class="carousel-slide">
+                        <div class="cliente-card">
+                            <img src="assets/images/clientes/cliente-2.jpg" alt="Cliente contemplado 2" class="cliente-foto">
+                            <div class="cliente-info">
+                                <h3 class="cliente-nome">Maria Santos</h3>
+                                <p class="cliente-veiculo">Volkswagen T-Cross 2024</p>
+                                <p class="cliente-cidade">Corupá - SC</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 3 -->
+                    <div class="carousel-slide">
+                        <div class="cliente-card">
+                            <img src="assets/images/clientes/cliente-3.jpg" alt="Cliente contemplado 3" class="cliente-foto">
+                            <div class="cliente-info">
+                                <h3 class="cliente-nome">Carlos Oliveira</h3>
+                                <p class="cliente-veiculo">Volkswagen Virtus 2024</p>
+                                <p class="cliente-cidade">Guaramirim - SC</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 4 -->
+                    <div class="carousel-slide">
+                        <div class="cliente-card">
+                            <img src="assets/images/clientes/cliente-4.jpg" alt="Cliente contemplado 4" class="cliente-foto">
+                            <div class="cliente-info">
+                                <h3 class="cliente-nome">Ana Costa</h3>
+                                <p class="cliente-veiculo">Volkswagen Nivus 2024</p>
+                                <p class="cliente-cidade">Massaranduba - SC</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 5 -->
+                    <div class="carousel-slide">
+                        <div class="cliente-card">
+                            <img src="assets/images/clientes/cliente-5.jpg" alt="Cliente contemplado 5" class="cliente-foto">
+                            <div class="cliente-info">
+                                <h3 class="cliente-nome">Roberto Lima</h3>
+                                <p class="cliente-veiculo">Volkswagen Jetta 2024</p>
+                                <p class="cliente-cidade">Schroeder - SC</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 6 -->
+                    <div class="carousel-slide">
+                        <div class="cliente-card">
+                            <img src="assets/images/clientes/cliente-6.jpg" alt="Cliente contemplado 6" class="cliente-foto">
+                            <div class="cliente-info">
+                                <h3 class="cliente-nome">Patricia Souza</h3>
+                                <p class="cliente-veiculo">Volkswagen Tiguan 2024</p>
+                                <p class="cliente-cidade">Jaraguá do Sul - SC</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 7 -->
+                    <div class="carousel-slide">
+                        <div class="cliente-card">
+                            <img src="assets/images/clientes/cliente-7.jpg" alt="Cliente contemplado 7" class="cliente-foto">
+                            <div class="cliente-info">
+                                <h3 class="cliente-nome">Fernando Alves</h3>
+                                <p class="cliente-veiculo">Volkswagen Amarok 2024</p>
+                                <p class="cliente-cidade">Pomerode - SC</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 8 -->
+                    <div class="carousel-slide">
+                        <div class="cliente-card">
+                            <img src="assets/images/clientes/cliente-8.jpg" alt="Cliente contemplado 8" class="cliente-foto">
+                            <div class="cliente-info">
+                                <h3 class="cliente-nome">Juliana Pereira</h3>
+                                <p class="cliente-veiculo">Volkswagen Gol 2024</p>
+                                <p class="cliente-cidade">Blumenau - SC</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 9 -->
+                    <div class="carousel-slide">
+                        <div class="cliente-card">
+                            <img src="assets/images/clientes/cliente-9.jpg" alt="Cliente contemplado 9" class="cliente-foto">
+                            <div class="cliente-info">
+                                <h3 class="cliente-nome">Eduardo Rodrigues</h3>
+                                <p class="cliente-veiculo">Volkswagen Voyage 2024</p>
+                                <p class="cliente-cidade">Joinville - SC</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 10 -->
+                    <div class="carousel-slide">
+                        <div class="cliente-card">
+                            <img src="assets/images/clientes/cliente-10.jpg" alt="Cliente contemplado 10" class="cliente-foto">
+                            <div class="cliente-info">
+                                <h3 class="cliente-nome">Camila Ferreira</h3>
+                                <p class="cliente-veiculo">Volkswagen Saveiro 2024</p>
+                                <p class="cliente-cidade">Jaraguá do Sul - SC</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="carousel-controls">
+                    <button class="carousel-btn prev" id="prevBtn">❮</button>
+                    <button class="carousel-btn next" id="nextBtn">❯</button>
+                </div>
+
+                <!-- Dots Indicator -->
+                <div class="carousel-dots" id="carouselDots">
+                    <span class="dot active" data-slide="0"></span>
+                    <span class="dot" data-slide="1"></span>
+                    <span class="dot" data-slide="2"></span>
+                    <span class="dot" data-slide="3"></span>
+                    <span class="dot" data-slide="4"></span>
+                    <span class="dot" data-slide="5"></span>
+                    <span class="dot" data-slide="6"></span>
+                    <span class="dot" data-slide="7"></span>
+                    <span class="dot" data-slide="8"></span>
+                    <span class="dot" data-slide="9"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Career Section -->
     <section class="career-section">
         <div class="container">

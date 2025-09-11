@@ -358,3 +358,153 @@ window.openSimulationModal = openSimulationModal;
 window.closeSimulationModal = closeSimulationModal;
 window.toggleFAQ = toggleFAQ;
 window.toggleDownPayment = toggleDownPayment;
+
+// Carousel functionality for Clientes Contemplados
+class ContempladosCarousel {
+    constructor() {
+        this.currentSlide = 0;
+        this.totalSlides = 10;
+        this.autoplayInterval = null;
+        this.autoplayDelay = 4000; // 4 segundos
+        
+        this.carousel = document.getElementById('contempladosCarousel');
+        this.slides = document.querySelectorAll('.carousel-slide');
+        this.dots = document.querySelectorAll('.dot');
+        this.prevBtn = document.getElementById('prevBtn');
+        this.nextBtn = document.getElementById('nextBtn');
+        
+        this.init();
+    }
+    
+    init() {
+        if (!this.carousel) return;
+        
+        // Event listeners
+        this.prevBtn?.addEventListener('click', () => this.prevSlide());
+        this.nextBtn?.addEventListener('click', () => this.nextSlide());
+        
+        // Dots navigation
+        this.dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => this.goToSlide(index));
+        });
+        
+        // Touch/swipe support
+        this.addTouchSupport();
+        
+        // Start autoplay
+        this.startAutoplay();
+        
+        // Pause on hover
+        this.carousel.addEventListener('mouseenter', () => this.pauseAutoplay());
+        this.carousel.addEventListener('mouseleave', () => this.startAutoplay());
+    }
+    
+    goToSlide(slideIndex) {
+        // Remove active classes
+        this.slides[this.currentSlide]?.classList.remove('active');
+        this.dots[this.currentSlide]?.classList.remove('active');
+        
+        // Update current slide
+        this.currentSlide = slideIndex;
+        
+        // Add active classes
+        this.slides[this.currentSlide]?.classList.add('active');
+        this.dots[this.currentSlide]?.classList.add('active');
+        
+        // Transform carousel
+        const translateX = -this.currentSlide * 100;
+        this.carousel.style.transform = `translateX(${translateX}%)`;
+    }
+    
+    nextSlide() {
+        const nextIndex = (this.currentSlide + 1) % this.totalSlides;
+        this.goToSlide(nextIndex);
+    }
+    
+    prevSlide() {
+        const prevIndex = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
+        this.goToSlide(prevIndex);
+    }
+    
+    startAutoplay() {
+        this.pauseAutoplay(); // Clear existing interval
+        this.autoplayInterval = setInterval(() => {
+            this.nextSlide();
+        }, this.autoplayDelay);
+    }
+    
+    pauseAutoplay() {
+        if (this.autoplayInterval) {
+            clearInterval(this.autoplayInterval);
+            this.autoplayInterval = null;
+        }
+    }
+    
+    addTouchSupport() {
+        let startX = 0;
+        let endX = 0;
+        
+        this.carousel.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        });
+        
+        this.carousel.addEventListener('touchend', (e) => {
+            endX = e.changedTouches[0].clientX;
+            this.handleSwipe(startX, endX);
+        });
+        
+        // Mouse drag support
+        let isDragging = false;
+        
+        this.carousel.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+            this.carousel.style.cursor = 'grabbing';
+        });
+        
+        this.carousel.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+        });
+        
+        this.carousel.addEventListener('mouseup', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            endX = e.clientX;
+            this.carousel.style.cursor = 'grab';
+            this.handleSwipe(startX, endX);
+        });
+        
+        this.carousel.addEventListener('mouseleave', () => {
+            if (isDragging) {
+                isDragging = false;
+                this.carousel.style.cursor = 'grab';
+            }
+        });
+    }
+    
+    handleSwipe(startX, endX) {
+        const threshold = 50;
+        const diff = startX - endX;
+        
+        if (Math.abs(diff) > threshold) {
+            if (diff > 0) {
+                this.nextSlide();
+            } else {
+                this.prevSlide();
+            }
+        }
+    }
+}
+
+// Initialize carousel when DOM loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize existing functionality
+    initializeEventListeners();
+    initializeAnimations();
+    initializeFormMasks();
+    handleScrollEffects();
+    
+    // Initialize carousel
+    new ContempladosCarousel();
+});
