@@ -360,7 +360,7 @@ body {
     position: absolute;
     inset: 0;
     background: var(--gradient-hero);
-    opacity: 0.8;
+    opacity: 0.25;
 }
 
 .hero-content {
