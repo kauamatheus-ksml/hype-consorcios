@@ -362,97 +362,44 @@
                 </p>
             </div>
 
-            <div class="contemplados-carousel-container">
-                <div class="contemplados-carousel" id="contempladosCarousel">
-                    <!-- Slide 1 -->
-                    <div class="carousel-slide active">
-                        <div class="cliente-card">
-                            <img src="assets/images/clientes/cliente-1.jpg" alt="Cliente contemplado 1" class="cliente-foto">
-                        </div>
+            <div class="contemplados-grid-container">
+                <div class="contemplados-track" id="contempladosTrack">
+                    <div class="cliente-item">
+                        <img src="assets/images/clientes/cliente-1.jpg" alt="Cliente contemplado 1" class="cliente-image">
                     </div>
-
-                    <!-- Slide 2 -->
-                    <div class="carousel-slide">
-                        <div class="cliente-card">
-                            <img src="assets/images/clientes/cliente-2.jpg" alt="Cliente contemplado 2" class="cliente-foto">
-                        </div>
+                    <div class="cliente-item">
+                        <img src="assets/images/clientes/cliente-2.jpg" alt="Cliente contemplado 2" class="cliente-image">
                     </div>
-
-                    <!-- Slide 3 -->
-                    <div class="carousel-slide">
-                        <div class="cliente-card">
-                            <img src="assets/images/clientes/cliente-3.jpg" alt="Cliente contemplado 3" class="cliente-foto">
-                        </div>
+                    <div class="cliente-item">
+                        <img src="assets/images/clientes/cliente-3.jpg" alt="Cliente contemplado 3" class="cliente-image">
                     </div>
-
-                    <!-- Slide 4 -->
-                    <div class="carousel-slide">
-                        <div class="cliente-card">
-                            <img src="assets/images/clientes/cliente-4.jpg" alt="Cliente contemplado 4" class="cliente-foto">
-                        </div>
+                    <div class="cliente-item">
+                        <img src="assets/images/clientes/cliente-4.jpg" alt="Cliente contemplado 4" class="cliente-image">
                     </div>
-
-                    <!-- Slide 5 -->
-                    <div class="carousel-slide">
-                        <div class="cliente-card">
-                            <img src="assets/images/clientes/cliente-5.jpg" alt="Cliente contemplado 5" class="cliente-foto">
-                        </div>
+                    <div class="cliente-item">
+                        <img src="assets/images/clientes/cliente-5.jpg" alt="Cliente contemplado 5" class="cliente-image">
                     </div>
-
-                    <!-- Slide 6 -->
-                    <div class="carousel-slide">
-                        <div class="cliente-card">
-                            <img src="assets/images/clientes/cliente-6.jpg" alt="Cliente contemplado 6" class="cliente-foto">
-                        </div>
+                    <div class="cliente-item">
+                        <img src="assets/images/clientes/cliente-6.jpg" alt="Cliente contemplado 6" class="cliente-image">
                     </div>
-
-                    <!-- Slide 7 -->
-                    <div class="carousel-slide">
-                        <div class="cliente-card">
-                            <img src="assets/images/clientes/cliente-7.jpg" alt="Cliente contemplado 7" class="cliente-foto">
-                        </div>
+                    <div class="cliente-item">
+                        <img src="assets/images/clientes/cliente-7.jpg" alt="Cliente contemplado 7" class="cliente-image">
                     </div>
-
-                    <!-- Slide 8 -->
-                    <div class="carousel-slide">
-                        <div class="cliente-card">
-                            <img src="assets/images/clientes/cliente-8.jpg" alt="Cliente contemplado 8" class="cliente-foto">
-                        </div>
+                    <div class="cliente-item">
+                        <img src="assets/images/clientes/cliente-8.jpg" alt="Cliente contemplado 8" class="cliente-image">
                     </div>
-
-                    <!-- Slide 9 -->
-                    <div class="carousel-slide">
-                        <div class="cliente-card">
-                            <img src="assets/images/clientes/cliente-9.jpg" alt="Cliente contemplado 9" class="cliente-foto">
-                        </div>
+                    <div class="cliente-item">
+                        <img src="assets/images/clientes/cliente-9.jpg" alt="Cliente contemplado 9" class="cliente-image">
                     </div>
-
-                    <!-- Slide 10 -->
-                    <div class="carousel-slide">
-                        <div class="cliente-card">
-                            <img src="assets/images/clientes/cliente-10.jpg" alt="Cliente contemplado 10" class="cliente-foto">
-                        </div>
+                    <div class="cliente-item">
+                        <img src="assets/images/clientes/cliente-10.jpg" alt="Cliente contemplado 10" class="cliente-image">
                     </div>
                 </div>
 
                 <!-- Navigation Controls -->
-                <div class="carousel-controls">
-                    <button class="carousel-btn prev" id="prevBtn">❮</button>
-                    <button class="carousel-btn next" id="nextBtn">❯</button>
-                </div>
-
-                <!-- Dots Indicator -->
-                <div class="carousel-dots" id="carouselDots">
-                    <span class="dot active" data-slide="0"></span>
-                    <span class="dot" data-slide="1"></span>
-                    <span class="dot" data-slide="2"></span>
-                    <span class="dot" data-slide="3"></span>
-                    <span class="dot" data-slide="4"></span>
-                    <span class="dot" data-slide="5"></span>
-                    <span class="dot" data-slide="6"></span>
-                    <span class="dot" data-slide="7"></span>
-                    <span class="dot" data-slide="8"></span>
-                    <span class="dot" data-slide="9"></span>
+                <div class="grid-controls">
+                    <button class="grid-btn prev" id="gridPrevBtn">❮</button>
+                    <button class="grid-btn next" id="gridNextBtn">❯</button>
                 </div>
             </div>
         </div>
