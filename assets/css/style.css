@@ -1501,15 +1501,12 @@ body {
 
 /* Cliente Cards */
 .cliente-card {
-    background: white;
-    border-radius: 20px;
-    padding: 20px;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
     text-align: center;
-    box-shadow: 
-        0 10px 25px rgba(0, 0, 0, 0.08),
-        0 4px 10px rgba(0, 0, 0, 0.04);
     transition: all 0.3s ease;
-    max-width: 500px;
+    max-width: 400px;
     width: 100%;
     position: relative;
     overflow: hidden;
@@ -1518,40 +1515,27 @@ body {
     align-items: center;
 }
 
-.cliente-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: var(--gradient);
-    border-radius: 20px 20px 0 0;
-}
-
 .cliente-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.12),
-        0 8px 16px rgba(0, 0, 0, 0.06);
+    transform: translateY(-5px);
 }
 
 /* Cliente Photo - Dimensões 1080x1453 (aspect ratio ~0.74) */
 .cliente-foto {
     width: 320px;
     height: 430px;
-    border-radius: 15px;
+    border-radius: 10px;
     object-fit: cover;
     object-position: center;
-    border: 4px solid transparent;
-    background: var(--gradient);
-    padding: 4px;
+    border: none;
+    background: none;
+    padding: 0;
     transition: all 0.3s ease;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .cliente-card:hover .cliente-foto {
     transform: scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* Navigation Controls */
@@ -1653,15 +1637,15 @@ body {
     }
     
     .cliente-card {
-        padding: 15px;
+        padding: 0;
         margin: 0 10px;
-        max-width: 350px;
+        max-width: 300px;
     }
     
     .cliente-foto {
         width: 250px;
         height: 335px;
-        border-radius: 12px;
+        border-radius: 8px;
     }
     
     
@@ -1695,14 +1679,14 @@ body {
     }
     
     .cliente-card {
-        padding: 10px;
-        max-width: 280px;
+        padding: 0;
+        max-width: 220px;
     }
     
     .cliente-foto {
         width: 200px;
         height: 268px;
-        border-radius: 10px;
+        border-radius: 6px;
     }
     
     .carousel-btn.prev {
