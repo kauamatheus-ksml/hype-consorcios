@@ -532,7 +532,7 @@
                 <div class="location-info-card">
                     <div class="info-header">
                         <div class="info-icon">
-                            <i class="fas fa-map-marker-alt"></i>
+                            <i class="fas fa-location-dot"></i>
                         </div>
                         <h3 class="info-title">Hype Consórcios</h3>
                         <p class="info-subtitle">Seu parceiro em realizações</p>

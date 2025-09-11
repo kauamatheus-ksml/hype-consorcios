@@ -1720,10 +1720,27 @@ body {
 
 /* Location Content Layout */
 .location-content {
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* When both card and map are present */
+.location-content.has-map {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 40px;
-    align-items: start;
+    justify-content: stretch;
+}
+
+/* Single card centering */
+.location-content:not(.has-map) .location-info-card,
+.location-content .location-info-card:only-child {
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 /* Info Card */
@@ -1778,6 +1795,19 @@ body {
     font-size: 2rem;
     color: white;
     box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+    position: relative;
+}
+
+.info-icon i {
+    z-index: 1;
+}
+
+/* Fallback se o ícone não carregar */
+.info-icon::before {
+    content: "📍";
+    font-size: 2rem;
+    position: absolute;
+    z-index: 0;
 }
 
 .info-title {
@@ -1946,12 +1976,21 @@ body {
     }
     
     .location-content {
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
         gap: 30px;
+        align-items: center;
+    }
+    
+    .location-content.has-map {
+        display: flex;
+        flex-direction: column;
     }
     
     .location-info-card {
         padding: 24px;
+        max-width: 500px;
+        width: 100%;
     }
     
     .info-icon {
