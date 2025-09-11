@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🥇 Melhor Consórcio de Veículos Jaraguá do Sul SC | Hype Consórcios</title>
+    <title>🥇 Melhor Consórcio de Veículos Jaraguá do Sul SC - Hype Consórcios</title>
     <meta name="description" content="🚗 Consórcio de veículos #1 em Jaraguá do Sul SC! Sem juros, sem entrada. Volkswagen, carros leves, premium e pesados. Parceiro Embracon. Simulação grátis! ⭐">
     <meta name="keywords" content="consórcio jaraguá do sul, consórcio veículos jaraguá do sul sc, consórcio carros jaraguá do sul, volkswagen jaraguá do sul, embracon jaraguá do sul, carta contemplada jaraguá do sul, consórcio sem juros jaraguá do sul">
     <link rel="canonical" href="https://hypeconsorcios.com.br/consorcio-jaragua-do-sul.php">
