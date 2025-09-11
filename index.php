@@ -558,14 +558,7 @@
                             </div>
                         </div>
 
-                        <div class="address-item">
-                            <i class="fas fa-phone"></i>
-                            <div class="address-text">
-                                <strong>Contato:</strong><br>
-                                (47) 99686-2997<br>
-                                WhatsApp disponível
-                            </div>
-                        </div>
+                        
                     </div>
 
                     <div class="location-actions">
