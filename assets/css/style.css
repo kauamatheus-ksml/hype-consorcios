@@ -346,6 +346,7 @@ body {
 /* Hero Logo Float */
 .hero-logo-float {
     position: absolute;
+    opacity: 35%;
     top: 650px;
     right: 120px;
     z-index: 5;
