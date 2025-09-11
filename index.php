@@ -368,11 +368,6 @@
                     <div class="carousel-slide active">
                         <div class="cliente-card">
                             <img src="assets/images/clientes/cliente-1.jpg" alt="Cliente contemplado 1" class="cliente-foto">
-                            <div class="cliente-info">
-                                <h3 class="cliente-nome">João Silva</h3>
-                                <p class="cliente-veiculo">Volkswagen Polo 2024</p>
-                                <p class="cliente-cidade">Jaraguá do Sul - SC</p>
-                            </div>
                         </div>
                     </div>
 
@@ -380,11 +375,6 @@
                     <div class="carousel-slide">
                         <div class="cliente-card">
                             <img src="assets/images/clientes/cliente-2.jpg" alt="Cliente contemplado 2" class="cliente-foto">
-                            <div class="cliente-info">
-                                <h3 class="cliente-nome">Maria Santos</h3>
-                                <p class="cliente-veiculo">Volkswagen T-Cross 2024</p>
-                                <p class="cliente-cidade">Corupá - SC</p>
-                            </div>
                         </div>
                     </div>
 
@@ -392,11 +382,6 @@
                     <div class="carousel-slide">
                         <div class="cliente-card">
                             <img src="assets/images/clientes/cliente-3.jpg" alt="Cliente contemplado 3" class="cliente-foto">
-                            <div class="cliente-info">
-                                <h3 class="cliente-nome">Carlos Oliveira</h3>
-                                <p class="cliente-veiculo">Volkswagen Virtus 2024</p>
-                                <p class="cliente-cidade">Guaramirim - SC</p>
-                            </div>
                         </div>
                     </div>
 
@@ -404,11 +389,6 @@
                     <div class="carousel-slide">
                         <div class="cliente-card">
                             <img src="assets/images/clientes/cliente-4.jpg" alt="Cliente contemplado 4" class="cliente-foto">
-                            <div class="cliente-info">
-                                <h3 class="cliente-nome">Ana Costa</h3>
-                                <p class="cliente-veiculo">Volkswagen Nivus 2024</p>
-                                <p class="cliente-cidade">Massaranduba - SC</p>
-                            </div>
                         </div>
                     </div>
 
@@ -416,11 +396,6 @@
                     <div class="carousel-slide">
                         <div class="cliente-card">
                             <img src="assets/images/clientes/cliente-5.jpg" alt="Cliente contemplado 5" class="cliente-foto">
-                            <div class="cliente-info">
-                                <h3 class="cliente-nome">Roberto Lima</h3>
-                                <p class="cliente-veiculo">Volkswagen Jetta 2024</p>
-                                <p class="cliente-cidade">Schroeder - SC</p>
-                            </div>
                         </div>
                     </div>
 
@@ -428,11 +403,6 @@
                     <div class="carousel-slide">
                         <div class="cliente-card">
                             <img src="assets/images/clientes/cliente-6.jpg" alt="Cliente contemplado 6" class="cliente-foto">
-                            <div class="cliente-info">
-                                <h3 class="cliente-nome">Patricia Souza</h3>
-                                <p class="cliente-veiculo">Volkswagen Tiguan 2024</p>
-                                <p class="cliente-cidade">Jaraguá do Sul - SC</p>
-                            </div>
                         </div>
                     </div>
 
@@ -440,11 +410,6 @@
                     <div class="carousel-slide">
                         <div class="cliente-card">
                             <img src="assets/images/clientes/cliente-7.jpg" alt="Cliente contemplado 7" class="cliente-foto">
-                            <div class="cliente-info">
-                                <h3 class="cliente-nome">Fernando Alves</h3>
-                                <p class="cliente-veiculo">Volkswagen Amarok 2024</p>
-                                <p class="cliente-cidade">Pomerode - SC</p>
-                            </div>
                         </div>
                     </div>
 
@@ -452,11 +417,6 @@
                     <div class="carousel-slide">
                         <div class="cliente-card">
                             <img src="assets/images/clientes/cliente-8.jpg" alt="Cliente contemplado 8" class="cliente-foto">
-                            <div class="cliente-info">
-                                <h3 class="cliente-nome">Juliana Pereira</h3>
-                                <p class="cliente-veiculo">Volkswagen Gol 2024</p>
-                                <p class="cliente-cidade">Blumenau - SC</p>
-                            </div>
                         </div>
                     </div>
 
@@ -464,11 +424,6 @@
                     <div class="carousel-slide">
                         <div class="cliente-card">
                             <img src="assets/images/clientes/cliente-9.jpg" alt="Cliente contemplado 9" class="cliente-foto">
-                            <div class="cliente-info">
-                                <h3 class="cliente-nome">Eduardo Rodrigues</h3>
-                                <p class="cliente-veiculo">Volkswagen Voyage 2024</p>
-                                <p class="cliente-cidade">Joinville - SC</p>
-                            </div>
                         </div>
                     </div>
 
@@ -476,11 +431,6 @@
                     <div class="carousel-slide">
                         <div class="cliente-card">
                             <img src="assets/images/clientes/cliente-10.jpg" alt="Cliente contemplado 10" class="cliente-foto">
-                            <div class="cliente-info">
-                                <h3 class="cliente-nome">Camila Ferreira</h3>
-                                <p class="cliente-veiculo">Volkswagen Saveiro 2024</p>
-                                <p class="cliente-cidade">Jaraguá do Sul - SC</p>
-                            </div>
                         </div>
                     </div>
                 </div>

@@ -1503,16 +1503,19 @@ body {
 .cliente-card {
     background: white;
     border-radius: 20px;
-    padding: 40px;
+    padding: 20px;
     text-align: center;
     box-shadow: 
         0 10px 25px rgba(0, 0, 0, 0.08),
         0 4px 10px rgba(0, 0, 0, 0.04);
     transition: all 0.3s ease;
-    max-width: 400px;
+    max-width: 500px;
     width: 100%;
     position: relative;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .cliente-card::before {
@@ -1533,46 +1536,22 @@ body {
         0 8px 16px rgba(0, 0, 0, 0.06);
 }
 
-/* Cliente Photo */
+/* Cliente Photo - Dimensões 1080x1453 (aspect ratio ~0.74) */
 .cliente-foto {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
+    width: 320px;
+    height: 430px;
+    border-radius: 15px;
     object-fit: cover;
-    margin: 0 auto 24px;
+    object-position: center;
     border: 4px solid transparent;
     background: var(--gradient);
     padding: 4px;
     transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .cliente-card:hover .cliente-foto {
-    transform: scale(1.05);
-}
-
-/* Cliente Info */
-.cliente-info {
-    color: var(--text-dark);
-}
-
-.cliente-nome {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: var(--text-dark);
-}
-
-.cliente-veiculo {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--primary);
-    margin-bottom: 4px;
-}
-
-.cliente-cidade {
-    font-size: 1rem;
-    color: var(--text-muted);
-    margin: 0;
+    transform: scale(1.02);
 }
 
 /* Navigation Controls */
@@ -1674,23 +1653,17 @@ body {
     }
     
     .cliente-card {
-        padding: 30px;
+        padding: 15px;
         margin: 0 10px;
+        max-width: 350px;
     }
     
     .cliente-foto {
-        width: 100px;
-        height: 100px;
-        margin-bottom: 20px;
+        width: 250px;
+        height: 335px;
+        border-radius: 12px;
     }
     
-    .cliente-nome {
-        font-size: 1.25rem;
-    }
-    
-    .cliente-veiculo {
-        font-size: 1rem;
-    }
     
     .carousel-btn {
         width: 40px;
@@ -1722,7 +1695,14 @@ body {
     }
     
     .cliente-card {
-        padding: 25px;
+        padding: 10px;
+        max-width: 280px;
+    }
+    
+    .cliente-foto {
+        width: 200px;
+        height: 268px;
+        border-radius: 10px;
     }
     
     .carousel-btn.prev {
