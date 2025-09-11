@@ -158,7 +158,7 @@
     </script>
     
     <!-- Styles -->
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Fonts -->
@@ -675,7 +675,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="assets/js/script.js"></script>
+    <script src="assets/js/script.js?v=<?php echo filemtime('assets/js/script.js'); ?>"></script>
     
     <script>
         // Função para enviar dados do lead
