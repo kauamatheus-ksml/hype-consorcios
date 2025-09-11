@@ -210,8 +210,11 @@
 
     <!-- Hero Section -->
     <section id="inicio" class="hero-section">
-        <div class="hero-background">
-            <img src="assets/images/hero-cars.jpg" alt="Carros Volkswagen">
+        <div class="hero-video-container">
+            <video class="hero-video" autoplay muted loop playsinline>
+                <source src="assets/videos/test-drive-hero.mp4" type="video/mp4">
+                <source src="assets/videos/test-drive-hero.webm" type="video/webm">
+            </video>
             <div class="hero-overlay"></div>
         </div>
         
@@ -223,12 +226,12 @@
                 </div>
                 
                 <h1 class="hero-title">
-                    Você tem sonhos 
-                    <span class="gradient-text">nós temos a chave</span>
+                    Seu carro novo 
+                    <span class="gradient-text">está aqui</span>
                 </h1>
                 
                 <p class="hero-subtitle">
-                    Com parcelas que você nunca imaginou. Seu carro novo há clique de você.
+                    Realize o test drive dos seus sonhos
                 </p>
 
                 <div class="hero-buttons">
