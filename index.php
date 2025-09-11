@@ -226,12 +226,12 @@
                 </div>
                 
                 <h1 class="hero-title">
-                    Seu carro novo 
-                    <span class="gradient-text">está aqui</span>
+                    Você tem sonhos 
+                    <span class="gradient-text">nós temos a chave</span>
                 </h1>
                 
                 <p class="hero-subtitle">
-                    Realize o test drive dos seus sonhos
+                    Com parcelas que você nunca imaginou. Seu carro novo há clique de você.
                 </p>
 
                 <div class="hero-buttons">
