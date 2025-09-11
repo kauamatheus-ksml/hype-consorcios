@@ -1648,7 +1648,7 @@ body {
 
 @media (max-width: 480px) {
     .contemplados-grid-container {
-        padding: 0 30px;
+        padding: 0px;
     }
     
     .contemplados-track {
