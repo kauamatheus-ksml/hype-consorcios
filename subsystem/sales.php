@@ -498,22 +498,27 @@ $currentPage = 'sales';
             }
         }
 
-        /* Modal Nova Venda */
+        /* Modal Nova Venda - Estado inicial FECHADO */
         .modal-overlay {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            background: rgba(0, 0, 0, 0.6) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            z-index: 99999 !important;
-            padding: 2rem !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            display: none; /* FECHADO por padrão */
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            padding: 2rem;
             backdrop-filter: blur(4px);
+        }
+
+        /* Estado ABERTO do modal */
+        .modal-overlay.show {
+            display: flex !important;
             visibility: visible !important;
             opacity: 1 !important;
         }
@@ -795,6 +800,9 @@ $currentPage = 'sales';
                     </button>
                     <button style="margin-left: 10px; padding: 0.5rem 1rem; background: #9b59b6; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="window.testModal()">
                         Teste Modal
+                    </button>
+                    <button style="margin-left: 10px; padding: 0.5rem 1rem; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="window.forceCloseModal()">
+                        🚨 Fechar Modal
                     </button>
                 </div>
             </div>
@@ -1486,60 +1494,47 @@ $currentPage = 'sales';
             `;
         }
 
-        // Funções do Modal de Nova Venda - Tornar globais
+        // Funções do Modal de Nova Venda - CORRIGIDAS
         window.openNewSaleModal = function() {
-            console.log('=== openNewSaleModal INÍCIO ===');
+            console.log('=== ABRINDO MODAL ===');
             const modal = document.getElementById('newSaleModal');
             if (!modal) {
-                console.error('Modal newSaleModal não encontrado');
-                alert('Erro: Modal não encontrado no DOM');
+                console.error('Modal não encontrado');
                 return;
             }
             
-            console.log('Modal encontrado, alterando estilos...');
-            
-            // Forçar visibilidade do modal
-            modal.style.setProperty('display', 'flex', 'important');
-            modal.style.setProperty('visibility', 'visible', 'important');
-            modal.style.setProperty('opacity', '1', 'important');
-            modal.style.setProperty('z-index', '99999', 'important');
-            modal.style.setProperty('position', 'fixed', 'important');
-            modal.style.setProperty('top', '0', 'important');
-            modal.style.setProperty('left', '0', 'important');
-            modal.style.setProperty('width', '100vw', 'important');
-            modal.style.setProperty('height', '100vh', 'important');
-            
+            // Usar classe para abrir
+            modal.classList.add('show');
             document.body.style.overflow = 'hidden';
             
-            console.log('Estilos aplicados, estado do modal:', {
-                display: modal.style.display,
-                visibility: modal.style.visibility,
-                opacity: modal.style.opacity,
-                zIndex: modal.style.zIndex
-            });
-            
             // Carregar leads para o select
-            loadLeadsForSelect();
+            try {
+                loadLeadsForSelect();
+            } catch (e) {
+                console.warn('Erro ao carregar leads:', e);
+            }
             
             // Reset form
             const form = document.getElementById('newSaleForm');
             if (form) {
                 form.reset();
-                const dateInput = document.querySelector('input[name="sale_date"]');
+                const dateInput = form.querySelector('input[name="sale_date"]');
                 if (dateInput) {
                     dateInput.value = new Date().toISOString().split('T')[0];
                 }
             }
             
-            console.log('=== openNewSaleModal CONCLUÍDO ===');
+            console.log('✅ Modal aberto');
         };
 
         window.closeNewSaleModal = function() {
-            console.log('closeNewSaleModal chamada');
+            console.log('=== FECHANDO MODAL ===');
             const modal = document.getElementById('newSaleModal');
             if (modal) {
-                modal.style.display = 'none';
+                // Usar classe para fechar
+                modal.classList.remove('show');
                 document.body.style.overflow = 'auto';
+                console.log('✅ Modal fechado');
             }
         };
 
@@ -1754,31 +1749,54 @@ $currentPage = 'sales';
             alert('Botão funcionando!');
         };
 
+        // Função para FORÇAR fechamento do modal
+        window.forceCloseModal = function() {
+            console.log('🚨 FORÇANDO FECHAMENTO DO MODAL');
+            const modal = document.getElementById('newSaleModal');
+            if (modal) {
+                // Remover todas as classes
+                modal.classList.remove('show');
+                modal.className = 'modal-overlay';
+                
+                // Forçar display none
+                modal.style.display = 'none';
+                modal.style.visibility = 'hidden';
+                modal.style.opacity = '0';
+                
+                // Restaurar body
+                document.body.style.overflow = 'auto';
+                
+                console.log('✅ Modal forçadamente fechado');
+            }
+        };
+
         // Função de teste para modal
         window.testModal = function() {
             const modal = document.getElementById('newSaleModal');
             if (modal) {
-                modal.innerHTML = '<div style="background: white; padding: 2rem; border-radius: 8px; position: relative; z-index: 100000;"><h2>TESTE MODAL</h2><button onclick="window.closeTestModal()">Fechar</button></div>';
-                modal.style.setProperty('display', 'flex', 'important');
-                modal.style.setProperty('background', 'rgba(255, 0, 0, 0.8)', 'important');
+                modal.innerHTML = '<div style="background: white; padding: 2rem; border-radius: 8px; position: relative; z-index: 100000;"><h2>TESTE MODAL</h2><button onclick="window.forceCloseModal()">Fechar</button></div>';
+                modal.classList.add('show');
                 console.log('Modal de teste mostrado');
             }
         };
 
-        window.closeTestModal = function() {
+        // Configuração única do botão e FECHAMENTO FORÇADO
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM carregado - configurando...');
+            
+            // PRIMEIRO: Forçar modal fechado
             const modal = document.getElementById('newSaleModal');
             if (modal) {
+                console.log('🔒 Forçando modal fechado no carregamento');
+                modal.classList.remove('show');
                 modal.style.display = 'none';
+                modal.style.visibility = 'hidden';
+                modal.style.opacity = '0';
+                document.body.style.overflow = 'auto';
             }
-        };
-
-        // Configuração única do botão (sem duplicação)
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM carregado - configurando botão Nova Venda...');
             
             setTimeout(function() {
                 const btnNewSale = document.querySelector('.btn-new-sale');
-                const modal = document.getElementById('newSaleModal');
                 
                 if (!btnNewSale) {
                     console.error('Botão Nova Venda não encontrado');
@@ -1790,7 +1808,7 @@ $currentPage = 'sales';
                     return;
                 }
                 
-                console.log('✅ Botão e Modal encontrados - configuração concluída');
+                console.log('✅ Configuração concluída - Modal FECHADO');
                 
             }, 500);
         });
