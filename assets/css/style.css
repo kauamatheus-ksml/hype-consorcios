@@ -346,15 +346,10 @@ body {
 /* Hero Logo Float */
 .hero-logo-float {
     position: absolute;
-    
     top: 570px;
     right: 120px;
     z-index: 5;
-    
-    
-    
     padding: 15px;
-    
     animation: float 6s ease-in-out infinite;
     transition: all 0.3s ease;
 }

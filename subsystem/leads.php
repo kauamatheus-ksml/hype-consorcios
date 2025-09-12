@@ -38,6 +38,10 @@ if (!$authenticated) {
 $userRole = $user['role'] ?? 'viewer';
 $userName = $user['full_name'] ?? 'Usuário';
 $userId = $user['id'] ?? null;
+
+// Incluir componente da sidebar
+require_once 'components/sidebar.php';
+$currentPage = 'leads';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
