@@ -500,18 +500,22 @@ $currentPage = 'sales';
 
         /* Modal Nova Venda */
         .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            padding: 2rem;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: rgba(0, 0, 0, 0.6) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 99999 !important;
+            padding: 2rem !important;
             backdrop-filter: blur(4px);
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
         .modal-container {
@@ -785,9 +789,12 @@ $currentPage = 'sales';
                         <i class="fas fa-plus"></i>
                         Nova Venda
                     </button>
-                    <!-- Botão de teste temporário -->
+                    <!-- Botões de teste temporários -->
                     <button style="margin-left: 10px; padding: 0.5rem 1rem; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="window.testButton()">
-                        Teste
+                        Teste Clique
+                    </button>
+                    <button style="margin-left: 10px; padding: 0.5rem 1rem; background: #9b59b6; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="window.testModal()">
+                        Teste Modal
                     </button>
                 </div>
             </div>
@@ -1481,15 +1488,35 @@ $currentPage = 'sales';
 
         // Funções do Modal de Nova Venda - Tornar globais
         window.openNewSaleModal = function() {
-            console.log('openNewSaleModal chamada');
+            console.log('=== openNewSaleModal INÍCIO ===');
             const modal = document.getElementById('newSaleModal');
             if (!modal) {
                 console.error('Modal newSaleModal não encontrado');
+                alert('Erro: Modal não encontrado no DOM');
                 return;
             }
             
-            modal.style.display = 'flex';
+            console.log('Modal encontrado, alterando estilos...');
+            
+            // Forçar visibilidade do modal
+            modal.style.setProperty('display', 'flex', 'important');
+            modal.style.setProperty('visibility', 'visible', 'important');
+            modal.style.setProperty('opacity', '1', 'important');
+            modal.style.setProperty('z-index', '99999', 'important');
+            modal.style.setProperty('position', 'fixed', 'important');
+            modal.style.setProperty('top', '0', 'important');
+            modal.style.setProperty('left', '0', 'important');
+            modal.style.setProperty('width', '100vw', 'important');
+            modal.style.setProperty('height', '100vh', 'important');
+            
             document.body.style.overflow = 'hidden';
+            
+            console.log('Estilos aplicados, estado do modal:', {
+                display: modal.style.display,
+                visibility: modal.style.visibility,
+                opacity: modal.style.opacity,
+                zIndex: modal.style.zIndex
+            });
             
             // Carregar leads para o select
             loadLeadsForSelect();
@@ -1503,7 +1530,8 @@ $currentPage = 'sales';
                     dateInput.value = new Date().toISOString().split('T')[0];
                 }
             }
-            console.log('Modal aberto');
+            
+            console.log('=== openNewSaleModal CONCLUÍDO ===');
         };
 
         window.closeNewSaleModal = function() {
@@ -1726,48 +1754,44 @@ $currentPage = 'sales';
             alert('Botão funcionando!');
         };
 
-        // Backup: Adicionar event listener direto no botão
+        // Função de teste para modal
+        window.testModal = function() {
+            const modal = document.getElementById('newSaleModal');
+            if (modal) {
+                modal.innerHTML = '<div style="background: white; padding: 2rem; border-radius: 8px; position: relative; z-index: 100000;"><h2>TESTE MODAL</h2><button onclick="window.closeTestModal()">Fechar</button></div>';
+                modal.style.setProperty('display', 'flex', 'important');
+                modal.style.setProperty('background', 'rgba(255, 0, 0, 0.8)', 'important');
+                console.log('Modal de teste mostrado');
+            }
+        };
+
+        window.closeTestModal = function() {
+            const modal = document.getElementById('newSaleModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        // Configuração única do botão (sem duplicação)
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM carregado - procurando botão Nova Venda');
+            console.log('DOM carregado - configurando botão Nova Venda...');
             
-            // Aguardar um pouco para garantir que tudo foi carregado
             setTimeout(function() {
                 const btnNewSale = document.querySelector('.btn-new-sale');
-                if (btnNewSale) {
-                    console.log('Botão Nova Venda encontrado, adicionando listener');
-                    
-                    // Remover qualquer event listener existente
-                    btnNewSale.removeAttribute('onclick');
-                    
-                    // Adicionar novo event listener
-                    btnNewSale.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('Botão Nova Venda clicado via event listener');
-                        
-                        // Verificar se a função existe
-                        if (typeof window.openNewSaleModal === 'function') {
-                            window.openNewSaleModal();
-                        } else {
-                            console.error('Função openNewSaleModal não encontrada');
-                            alert('Erro: Função não encontrada. Recarregue a página.');
-                        }
-                    });
-                    
-                    // Adicionar atributo onclick como backup
-                    btnNewSale.setAttribute('onclick', 'window.openNewSaleModal()');
-                    
-                } else {
-                    console.error('Botão Nova Venda não encontrado');
-                }
-
-                // Verificar se modal existe
                 const modal = document.getElementById('newSaleModal');
+                
+                if (!btnNewSale) {
+                    console.error('Botão Nova Venda não encontrado');
+                    return;
+                }
+                
                 if (!modal) {
                     console.error('Modal newSaleModal não encontrado no DOM');
-                } else {
-                    console.log('Modal newSaleModal encontrado no DOM');
+                    return;
                 }
+                
+                console.log('✅ Botão e Modal encontrados - configuração concluída');
+                
             }, 500);
         });
 
