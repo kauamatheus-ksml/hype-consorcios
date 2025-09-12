@@ -90,9 +90,9 @@ $totalPages = ceil($totalLogs / $limit);
             --info: #3b82f6;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
+        /* Reset apenas para área de conteúdo, não para sidebar */
+        .content-area,
+        .content-area * {
             box-sizing: border-box;
         }
 
@@ -101,6 +101,8 @@ $totalPages = ceil($totalLogs / $limit);
             background-color: #f8fafc;
             color: #334155;
             line-height: 1.6;
+            margin: 0;
+            padding: 0;
         }
 
         .main-container {
@@ -265,6 +267,15 @@ $totalPages = ceil($totalLogs / $limit);
         .stat-label {
             color: var(--muted-foreground);
             font-size: 0.875rem;
+        }
+
+        /* Garantir que a sidebar não seja afetada pelos resets */
+        .sidebar {
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            height: 100vh !important;
+            z-index: 1000 !important;
         }
 
         /* Responsividade */

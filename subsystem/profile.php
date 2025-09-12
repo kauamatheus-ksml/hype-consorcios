@@ -124,9 +124,9 @@ $stats['converted_leads'] = $convertedStats['total'] ?? 0;
             --danger: #ef4444;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
+        /* Reset apenas para área de conteúdo, não para sidebar */
+        .content-area,
+        .content-area * {
             box-sizing: border-box;
         }
 
@@ -135,6 +135,8 @@ $stats['converted_leads'] = $convertedStats['total'] ?? 0;
             background-color: #f8fafc;
             color: #334155;
             line-height: 1.6;
+            margin: 0;
+            padding: 0;
         }
 
         .main-container {
@@ -395,6 +397,15 @@ $stats['converted_leads'] = $convertedStats['total'] ?? 0;
             background: #fef2f2;
             border-color: var(--danger);
             color: #991b1b;
+        }
+
+        /* Garantir que a sidebar não seja afetada pelos resets */
+        .sidebar {
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            height: 100vh !important;
+            z-index: 1000 !important;
         }
 
         /* Responsividade */
