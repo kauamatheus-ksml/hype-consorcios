@@ -61,41 +61,117 @@ if (!$userData) {
 require_once 'components/sidebar.php';
 $currentPage = 'profile';
 
-// Buscar estatísticas do usuário
+// Buscar estatísticas do usuário baseado no role
 $stats = [];
 
-// Estatísticas para vendedores
-if (in_array($userData['role'], ['seller', 'manager', 'admin'])) {
-    // Total de vendas
-    $stmt = $conn->prepare("SELECT COUNT(*) as total, COALESCE(SUM(sale_value), 0) as total_value FROM sales WHERE seller_id = ?");
-    $stmt->execute([$user['id']]);
-    $salesStats = $stmt->fetch(PDO::FETCH_ASSOC);
-    $stats['total_sales'] = $salesStats['total'] ?? 0;
-    $stats['total_sales_value'] = $salesStats['total_value'] ?? 0;
-    
-    // Vendas este mês
-    $stmt = $conn->prepare("
-        SELECT COUNT(*) as total, COALESCE(SUM(sale_value), 0) as total_value 
-        FROM sales 
-        WHERE seller_id = ? AND MONTH(sale_date) = MONTH(CURRENT_DATE()) AND YEAR(sale_date) = YEAR(CURRENT_DATE())
-    ");
-    $stmt->execute([$user['id']]);
-    $monthlySales = $stmt->fetch(PDO::FETCH_ASSOC);
-    $stats['monthly_sales'] = $monthlySales['total'] ?? 0;
-    $stats['monthly_sales_value'] = $monthlySales['total_value'] ?? 0;
+switch ($userData['role']) {
+    case 'admin':
+        // Admins veem estatísticas globais
+        // Total de vendas (todas)
+        $stmt = $conn->prepare("SELECT COUNT(*) as total, COALESCE(SUM(sale_value), 0) as total_value FROM sales");
+        $stmt->execute();
+        $salesStats = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stats['total_sales'] = $salesStats['total'] ?? 0;
+        $stats['total_sales_value'] = $salesStats['total_value'] ?? 0;
+        
+        // Vendas este mês (todas)
+        $stmt = $conn->prepare("
+            SELECT COUNT(*) as total, COALESCE(SUM(sale_value), 0) as total_value 
+            FROM sales 
+            WHERE MONTH(sale_date) = MONTH(CURRENT_DATE()) AND YEAR(sale_date) = YEAR(CURRENT_DATE())
+        ");
+        $stmt->execute();
+        $monthlySales = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stats['monthly_sales'] = $monthlySales['total'] ?? 0;
+        $stats['monthly_sales_value'] = $monthlySales['total_value'] ?? 0;
+        
+        // Total de leads (todos)
+        $stmt = $conn->prepare("SELECT COUNT(*) as total FROM leads");
+        $stmt->execute();
+        $leadsStats = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stats['total_leads'] = $leadsStats['total'] ?? 0;
+        
+        // Leads convertidos (todos)
+        $stmt = $conn->prepare("SELECT COUNT(*) as total FROM leads WHERE status = 'converted'");
+        $stmt->execute();
+        $convertedStats = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stats['converted_leads'] = $convertedStats['total'] ?? 0;
+        break;
+        
+    case 'manager':
+        // Managers veem estatísticas globais (como admin)
+        $stmt = $conn->prepare("SELECT COUNT(*) as total, COALESCE(SUM(sale_value), 0) as total_value FROM sales");
+        $stmt->execute();
+        $salesStats = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stats['total_sales'] = $salesStats['total'] ?? 0;
+        $stats['total_sales_value'] = $salesStats['total_value'] ?? 0;
+        
+        $stmt = $conn->prepare("
+            SELECT COUNT(*) as total, COALESCE(SUM(sale_value), 0) as total_value 
+            FROM sales 
+            WHERE MONTH(sale_date) = MONTH(CURRENT_DATE()) AND YEAR(sale_date) = YEAR(CURRENT_DATE())
+        ");
+        $stmt->execute();
+        $monthlySales = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stats['monthly_sales'] = $monthlySales['total'] ?? 0;
+        $stats['monthly_sales_value'] = $monthlySales['total_value'] ?? 0;
+        
+        $stmt = $conn->prepare("SELECT COUNT(*) as total FROM leads");
+        $stmt->execute();
+        $leadsStats = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stats['total_leads'] = $leadsStats['total'] ?? 0;
+        
+        $stmt = $conn->prepare("SELECT COUNT(*) as total FROM leads WHERE status = 'converted'");
+        $stmt->execute();
+        $convertedStats = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stats['converted_leads'] = $convertedStats['total'] ?? 0;
+        break;
+        
+    case 'seller':
+        // Vendedores veem apenas suas próprias estatísticas
+        $stmt = $conn->prepare("SELECT COUNT(*) as total, COALESCE(SUM(sale_value), 0) as total_value FROM sales WHERE seller_id = ?");
+        $stmt->execute([$user['id']]);
+        $salesStats = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stats['total_sales'] = $salesStats['total'] ?? 0;
+        $stats['total_sales_value'] = $salesStats['total_value'] ?? 0;
+        
+        $stmt = $conn->prepare("
+            SELECT COUNT(*) as total, COALESCE(SUM(sale_value), 0) as total_value 
+            FROM sales 
+            WHERE seller_id = ? AND MONTH(sale_date) = MONTH(CURRENT_DATE()) AND YEAR(sale_date) = YEAR(CURRENT_DATE())
+        ");
+        $stmt->execute([$user['id']]);
+        $monthlySales = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stats['monthly_sales'] = $monthlySales['total'] ?? 0;
+        $stats['monthly_sales_value'] = $monthlySales['total_value'] ?? 0;
+        
+        // Leads atribuídos ao vendedor
+        $stmt = $conn->prepare("SELECT COUNT(*) as total FROM leads WHERE assigned_to = ?");
+        $stmt->execute([$user['id']]);
+        $leadsStats = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stats['total_leads'] = $leadsStats['total'] ?? 0;
+        
+        // Leads convertidos pelo vendedor
+        $stmt = $conn->prepare("SELECT COUNT(*) as total FROM leads WHERE assigned_to = ? AND status = 'converted'");
+        $stmt->execute([$user['id']]);
+        $convertedStats = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stats['converted_leads'] = $convertedStats['total'] ?? 0;
+        break;
+        
+    case 'viewer':
+    default:
+        // Viewers não veem estatísticas de vendas, apenas leads atribuídos
+        $stmt = $conn->prepare("SELECT COUNT(*) as total FROM leads WHERE assigned_to = ?");
+        $stmt->execute([$user['id']]);
+        $leadsStats = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stats['total_leads'] = $leadsStats['total'] ?? 0;
+        
+        $stmt = $conn->prepare("SELECT COUNT(*) as total FROM leads WHERE assigned_to = ? AND status = 'converted'");
+        $stmt->execute([$user['id']]);
+        $convertedStats = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stats['converted_leads'] = $convertedStats['total'] ?? 0;
+        break;
 }
-
-// Leads atribuídos
-$stmt = $conn->prepare("SELECT COUNT(*) as total FROM leads WHERE assigned_to = ?");
-$stmt->execute([$user['id']]);
-$leadsStats = $stmt->fetch(PDO::FETCH_ASSOC);
-$stats['total_leads'] = $leadsStats['total'] ?? 0;
-
-// Leads convertidos
-$stmt = $conn->prepare("SELECT COUNT(*) as total FROM leads WHERE assigned_to = ? AND status = 'converted'");
-$stmt->execute([$user['id']]);
-$convertedStats = $stmt->fetch(PDO::FETCH_ASSOC);
-$stats['converted_leads'] = $convertedStats['total'] ?? 0;
 
 ?>
 <!DOCTYPE html>
@@ -677,7 +753,7 @@ $stats['converted_leads'] = $convertedStats['total'] ?? 0;
                 </div>
             </div>
 
-            <!-- Statistics -->
+            <!-- Statistics - Visibilidade por Role -->
             <?php if (!empty($stats)): ?>
             <div class="stats-grid">
                 <?php if (isset($stats['total_leads'])): ?>
