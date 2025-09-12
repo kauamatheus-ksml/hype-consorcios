@@ -28,7 +28,7 @@ try {
     
     $result = $stmt->execute([
         'admin',
-        'admin@hypeconsorcios.com.br',
+        'admfinanceiro@hypeconsorcios.com.br',
         $passwordHash,
         'Administrador Sistema',
         'admin',
