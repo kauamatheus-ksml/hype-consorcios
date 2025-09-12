@@ -794,16 +794,6 @@ $currentPage = 'sales';
                         <i class="fas fa-plus"></i>
                         Nova Venda
                     </button>
-                    <!-- Botões de teste temporários -->
-                    <button style="margin-left: 10px; padding: 0.5rem 1rem; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="window.testButton()">
-                        Teste Clique
-                    </button>
-                    <button style="margin-left: 10px; padding: 0.5rem 1rem; background: #9b59b6; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="window.testModal()">
-                        Teste Modal
-                    </button>
-                    <button style="margin-left: 10px; padding: 0.5rem 1rem; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="window.forceCloseModal()">
-                        🚨 Fechar Modal
-                    </button>
                 </div>
             </div>
 
@@ -1540,50 +1530,117 @@ $currentPage = 'sales';
 
         async function loadLeadsForSelect() {
             try {
+                console.log('📋 Carregando leads para o select...');
                 const response = await fetch('api/leads.php?status=new,contacted,negotiating&limit=100');
-                const data = await response.json();
                 
-                if (data.success && data.leads) {
-                    const leadSelect = document.getElementById('leadSelect');
-                    
-                    // Limpar opções existentes (exceto a primeira)
-                    while (leadSelect.children.length > 1) {
-                        leadSelect.removeChild(leadSelect.lastChild);
-                    }
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('📋 Resposta da API de leads:', data);
+                
+                const leadSelect = document.getElementById('leadSelect');
+                if (!leadSelect) {
+                    console.error('Select de leads não encontrado');
+                    return;
+                }
+                
+                // Limpar opções existentes (exceto a primeira)
+                while (leadSelect.children.length > 1) {
+                    leadSelect.removeChild(leadSelect.lastChild);
+                }
+                
+                if (data.success && data.leads && data.leads.length > 0) {
+                    console.log(`📋 Carregando ${data.leads.length} leads no select`);
                     
                     // Adicionar leads
                     data.leads.forEach(lead => {
                         const option = document.createElement('option');
                         option.value = lead.id;
-                        option.textContent = `${lead.lead_name || lead.name} - ${lead.phone || 'Sem telefone'}`;
+                        
+                        // Usar diferentes campos possíveis para nome
+                        const leadName = lead.lead_name || lead.name || lead.customer_name || 'Nome não informado';
+                        const leadPhone = lead.phone || lead.telephone || 'Sem telefone';
+                        
+                        option.textContent = `${leadName} - ${leadPhone}`;
                         option.dataset.leadData = JSON.stringify(lead);
                         leadSelect.appendChild(option);
                     });
+                    
+                    console.log('✅ Leads carregados no select');
+                } else {
+                    console.log('📋 Nenhum lead encontrado ou API retornou erro:', data.message || 'Erro desconhecido');
+                    
+                    // Adicionar opção informativa
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'Nenhum lead disponível';
+                    option.disabled = true;
+                    leadSelect.appendChild(option);
                 }
+                
             } catch (error) {
-                console.error('Erro ao carregar leads:', error);
+                console.error('❌ Erro ao carregar leads:', error);
+                
+                const leadSelect = document.getElementById('leadSelect');
+                if (leadSelect && leadSelect.children.length <= 1) {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'Erro ao carregar leads';
+                    option.disabled = true;
+                    leadSelect.appendChild(option);
+                }
             }
         }
 
         // Auto-preenchimento quando um lead é selecionado
-        document.addEventListener('DOMContentLoaded', function() {
+        function setupLeadSelection() {
             const leadSelect = document.getElementById('leadSelect');
-            leadSelect?.addEventListener('change', function() {
+            if (!leadSelect) {
+                console.warn('Select de leads não encontrado para configurar');
+                return;
+            }
+            
+            leadSelect.addEventListener('change', function() {
+                console.log('📋 Lead selecionado:', this.value);
+                
                 if (this.value) {
-                    const leadData = JSON.parse(this.options[this.selectedIndex].dataset.leadData || '{}');
-                    
-                    // Preencher campos do formulário
-                    document.querySelector('input[name="customer_name"]').value = leadData.lead_name || leadData.name || '';
-                    document.querySelector('input[name="email"]').value = leadData.email || '';
-                    document.querySelector('input[name="phone"]').value = leadData.phone || '';
+                    try {
+                        const leadData = JSON.parse(this.options[this.selectedIndex].dataset.leadData || '{}');
+                        console.log('📋 Dados do lead:', leadData);
+                        
+                        // Preencher campos do formulário com múltiplas opções de campo
+                        const customerNameField = document.querySelector('input[name="customer_name"]');
+                        const emailField = document.querySelector('input[name="email"]');
+                        const phoneField = document.querySelector('input[name="phone"]');
+                        
+                        if (customerNameField) {
+                            customerNameField.value = leadData.lead_name || leadData.name || leadData.customer_name || '';
+                        }
+                        if (emailField) {
+                            emailField.value = leadData.email || '';
+                        }
+                        if (phoneField) {
+                            phoneField.value = leadData.phone || leadData.telephone || '';
+                        }
+                        
+                        console.log('✅ Campos preenchidos automaticamente');
+                        
+                    } catch (error) {
+                        console.error('Erro ao processar dados do lead:', error);
+                    }
                 } else {
                     // Limpar campos se "Selecionar lead" foi escolhido
-                    document.querySelector('input[name="customer_name"]').value = '';
-                    document.querySelector('input[name="email"]').value = '';
-                    document.querySelector('input[name="phone"]').value = '';
+                    const fields = ['customer_name', 'email', 'phone'];
+                    fields.forEach(fieldName => {
+                        const field = document.querySelector(`input[name="${fieldName}"]`);
+                        if (field) field.value = '';
+                    });
+                    console.log('🧹 Campos limpos');
                 }
             });
-        });
+        }
 
         // Submissão do formulário
         document.addEventListener('DOMContentLoaded', function() {
@@ -1592,6 +1649,9 @@ $currentPage = 'sales';
                 e.preventDefault();
                 await submitNewSale(this);
             });
+            
+            // Configurar seleção de leads
+            setupLeadSelection();
         });
 
         async function submitNewSale(form) {
@@ -1744,12 +1804,7 @@ $currentPage = 'sales';
             }
         });
 
-        // Função de teste simples (temporária)
-        window.testButton = function() {
-            alert('Botão funcionando!');
-        };
-
-        // Função para FORÇAR fechamento do modal
+        // Função para FORÇAR fechamento do modal (manter para debug se necessário)
         window.forceCloseModal = function() {
             console.log('🚨 FORÇANDO FECHAMENTO DO MODAL');
             const modal = document.getElementById('newSaleModal');
@@ -1767,16 +1822,6 @@ $currentPage = 'sales';
                 document.body.style.overflow = 'auto';
                 
                 console.log('✅ Modal forçadamente fechado');
-            }
-        };
-
-        // Função de teste para modal
-        window.testModal = function() {
-            const modal = document.getElementById('newSaleModal');
-            if (modal) {
-                modal.innerHTML = '<div style="background: white; padding: 2rem; border-radius: 8px; position: relative; z-index: 100000;"><h2>TESTE MODAL</h2><button onclick="window.forceCloseModal()">Fechar</button></div>';
-                modal.classList.add('show');
-                console.log('Modal de teste mostrado');
             }
         };
 
