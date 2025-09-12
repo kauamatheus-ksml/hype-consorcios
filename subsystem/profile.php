@@ -416,7 +416,7 @@ $stats['converted_leads'] = $convertedStats['total'] ?? 0;
 </head>
 <body>
     <div class="main-container">
-        <?php renderSidebar($currentPage, $userData['role'] ?? 'viewer'); ?>
+        <?php renderSidebar($currentPage, $userData['role'] ?? 'viewer', $userData['full_name']); ?>
         
         <div class="content-area">
             <!-- Header -->

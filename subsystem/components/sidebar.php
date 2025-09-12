@@ -56,11 +56,20 @@ function renderSidebar($currentPage, $userRole, $userName) {
         <?php endif; ?>
 
         <div class="nav-item">
-            <a href="#" class="nav-link" onclick="showComingSoon('Perfil')">
+            <a href="profile.php" class="nav-link <?= $currentPage === 'profile' ? 'active' : '' ?>">
                 <i class="fas fa-user nav-icon"></i>
                 Perfil
             </a>
         </div>
+        
+        <?php if (in_array($userRole, ['admin'])): ?>
+        <div class="nav-item">
+            <a href="audit-logs.php" class="nav-link <?= $currentPage === 'audit-logs' ? 'active' : '' ?>">
+                <i class="fas fa-clipboard-list nav-icon"></i>
+                Logs de Auditoria
+            </a>
+        </div>
+        <?php endif; ?>
     </nav>
 
     <div class="sidebar-footer">
