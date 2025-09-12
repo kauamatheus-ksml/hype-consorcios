@@ -251,19 +251,21 @@ function handleGetSaleDetails($conn, $userRole, $userId) {
 function handleCreateSale($conn, $userId) {
     $input = json_decode(file_get_contents('php://input'), true);
     
-    // Validação
-    $requiredFields = ['lead_id', 'sale_value', 'vehicle_sold'];
+    // Validação - apenas campos obrigatórios básicos
+    $requiredFields = ['customer_name', 'sale_value', 'vehicle_sold', 'payment_type'];
     foreach ($requiredFields as $field) {
         if (empty($input[$field])) {
             throw new Exception("Campo '{$field}' é obrigatório");
         }
     }
     
-    // Verificar se o lead existe
-    $stmt = $conn->prepare("SELECT id FROM leads WHERE id = ?");
-    $stmt->execute([$input['lead_id']]);
-    if (!$stmt->fetch()) {
-        throw new Exception('Lead não encontrado');
+    // Verificar se o lead existe (opcional)
+    if (!empty($input['lead_id'])) {
+        $stmt = $conn->prepare("SELECT id FROM leads WHERE id = ?");
+        $stmt->execute([$input['lead_id']]);
+        if (!$stmt->fetch()) {
+            throw new Exception('Lead não encontrado');
+        }
     }
     
     // Calcular comissão se percentual foi fornecido
@@ -275,47 +277,64 @@ function handleCreateSale($conn, $userId) {
     // Inserir venda
     $stmt = $conn->prepare("
         INSERT INTO sales (
-            lead_id, seller_id, sale_value, commission_percentage, 
-            commission_value, vehicle_sold, payment_type, down_payment,
-            financing_months, monthly_payment, contract_number, notes, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            lead_id, seller_id, customer_name, email, phone,
+            sale_value, commission_percentage, commission_value, 
+            vehicle_sold, payment_type, down_payment,
+            financing_months, monthly_payment, contract_number, 
+            notes, status, sale_date, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
     ");
     
+    $saleDate = !empty($input['sale_date']) ? $input['sale_date'] : date('Y-m-d');
+    
     $result = $stmt->execute([
-        $input['lead_id'],
+        !empty($input['lead_id']) ? $input['lead_id'] : null,
         $input['seller_id'] ?? $userId,
+        $input['customer_name'],
+        $input['email'] ?? null,
+        $input['phone'] ?? null,
         $input['sale_value'],
         $input['commission_percentage'] ?? 0,
         $commission_value,
         $input['vehicle_sold'],
-        $input['payment_type'] ?? 'consorcio',
-        $input['down_payment'] ?? 0,
+        $input['payment_type'],
+        $input['down_payment'] ?? null,
         $input['financing_months'] ?? null,
         $input['monthly_payment'] ?? null,
         $input['contract_number'] ?? null,
         $input['notes'] ?? null,
-        $input['status'] ?? 'pending'
+        $input['status'] ?? 'completed',
+        $saleDate
     ]);
     
     if ($result) {
         $saleId = $conn->lastInsertId();
         
-        // Atualizar status do lead para convertido
-        $stmt = $conn->prepare("UPDATE leads SET status = 'converted' WHERE id = ?");
-        $stmt->execute([$input['lead_id']]);
-        
-        // Registrar interação no lead
-        $stmt = $conn->prepare("
-            INSERT INTO lead_interactions (lead_id, user_id, interaction_type, description)
-            VALUES (?, ?, 'note', ?)
-        ");
-        $description = "Lead convertido em venda - Valor: R$ " . number_format($input['sale_value'], 2, ',', '.');
-        $stmt->execute([$input['lead_id'], $userId, $description]);
+        // Atualizar status do lead para convertido (somente se houver lead_id)
+        if (!empty($input['lead_id'])) {
+            $stmt = $conn->prepare("UPDATE leads SET status = 'converted' WHERE id = ?");
+            $stmt->execute([$input['lead_id']]);
+            
+            // Registrar interação no lead
+            $stmt = $conn->prepare("
+                INSERT INTO lead_interactions (lead_id, user_id, interaction_type, description)
+                VALUES (?, ?, 'note', ?)
+            ");
+            $description = "Lead convertido em venda - Valor: R$ " . number_format($input['sale_value'], 2, ',', '.');
+            $stmt->execute([$input['lead_id'], $userId, $description]);
+        }
         
         echo json_encode([
             'success' => true,
             'message' => 'Venda criada com sucesso',
-            'sale_id' => (int)$saleId
+            'sale_id' => (int)$saleId,
+            'data' => [
+                'id' => (int)$saleId,
+                'customer_name' => $input['customer_name'],
+                'vehicle_sold' => $input['vehicle_sold'],
+                'sale_value' => (float)$input['sale_value'],
+                'sale_date' => $saleDate
+            ]
         ]);
     } else {
         throw new Exception('Erro ao criar venda');

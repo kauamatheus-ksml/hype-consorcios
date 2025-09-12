@@ -480,6 +480,268 @@ $currentPage = 'sales';
                 align-items: stretch;
             }
         }
+
+        /* Modal Nova Venda */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 2rem;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 16px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            animation: modalAppear 0.3s ease;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 2rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--foreground);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .modal-title i {
+            color: var(--primary);
+        }
+
+        .modal-close {
+            background: #f3f4f6;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .modal-form {
+            padding: 0 2rem 2rem;
+        }
+
+        .form-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .form-section {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            background: #f9fafb;
+        }
+
+        .section-title {
+            margin: 0 0 1.5rem 0;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--foreground);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--foreground);
+            font-size: 0.875rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.875rem;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 225, 201, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        .btn-primary:hover {
+            background: #2dd4bf;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 225, 201, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        /* Loading States */
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Mobile Modal */
+        @media (max-width: 768px) {
+            .modal-overlay {
+                padding: 1rem;
+            }
+            
+            .modal-header {
+                padding: 1.5rem 1.5rem 1rem;
+            }
+            
+            .modal-form {
+                padding: 0 1.5rem 1.5rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-actions {
+                flex-direction: column-reverse;
+            }
+            
+            .btn-primary,
+            .btn-secondary {
+                justify-content: center;
+            }
+        }
+
+        /* Animações para notificações */
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -638,6 +900,137 @@ $currentPage = 'sales';
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Modal Nova Venda -->
+    <div class="modal-overlay" id="newSaleModal" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-plus-circle"></i>
+                    Nova Venda
+                </h2>
+                <button class="modal-close" onclick="closeNewSaleModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="newSaleForm" class="modal-form">
+                <div class="form-sections">
+                    <!-- Seção: Informações do Cliente -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-user"></i>
+                            Informações do Cliente
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Lead Relacionado</label>
+                                <select name="lead_id" id="leadSelect">
+                                    <option value="">Selecionar lead existente (opcional)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Nome do Cliente *</label>
+                                <input type="text" name="customer_name" required placeholder="Nome completo">
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" name="email" placeholder="email@exemplo.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Telefone</label>
+                                <input type="tel" name="phone" placeholder="(11) 99999-9999">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seção: Detalhes da Venda -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-handshake"></i>
+                            Detalhes da Venda
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Veículo Vendido *</label>
+                                <input type="text" name="vehicle_sold" required placeholder="Ex: Honda Civic 2023">
+                            </div>
+                            <div class="form-group">
+                                <label>Número do Contrato</label>
+                                <input type="text" name="contract_number" placeholder="123456789">
+                            </div>
+                            <div class="form-group">
+                                <label>Forma de Pagamento *</label>
+                                <select name="payment_type" required>
+                                    <option value="">Selecionar</option>
+                                    <option value="consorcio">Consórcio</option>
+                                    <option value="financiamento">Financiamento</option>
+                                    <option value="vista">À Vista</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Data da Venda</label>
+                                <input type="date" name="sale_date" value="<?= date('Y-m-d') ?>">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seção: Valores Financeiros -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-dollar-sign"></i>
+                            Informações Financeiras
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Valor da Venda (R$) *</label>
+                                <input type="number" name="sale_value" step="0.01" min="0" required placeholder="0,00">
+                            </div>
+                            <div class="form-group">
+                                <label>Entrada (R$)</label>
+                                <input type="number" name="down_payment" step="0.01" min="0" placeholder="0,00">
+                            </div>
+                            <div class="form-group">
+                                <label>Comissão (%)</label>
+                                <input type="number" name="commission_percentage" step="0.01" min="0" max="100" placeholder="5,00">
+                            </div>
+                            <div class="form-group">
+                                <label>Parcelas</label>
+                                <input type="number" name="financing_months" min="1" max="120" placeholder="12">
+                            </div>
+                            <div class="form-group">
+                                <label>Valor da Parcela (R$)</label>
+                                <input type="number" name="monthly_payment" step="0.01" min="0" placeholder="0,00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seção: Observações -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-comment"></i>
+                            Observações
+                        </h3>
+                        <div class="form-group full-width">
+                            <label>Observações da Venda</label>
+                            <textarea name="notes" rows="4" placeholder="Informações adicionais sobre a venda..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeNewSaleModal()">
+                        <i class="fas fa-times"></i>
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i>
+                        Salvar Venda
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -1065,9 +1458,231 @@ $currentPage = 'sales';
             `;
         }
 
+        // Funções do Modal de Nova Venda
         function openNewSaleModal() {
-            alert('Nova venda - Em desenvolvimento');
+            const modal = document.getElementById('newSaleModal');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            // Carregar leads para o select
+            loadLeadsForSelect();
+            
+            // Reset form
+            document.getElementById('newSaleForm').reset();
+            document.querySelector('input[name="sale_date"]').value = new Date().toISOString().split('T')[0];
         }
+
+        function closeNewSaleModal() {
+            const modal = document.getElementById('newSaleModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        async function loadLeadsForSelect() {
+            try {
+                const response = await fetch('api/leads.php?status=new,contacted,negotiating&limit=100');
+                const data = await response.json();
+                
+                if (data.success && data.leads) {
+                    const leadSelect = document.getElementById('leadSelect');
+                    
+                    // Limpar opções existentes (exceto a primeira)
+                    while (leadSelect.children.length > 1) {
+                        leadSelect.removeChild(leadSelect.lastChild);
+                    }
+                    
+                    // Adicionar leads
+                    data.leads.forEach(lead => {
+                        const option = document.createElement('option');
+                        option.value = lead.id;
+                        option.textContent = `${lead.lead_name || lead.name} - ${lead.phone || 'Sem telefone'}`;
+                        option.dataset.leadData = JSON.stringify(lead);
+                        leadSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar leads:', error);
+            }
+        }
+
+        // Auto-preenchimento quando um lead é selecionado
+        document.addEventListener('DOMContentLoaded', function() {
+            const leadSelect = document.getElementById('leadSelect');
+            leadSelect?.addEventListener('change', function() {
+                if (this.value) {
+                    const leadData = JSON.parse(this.options[this.selectedIndex].dataset.leadData || '{}');
+                    
+                    // Preencher campos do formulário
+                    document.querySelector('input[name="customer_name"]').value = leadData.lead_name || leadData.name || '';
+                    document.querySelector('input[name="email"]').value = leadData.email || '';
+                    document.querySelector('input[name="phone"]').value = leadData.phone || '';
+                } else {
+                    // Limpar campos se "Selecionar lead" foi escolhido
+                    document.querySelector('input[name="customer_name"]').value = '';
+                    document.querySelector('input[name="email"]').value = '';
+                    document.querySelector('input[name="phone"]').value = '';
+                }
+            });
+        });
+
+        // Submissão do formulário
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('newSaleForm');
+            form?.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await submitNewSale(this);
+            });
+        });
+
+        async function submitNewSale(form) {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            try {
+                // Desabilitar botão e mostrar loading
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+                
+                // Coletar dados do formulário
+                const formData = new FormData(form);
+                const data = {
+                    lead_id: formData.get('lead_id') || null,
+                    customer_name: formData.get('customer_name'),
+                    email: formData.get('email') || null,
+                    phone: formData.get('phone') || null,
+                    vehicle_sold: formData.get('vehicle_sold'),
+                    contract_number: formData.get('contract_number') || null,
+                    payment_type: formData.get('payment_type'),
+                    sale_date: formData.get('sale_date') || new Date().toISOString().split('T')[0],
+                    sale_value: parseFloat(formData.get('sale_value')) || 0,
+                    down_payment: parseFloat(formData.get('down_payment')) || null,
+                    commission_percentage: parseFloat(formData.get('commission_percentage')) || null,
+                    financing_months: parseInt(formData.get('financing_months')) || null,
+                    monthly_payment: parseFloat(formData.get('monthly_payment')) || null,
+                    notes: formData.get('notes') || null,
+                    seller_id: currentUser.id
+                };
+
+                // Validações básicas
+                if (!data.customer_name.trim()) {
+                    throw new Error('Nome do cliente é obrigatório');
+                }
+                if (!data.vehicle_sold.trim()) {
+                    throw new Error('Veículo vendido é obrigatório');
+                }
+                if (!data.payment_type) {
+                    throw new Error('Forma de pagamento é obrigatória');
+                }
+                if (data.sale_value <= 0) {
+                    throw new Error('Valor da venda deve ser maior que zero');
+                }
+
+                // Enviar para API
+                const response = await fetch('api/sales_simple.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Sucesso
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> Salvo!';
+                    submitBtn.style.background = '#10b981';
+                    
+                    // Mostrar mensagem de sucesso
+                    showNotification('Venda criada com sucesso!', 'success');
+                    
+                    // Fechar modal após delay
+                    setTimeout(() => {
+                        closeNewSaleModal();
+                        
+                        // Recarregar dados
+                        loadSales(currentPage);
+                        loadStats();
+                        
+                        // Reset button
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.style.background = '';
+                    }, 1500);
+                    
+                } else {
+                    throw new Error(result.message || 'Erro ao criar venda');
+                }
+
+            } catch (error) {
+                console.error('Erro ao criar venda:', error);
+                
+                // Mostrar erro
+                showNotification('Erro ao criar venda: ' + error.message, 'error');
+                
+                // Re-habilitar botão
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        // Função para mostrar notificações
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 2rem;
+                right: 2rem;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 11000;
+                animation: slideIn 0.3s ease;
+                max-width: 400px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            `;
+            
+            switch (type) {
+                case 'success':
+                    notification.style.background = '#10b981';
+                    notification.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+                    break;
+                case 'error':
+                    notification.style.background = '#ef4444';
+                    notification.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+                    break;
+                default:
+                    notification.style.background = '#3b82f6';
+                    notification.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+            }
+            
+            document.body.appendChild(notification);
+            
+            // Remover após 4 segundos
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+
+        // Fechar modal ao clicar fora
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('newSaleModal');
+            if (e.target === modal) {
+                closeNewSaleModal();
+            }
+        });
+
+        // Fechar modal com ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('newSaleModal');
+                if (modal && modal.style.display === 'flex') {
+                    closeNewSaleModal();
+                }
+            }
+        });
 
         // Make functions globally available for debugging
         window.viewSale = async function(id) {
