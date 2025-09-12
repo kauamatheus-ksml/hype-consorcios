@@ -213,11 +213,28 @@ $currentPage = 'sales';
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            position: relative;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            outline: none;
         }
 
         .btn-new-sale:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(59, 225, 201, 0.3);
+            box-shadow: 0 4px 12px rgba(59, 225, 201, 0.4);
+            background: #2dd4bf;
+        }
+
+        .btn-new-sale:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(59, 225, 201, 0.3);
+        }
+
+        .btn-new-sale:focus {
+            box-shadow: 0 0 0 3px rgba(59, 225, 201, 0.3);
         }
 
         .filters-grid {
@@ -764,9 +781,13 @@ $currentPage = 'sales';
                 </div>
                 
                 <div class="page-actions">
-                    <button class="btn-new-sale" onclick="openNewSaleModal()">
+                    <button class="btn-new-sale" onclick="window.openNewSaleModal()">
                         <i class="fas fa-plus"></i>
                         Nova Venda
+                    </button>
+                    <!-- Botão de teste temporário -->
+                    <button style="margin-left: 10px; padding: 0.5rem 1rem; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="window.testButton()">
+                        Teste
                     </button>
                 </div>
             </div>
@@ -1458,9 +1479,15 @@ $currentPage = 'sales';
             `;
         }
 
-        // Funções do Modal de Nova Venda
-        function openNewSaleModal() {
+        // Funções do Modal de Nova Venda - Tornar globais
+        window.openNewSaleModal = function() {
+            console.log('openNewSaleModal chamada');
             const modal = document.getElementById('newSaleModal');
+            if (!modal) {
+                console.error('Modal newSaleModal não encontrado');
+                return;
+            }
+            
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
             
@@ -1468,15 +1495,25 @@ $currentPage = 'sales';
             loadLeadsForSelect();
             
             // Reset form
-            document.getElementById('newSaleForm').reset();
-            document.querySelector('input[name="sale_date"]').value = new Date().toISOString().split('T')[0];
-        }
+            const form = document.getElementById('newSaleForm');
+            if (form) {
+                form.reset();
+                const dateInput = document.querySelector('input[name="sale_date"]');
+                if (dateInput) {
+                    dateInput.value = new Date().toISOString().split('T')[0];
+                }
+            }
+            console.log('Modal aberto');
+        };
 
-        function closeNewSaleModal() {
+        window.closeNewSaleModal = function() {
+            console.log('closeNewSaleModal chamada');
             const modal = document.getElementById('newSaleModal');
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        };
 
         async function loadLeadsForSelect() {
             try {
@@ -1682,6 +1719,56 @@ $currentPage = 'sales';
                     closeNewSaleModal();
                 }
             }
+        });
+
+        // Função de teste simples (temporária)
+        window.testButton = function() {
+            alert('Botão funcionando!');
+        };
+
+        // Backup: Adicionar event listener direto no botão
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM carregado - procurando botão Nova Venda');
+            
+            // Aguardar um pouco para garantir que tudo foi carregado
+            setTimeout(function() {
+                const btnNewSale = document.querySelector('.btn-new-sale');
+                if (btnNewSale) {
+                    console.log('Botão Nova Venda encontrado, adicionando listener');
+                    
+                    // Remover qualquer event listener existente
+                    btnNewSale.removeAttribute('onclick');
+                    
+                    // Adicionar novo event listener
+                    btnNewSale.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Botão Nova Venda clicado via event listener');
+                        
+                        // Verificar se a função existe
+                        if (typeof window.openNewSaleModal === 'function') {
+                            window.openNewSaleModal();
+                        } else {
+                            console.error('Função openNewSaleModal não encontrada');
+                            alert('Erro: Função não encontrada. Recarregue a página.');
+                        }
+                    });
+                    
+                    // Adicionar atributo onclick como backup
+                    btnNewSale.setAttribute('onclick', 'window.openNewSaleModal()');
+                    
+                } else {
+                    console.error('Botão Nova Venda não encontrado');
+                }
+
+                // Verificar se modal existe
+                const modal = document.getElementById('newSaleModal');
+                if (!modal) {
+                    console.error('Modal newSaleModal não encontrado no DOM');
+                } else {
+                    console.log('Modal newSaleModal encontrado no DOM');
+                }
+            }, 500);
         });
 
         // Make functions globally available for debugging
