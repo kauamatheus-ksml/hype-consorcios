@@ -1531,14 +1531,19 @@ $currentPage = 'sales';
         async function loadLeadsForSelect() {
             try {
                 console.log('📋 Carregando leads para o select...');
-                const response = await fetch('api/leads.php?status=new,contacted,negotiating&limit=100');
+                
+                // Primeiro testar com todos os leads
+                let url = 'api/leads.php?limit=100';
+                console.log('🔗 Testando URL:', url);
+                
+                const response = await fetch(url);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 const data = await response.json();
-                console.log('📋 Resposta da API de leads:', data);
+                console.log('📋 Resposta completa da API de leads:', data);
                 
                 const leadSelect = document.getElementById('leadSelect');
                 if (!leadSelect) {
@@ -1551,31 +1556,59 @@ $currentPage = 'sales';
                     leadSelect.removeChild(leadSelect.lastChild);
                 }
                 
-                if (data.success && data.leads && data.leads.length > 0) {
-                    console.log(`📋 Carregando ${data.leads.length} leads no select`);
+                if (data.success && data.leads && Array.isArray(data.leads)) {
+                    console.log(`📋 Total de leads retornados: ${data.leads.length}`);
                     
-                    // Adicionar leads
-                    data.leads.forEach(lead => {
-                        const option = document.createElement('option');
-                        option.value = lead.id;
+                    // Filtrar leads por status no frontend (já que a API pode não suportar múltiplos status)
+                    const validLeads = data.leads.filter(lead => 
+                        ['new', 'contacted', 'negotiating', 'qualified'].includes(lead.status)
+                    );
+                    
+                    console.log(`📋 Leads válidos para seleção: ${validLeads.length}`);
+                    
+                    if (validLeads.length > 0) {
+                        // Adicionar leads
+                        validLeads.forEach(lead => {
+                            const option = document.createElement('option');
+                            option.value = lead.id;
+                            
+                            // Usar diferentes campos possíveis para nome
+                            const leadName = lead.name || lead.lead_name || lead.customer_name || 'Nome não informado';
+                            const leadPhone = lead.phone || lead.telephone || 'Sem telefone';
+                            
+                            option.textContent = `${leadName} - ${leadPhone}`;
+                            option.dataset.leadData = JSON.stringify(lead);
+                            leadSelect.appendChild(option);
+                        });
                         
-                        // Usar diferentes campos possíveis para nome
-                        const leadName = lead.lead_name || lead.name || lead.customer_name || 'Nome não informado';
-                        const leadPhone = lead.phone || lead.telephone || 'Sem telefone';
-                        
-                        option.textContent = `${leadName} - ${leadPhone}`;
-                        option.dataset.leadData = JSON.stringify(lead);
-                        leadSelect.appendChild(option);
-                    });
-                    
-                    console.log('✅ Leads carregados no select');
-                } else {
-                    console.log('📋 Nenhum lead encontrado ou API retornou erro:', data.message || 'Erro desconhecido');
-                    
-                    // Adicionar opção informativa
+                        console.log('✅ Leads carregados no select');
+                    } else {
+                        // Mostrar todos os leads se não houver com status específico
+                        console.log('📋 Nenhum lead com status válido, mostrando todos...');
+                        data.leads.forEach(lead => {
+                            const option = document.createElement('option');
+                            option.value = lead.id;
+                            
+                            const leadName = lead.name || lead.lead_name || lead.customer_name || 'Nome não informado';
+                            const leadPhone = lead.phone || lead.telephone || 'Sem telefone';
+                            
+                            option.textContent = `${leadName} - ${leadPhone} (${lead.status || 'sem status'})`;
+                            option.dataset.leadData = JSON.stringify(lead);
+                            leadSelect.appendChild(option);
+                        });
+                    }
+                } else if (data.success && (!data.leads || data.leads.length === 0)) {
+                    console.log('📋 API funcionou mas não retornou leads');
                     const option = document.createElement('option');
                     option.value = '';
-                    option.textContent = 'Nenhum lead disponível';
+                    option.textContent = 'Nenhum lead encontrado no sistema';
+                    option.disabled = true;
+                    leadSelect.appendChild(option);
+                } else {
+                    console.log('📋 API retornou erro:', data.message || 'Erro desconhecido');
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = data.message || 'Erro ao buscar leads';
                     option.disabled = true;
                     leadSelect.appendChild(option);
                 }
@@ -1587,7 +1620,7 @@ $currentPage = 'sales';
                 if (leadSelect && leadSelect.children.length <= 1) {
                     const option = document.createElement('option');
                     option.value = '';
-                    option.textContent = 'Erro ao carregar leads';
+                    option.textContent = `Erro: ${error.message}`;
                     option.disabled = true;
                     leadSelect.appendChild(option);
                 }
@@ -1822,6 +1855,29 @@ $currentPage = 'sales';
                 document.body.style.overflow = 'auto';
                 
                 console.log('✅ Modal forçadamente fechado');
+            }
+        };
+
+        // Função para testar API de leads manualmente
+        window.testLeadsAPI = async function() {
+            console.log('🧪 TESTANDO API DE LEADS MANUALMENTE');
+            
+            try {
+                const response = await fetch('api/leads.php?limit=10');
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                
+                const text = await response.text();
+                console.log('Response text:', text);
+                
+                const data = JSON.parse(text);
+                console.log('Response JSON:', data);
+                
+                alert(`Teste da API concluído. Status: ${response.status}. Dados no console.`);
+                
+            } catch (error) {
+                console.error('Erro no teste da API:', error);
+                alert(`Erro: ${error.message}`);
             }
         };
 
