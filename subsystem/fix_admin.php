@@ -1,11 +1,8 @@
 <?php
 /**
- * Script para corrigir/criar usuário Gerente de Vendas
+ * Script para corrigir/criar usuário admin
  * Hype Consórcios CRM
  */
-
-// Inicia o buffer de saída para garantir que o conteúdo seja exibido no <pre>
-ob_start();
 
 require_once 'config/database.php';
 
@@ -14,110 +11,134 @@ try {
     $conn = $db->getConnection();
     
     if (!$conn) {
-        throw new Exception("Não foi possível conectar ao banco de dados");
+        throw new Exception("Não foi possível conectar ao banco");
     }
     
-    // --- 1. Definir os dados do usuário Gerente de Vendas ---
-    $username     = 'gerentevendas';
-    $email        = 'gerentevendas@hypeconsorcios.com.br';
-    $newPassword  = 'HypeVendas@2025'; // Defina a nova senha aqui
-    $fullName     = 'Gerente de Vendas';
-    $role         = 'gerente_vendas';
-    $status       = 'active';
+    // Verificar se usuário admin já existe
+    $stmt = $conn->prepare("SELECT id FROM users WHERE username = 'admin' OR email = 'admin@hypeconsorcios.com.br'");
+    $stmt->execute();
+    $existingUser = $stmt->fetch();
     
-    // --- 2. Deletar usuário existente para evitar duplicatas ---
-    $stmt = $conn->prepare("DELETE FROM users WHERE username = ? OR email = ?");
-    $stmt->execute([$username, $email]);
-    echo "ℹ️ Usuário '{$username}' anterior (se existente) removido.\n";
+    if ($existingUser) {
+        echo "ℹ️ Usuário admin já existe. Atualizando senha...\n";
+        // Não deletar - apenas atualizar para evitar problemas de foreign key
+        $updateExisting = true;
+    } else {
+        echo "ℹ️ Criando novo usuário admin...\n";
+        $updateExisting = false;
+    }
     
-    // --- 3. Criar o hash da nova senha ---
-    $passwordHash = password_hash($newPassword, PASSWORD_DEFAULT);
+    // Criar/atualizar usuário admin com senha correta
+    $passwordHash = password_hash('password', PASSWORD_DEFAULT);
     
-    // --- 4. Inserir o novo usuário com a senha hasheada ---
-    $stmt = $conn->prepare("
-        INSERT INTO users (username, email, password_hash, full_name, role, status, created_at) 
-        VALUES (?, ?, ?, ?, ?, ?, NOW())
-    ");
+    // Validar se o hash foi criado corretamente
+    if (!$passwordHash) {
+        throw new Exception("Erro ao gerar hash da senha");
+    }
     
-    $result = $stmt->execute([
-        $username,
-        $email,
-        $passwordHash,
-        $fullName,
-        $role,
-        $status
-    ]);
+    echo "🔐 Hash gerado: " . substr($passwordHash, 0, 20) . "...\n";
+    echo "🧪 Validação do hash: " . (password_verify('password', $passwordHash) ? "OK" : "FALHOU") . "\n";
+    
+    if ($updateExisting) {
+        // Atualizar usuário existente
+        $stmt = $conn->prepare("
+            UPDATE users 
+            SET password_hash = ?, full_name = ?, role = ?, status = 'active'
+            WHERE username = 'admin' OR email = 'admin@hypeconsorcios.com.br'
+        ");
+        
+        $result = $stmt->execute([
+            $passwordHash,
+            'Administrador Sistema',
+            'admin'
+        ]);
+    } else {
+        // Criar novo usuário
+        $stmt = $conn->prepare("
+            INSERT INTO users (username, email, password_hash, full_name, role, status, created_at) 
+            VALUES (?, ?, ?, ?, ?, ?, NOW())
+        ");
+        
+        $result = $stmt->execute([
+            'admin',
+            'admin@hypeconsorcios.com.br',
+            $passwordHash,
+            'Administrador Sistema',
+            'admin',
+            'active'
+        ]);
+    }
     
     if ($result) {
-        echo "✅ Usuário 'Gerente de Vendas' criado/corrigido com sucesso!\n";
-        echo "--------------------------------------------------------\n";
-        echo "📧 Email: {$email}\n";
-        echo "🔑 Senha: {$newPassword}\n";
-        echo "👤 Nome: {$fullName}\n";
-        echo "🛡️ Função: {$role}\n\n";
+        $action = $updateExisting ? "atualizado" : "criado";
+        echo "✅ Usuário admin {$action} com sucesso!\n";
+        echo "📧 Email: admin@hypeconsorcios.com.br\n";
+        echo "🔑 Senha: password\n";
+        echo "👤 Nome: Administrador Sistema\n";
+        echo "🛡️ Função: admin\n\n";
         
-        // --- 5. Testar o login para verificar se a senha funciona ---
+        // Testar login - buscar usuário recém criado/atualizado
         $stmt = $conn->prepare("
             SELECT id, username, email, password_hash, full_name, role, status 
             FROM users 
-            WHERE username = ? AND status = ?
+            WHERE (username = 'admin' OR email = 'admin@hypeconsorcios.com.br') AND status = 'active'
         ");
-        $stmt->execute([$username, $status]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->execute();
+        $user = $stmt->fetch();
         
-        if ($user && password_verify($newPassword, $user['password_hash'])) {
+        if ($user && password_verify('password', $user['password_hash'])) {
             echo "🎉 Teste de login: SUCESSO!\n";
-            echo "📊 Dados do usuário recuperado do banco:\n";
-            // Usando print_r para uma saída mais limpa no terminal/pre formatado
-            print_r($user);
+            echo "📊 Hash da senha: " . substr($user['password_hash'], 0, 20) . "...\n";
+            echo "📊 Dados do usuário:\n";
+            echo json_encode($user, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         } else {
-            echo "❌ Teste de login: FALHOU! Verifique o hash da senha e a consulta.\n";
+            echo "❌ Teste de login: FALHOU!\n";
+            if ($user) {
+                echo "👤 Usuário encontrado mas senha não confere\n";
+                echo "🔍 Hash atual: " . substr($user['password_hash'], 0, 20) . "...\n";
+                echo "🔍 Hash esperado: " . substr($passwordHash, 0, 20) . "...\n";
+                echo "🧪 Teste manual: " . (password_verify('password', $passwordHash) ? "OK" : "FALHOU") . "\n";
+            } else {
+                echo "👤 Usuário não encontrado ou inativo\n";
+            }
         }
         
     } else {
-        echo "❌ Erro ao criar o usuário 'Gerente de Vendas'.\n";
-        // Imprimir informações de erro do PDO
-        print_r($stmt->errorInfo());
+        echo "❌ Erro ao criar usuário admin\n";
     }
     
 } catch (Exception $e) {
-    echo "❌ Erro Crítico: " . $e->getMessage() . "\n";
-    echo "Arquivo: " . $e->getFile() . "\n";
-    echo "Linha: " . $e->getLine() . "\n";
+    echo "❌ Erro: " . $e->getMessage() . "\n";
 }
-
-// Captura o conteúdo do buffer
-$output = ob_get_clean();
 ?>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Correção Gerente Vendas - Hype CRM</title>
+    <title>Correção Admin - Hype CRM</title>
     <style>
-        body { font-family: monospace, sans-serif; background: #1a1a1a; color: #00ff00; padding: 20px; font-size: 14px; }
-        h2, h3 { color: #ffffff; border-bottom: 1px solid #00ff00; padding-bottom: 5px;}
-        pre { background: #2b2b2b; padding: 20px; border-radius: 10px; border-left: 3px solid #00ff00; white-space: pre-wrap; word-wrap: break-word; }
-        a { color: #00ffff; }
-        ul { list-style: none; padding-left: 0;}
-        li { margin-bottom: 8px;}
-        strong { color: #ffffff; }
+        body { font-family: monospace; background: #1a1a1a; color: #00ff00; padding: 20px; }
+        pre { background: #333; padding: 20px; border-radius: 10px; }
     </style>
 </head>
 <body>
-    <h2>🔧 Script de Correção - Usuário Gerente de Vendas</h2>
-    <pre><?php echo htmlspecialchars($output); // Exibe a saída do script PHP de forma segura ?></pre>
+    <h2>🔧 Script de Correção - Usuário Admin</h2>
+    <pre><?php 
+        // Se executado via web, mostrar resultado formatado
+        if (isset($_SERVER['HTTP_HOST'])) {
+            ob_flush();
+        }
+    ?></pre>
     
     <h3>📋 Próximos Passos:</h3>
     <ol>
-        <li>Volte para a página de login do CRM.</li>
-        <li>Use as novas credenciais para acessar:</li>
+        <li>Volte para a página de teste: <a href="test_backend.php" style="color: #00ffff;">test_backend.php</a></li>
+        <li>Use as credenciais:</li>
         <ul>
-            <li><strong>Usuário:</strong> gerentevendas</li>
-            <li><strong>Senha:</strong> HypeVendas@2025</li>
+            <li><strong>Usuário:</strong> admin</li>
+            <li><strong>Senha:</strong> password</li>
         </ul>
-        <li>Após o login, por segurança, é recomendável alterar a senha através do perfil do usuário.</li>
-        <li><strong>IMPORTANTE:</strong> Delete este script do servidor após o uso para evitar riscos de segurança.</li>
+        <li>Faça login e teste o sistema!</li>
     </ol>
 </body>
 </html>
