@@ -48,7 +48,7 @@ function renderSidebar($currentPage, $userRole, $userName) {
         </div>
         
         <div class="nav-item">
-            <a href="#" class="nav-link" onclick="showComingSoon('Usuários')">
+            <a href="users.php" class="nav-link <?= $currentPage === 'users' ? 'active' : '' ?>">
                 <i class="fas fa-user-cog nav-icon"></i>
                 Usuários
             </a>
