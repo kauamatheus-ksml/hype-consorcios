@@ -165,7 +165,7 @@ function handleCreateOrUpdateUser($conn, $userRole) {
             if (strlen($password) < 6) {
                 throw new Exception('Senha deve ter pelo menos 6 caracteres');
             }
-            $query .= ", password = ?";
+            $query .= ", password_hash = ?";
             $params[] = password_hash($password, PASSWORD_DEFAULT);
         }
 
@@ -186,6 +186,15 @@ function handleCreateOrUpdateUser($conn, $userRole) {
             throw new Exception('Nome de usuário já existe');
         }
 
+        // Verificar se email já existe em outro usuário (se fornecido)
+        if (!empty($email)) {
+            $checkStmt = $conn->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
+            $checkStmt->execute([$email, $userId]);
+            if ($checkStmt->fetch()) {
+                throw new Exception('Email já existe');
+            }
+        }
+
     } else {
         // Criar novo usuário
         if (empty($password)) {
@@ -202,7 +211,16 @@ function handleCreateOrUpdateUser($conn, $userRole) {
             throw new Exception('Nome de usuário já existe');
         }
 
-        $query = "INSERT INTO users (full_name, username, email, role, status, password) VALUES (?, ?, ?, ?, ?, ?)";
+        // Verificar se email já existe (se fornecido)
+        if (!empty($email)) {
+            $checkStmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+            $checkStmt->execute([$email]);
+            if ($checkStmt->fetch()) {
+                throw new Exception('Email já existe');
+            }
+        }
+
+        $query = "INSERT INTO users (full_name, username, email, role, status, password_hash) VALUES (?, ?, ?, ?, ?, ?)";
         $params = [$fullName, $username, $email, $role, $status, password_hash($password, PASSWORD_DEFAULT)];
     }
 
