@@ -656,6 +656,29 @@ $currentPage = 'users';
         // Carregar usuários na inicialização
         document.addEventListener('DOMContentLoaded', function() {
             loadUsers();
+
+            // Prevenir reenvio de formulário ao recarregar página
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+
+            // Limpar cache de formulários do navegador
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    // Página foi carregada do cache - recarregar dados
+                    loadUsers();
+                }
+            });
+
+            // Confirmar se o usuário quer realmente sair com dados não salvos
+            window.addEventListener('beforeunload', function(event) {
+                const modal = document.getElementById('userModal');
+                if (modal.classList.contains('show')) {
+                    event.preventDefault();
+                    event.returnValue = 'Você tem alterações não salvas. Deseja realmente sair?';
+                    return event.returnValue;
+                }
+            });
         });
 
         async function loadUsers() {
@@ -820,8 +843,32 @@ $currentPage = 'users';
 
         function closeUserModal() {
             const modal = document.getElementById('userModal');
+            const form = document.getElementById('userForm');
+            const btn = document.getElementById('saveUserBtn');
+
             modal.classList.remove('show');
             currentEditingUser = null;
+
+            // Limpar completamente o estado do formulário
+            form.reset();
+
+            // Restaurar estado do botão
+            const btnText = btn.querySelector('span');
+            const btnIcon = btn.querySelector('i');
+            btn.disabled = false;
+            btnIcon.className = 'fas fa-save';
+            btnText.textContent = 'Salvar';
+            btn.style.display = 'inline-flex';
+
+            // Reabilitar todos os campos (caso esteja em modo visualização)
+            document.querySelectorAll('#userForm input, #userForm select').forEach(field => {
+                field.disabled = false;
+            });
+
+            // Limpar qualquer estado de validação visual
+            document.querySelectorAll('#userForm .form-input, #userForm .form-select').forEach(field => {
+                field.classList.remove('error', 'success');
+            });
         }
 
         function editUser(userId) {
@@ -850,6 +897,12 @@ $currentPage = 'users';
         async function saveUser(event) {
             event.preventDefault();
 
+            // Prevenir duplo envio
+            const btn = document.getElementById('saveUserBtn');
+            if (btn.disabled) {
+                return;
+            }
+
             const formData = new FormData(event.target);
             const userData = {
                 id: formData.get('userId') || null,
@@ -861,7 +914,6 @@ $currentPage = 'users';
                 password: formData.get('password')
             };
 
-            const btn = document.getElementById('saveUserBtn');
             const btnText = btn.querySelector('span');
             const btnIcon = btn.querySelector('i');
 
@@ -883,7 +935,17 @@ $currentPage = 'users';
                 if (result.success) {
                     showAlert(currentEditingUser ? 'Usuário atualizado com sucesso!' : 'Usuário criado com sucesso!', 'success');
                     closeUserModal();
-                    loadUsers();
+
+                    // Implementar PRG (Post-Redirect-Get) para evitar reenvio de formulário
+                    if (result.redirect) {
+                        // Usar history.replaceState para limpar o histórico de navegação
+                        window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+                    }
+
+                    // Aguardar um momento antes de recarregar para garantir que a operação foi processada
+                    setTimeout(() => {
+                        loadUsers();
+                    }, 100);
                 } else {
                     throw new Error(result.message || 'Erro ao salvar usuário');
                 }
@@ -917,7 +979,15 @@ $currentPage = 'users';
 
                 if (result.success) {
                     showAlert('Usuário excluído com sucesso!', 'success');
-                    loadUsers();
+
+                    // Implementar PRG para exclusão também
+                    if (result.redirect) {
+                        window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+                    }
+
+                    setTimeout(() => {
+                        loadUsers();
+                    }, 100);
                 } else {
                     throw new Error(result.message || 'Erro ao excluir usuário');
                 }

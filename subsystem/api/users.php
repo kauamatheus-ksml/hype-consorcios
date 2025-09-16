@@ -233,7 +233,8 @@ function handleCreateOrUpdateUser($conn, $userRole) {
 
     echo json_encode([
         'success' => true,
-        'message' => $userId ? 'Usuário atualizado com sucesso' : 'Usuário criado com sucesso'
+        'message' => $userId ? 'Usuário atualizado com sucesso' : 'Usuário criado com sucesso',
+        'redirect' => true
     ], JSON_UNESCAPED_UNICODE);
 }
 
@@ -272,7 +273,8 @@ function handleDeleteUser($conn, $userRole) {
 
     echo json_encode([
         'success' => true,
-        'message' => 'Usuário excluído com sucesso'
+        'message' => 'Usuário excluído com sucesso',
+        'redirect' => true
     ], JSON_UNESCAPED_UNICODE);
 }
 ?>
