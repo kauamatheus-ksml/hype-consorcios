@@ -246,6 +246,141 @@ $currentPage = 'site-config';
 
         .client-image-item .current-image {
             max-width: 100%;
+        }
+
+        /* FAQ Management Styles */
+        .faq-management {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .faq-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--foreground);
+        }
+
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .faq-item {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fafafa;
+            overflow: hidden;
+        }
+
+        .faq-item-header {
+            padding: 1rem;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .faq-item-header:hover {
+            background: #f8f9fa;
+        }
+
+        .faq-question {
+            font-weight: 600;
+            color: var(--foreground);
+            flex: 1;
+        }
+
+        .faq-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .faq-actions button {
+            padding: 0.25rem 0.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .btn-edit {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-toggle {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-toggle.inactive {
+            background: #6b7280;
+        }
+
+        .faq-form {
+            padding: 1rem;
+            background: white;
+            display: none;
+        }
+
+        .faq-form.active {
+            display: block;
+        }
+
+        .faq-form .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .faq-form .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--foreground);
+        }
+
+        .faq-form .form-input,
+        .faq-form .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .faq-form .form-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+
+        .drag-handle {
+            cursor: move;
+            color: #6b7280;
+            margin-right: 0.5rem;
+        }
+
+        .faq-item.dragging {
+            opacity: 0.5;
+        }
             max-height: 120px;
             width: 100%;
             object-fit: cover;
@@ -421,6 +556,11 @@ $currentPage = 'site-config';
             // Gerar formulário para a seção
             const sectionsContainer = document.getElementById('configSections');
             sectionsContainer.innerHTML = generateSectionForm(section);
+
+            // Se for a seção FAQ, carregar as FAQs
+            if (section === 'faq') {
+                loadFaqs();
+            }
         }
 
         function generateSectionForm(section) {
@@ -439,8 +579,24 @@ $currentPage = 'site-config';
                     <form id="configForm-${section}" onsubmit="saveConfigurations(event, '${section}')">
             `;
 
+            // Para a seção de FAQs, criar interface especial de gerenciamento
+            if (section === 'faq') {
+                formHtml += `
+                    <div class="faq-management">
+                        <div class="faq-header">
+                            <h3><i class="fas fa-question-circle"></i> Gerenciar Perguntas Frequentes</h3>
+                            <button type="button" class="btn btn-primary" onclick="addNewFaq()">
+                                <i class="fas fa-plus"></i> Nova Pergunta
+                            </button>
+                        </div>
+                        <div id="faqList" class="faq-list">
+                            <!-- FAQs serão carregadas aqui -->
+                        </div>
+                    </div>
+                `;
+            }
             // Para a seção de clientes, criar layout especial para imagens
-            if (section === 'clients') {
+            else if (section === 'clients') {
                 const textConfigs = sectionConfigs.filter(config => !config.config_key.includes('client_image_'));
                 const imageConfigs = sectionConfigs.filter(config => config.config_key.includes('client_image_'));
 
