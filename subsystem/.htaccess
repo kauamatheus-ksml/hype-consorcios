@@ -1,0 +1,55 @@
+# Proteger arquivos sensíveis e de desenvolvimento
+# Bloquear acesso direto a arquivos de configuração
+<Files "*.php">
+    # Permitir apenas arquivos principais do sistema
+    <FilesMatch "^(index|login|dashboard|leads|sales|users|profile|audit-logs|site-config)\.php$">
+        Order allow,deny
+        Allow from all
+    </FilesMatch>
+
+    # Bloquear todos os outros arquivos PHP por padrão
+    Order deny,allow
+    Deny from all
+</Files>
+
+# Bloquear acesso ao diretório dev-tools
+<Directory "dev-tools">
+    Order deny,allow
+    Deny from all
+</Directory>
+
+# Bloquear acesso a arquivos de backup e configuração
+<FilesMatch "\.(sql|json|bak|backup|log)$">
+    Order deny,allow
+    Deny from all
+</FilesMatch>
+
+# Bloquear acesso a arquivos de configuração específicos
+<Files "database.php">
+    Order deny,allow
+    Deny from all
+</Files>
+
+# Permitir acesso a arquivos de API
+<Directory "api">
+    <Files "*.php">
+        Order allow,deny
+        Allow from all
+    </Files>
+</Directory>
+
+# Permitir acesso a componentes
+<Directory "components">
+    <Files "*.php">
+        Order allow,deny
+        Allow from all
+    </Files>
+</Directory>
+
+# Permitir acesso a classes
+<Directory "classes">
+    <Files "*.php">
+        Order allow,deny
+        Allow from all
+    </Files>
+</Directory>

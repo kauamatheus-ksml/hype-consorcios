@@ -1,6 +1,9 @@
 # Arquivos de configuração do banco de dados
 subsystem/config/database.php
 
+# Ferramentas de desenvolvimento (não devem estar em produção)
+subsystem/dev-tools/
+
 # Arquivos de upload dos usuários (NÃO devem ser versionados)
 assets/images/admin/
 assets/videos/admin/
