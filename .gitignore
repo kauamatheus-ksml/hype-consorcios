@@ -1,0 +1,44 @@
+# Arquivos de configuração do banco de dados
+subsystem/config/database.php
+
+# Arquivos de upload dos usuários (NÃO devem ser versionados)
+assets/images/admin/
+assets/videos/admin/
+backups/
+
+# Arquivos temporários
+*.tmp
+*.log
+*.cache
+
+# Diretórios de cache
+cache/
+temp/
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Arquivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Arquivos de backup
+*.bak
+*.backup
+
+# Logs do PHP
+error.log
+php_errors.log
+
+# Arquivos de sessão do PHP
+sessions/
+
+# Node modules (se usar)
+node_modules/
+
+# Composer vendor (se usar)
+vendor/

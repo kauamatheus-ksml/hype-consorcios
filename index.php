@@ -344,7 +344,7 @@ $configs = getAllSiteConfigs();
                         <p class="car-description"><?= $car['description'] ?></p>
                         
                         <a href="<?= $car['link'] ?>" class="btn btn-primary">
-                            Saiba Mais
+                            Saiba Mais.
                         </a>
                     </div>
                 </div>

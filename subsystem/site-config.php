@@ -355,6 +355,14 @@ $currentPage = 'site-config';
                     <i class="fas fa-plus"></i>
                     Instalar Imagens Clientes
                 </a>
+                <a href="backup_configs.php" target="_blank" class="preview-btn" style="background: #28a745;">
+                    <i class="fas fa-download"></i>
+                    Backup Configurações
+                </a>
+                <a href="restore_configs.php" target="_blank" class="preview-btn" style="background: #ffc107; color: #000;">
+                    <i class="fas fa-upload"></i>
+                    Restaurar Configurações
+                </a>
             </div>
 
             <div class="success-message" id="successMessage">
