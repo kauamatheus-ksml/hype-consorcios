@@ -397,45 +397,27 @@ $configs = getAllSiteConfigs();
         <div class="container">
             <div class="contemplados-header">
                 <h2 class="section-title">
-                    Clientes <span class="gradient-text">Contemplados</span>
+                    <?= escapeConfig(getSiteConfig('clients_title', 'Clientes')) ?> <span class="gradient-text"><?= escapeConfig(getSiteConfig('clients_title_highlight', 'Contemplados')) ?></span>
                 </h2>
                 <p class="section-subtitle">
-                    Veja alguns dos nossos clientes que realizaram o sonho do carro novo! 🚗✨
+                    <?= escapeConfig(getSiteConfig('clients_subtitle', 'Veja alguns dos nossos clientes que realizaram o sonho do carro novo! 🚗✨')) ?>
                 </p>
             </div>
 
             <div class="contemplados-grid-container">
                 <div class="contemplados-track" id="contempladosTrack">
-                    <div class="cliente-item">
-                        <img src="assets/images/clientes/cliente-1.jpg" alt="Cliente contemplado 1" class="cliente-image">
-                    </div>
-                    <div class="cliente-item">
-                        <img src="assets/images/clientes/cliente-2.jpg" alt="Cliente contemplado 2" class="cliente-image">
-                    </div>
-                    <div class="cliente-item">
-                        <img src="assets/images/clientes/cliente-3.jpg" alt="Cliente contemplado 3" class="cliente-image">
-                    </div>
-                    <div class="cliente-item">
-                        <img src="assets/images/clientes/cliente-4.jpg" alt="Cliente contemplado 4" class="cliente-image">
-                    </div>
-                    <div class="cliente-item">
-                        <img src="assets/images/clientes/cliente-5.jpg" alt="Cliente contemplado 5" class="cliente-image">
-                    </div>
-                    <div class="cliente-item">
-                        <img src="assets/images/clientes/cliente-6.jpg" alt="Cliente contemplado 6" class="cliente-image">
-                    </div>
-                    <div class="cliente-item">
-                        <img src="assets/images/clientes/cliente-7.jpg" alt="Cliente contemplado 7" class="cliente-image">
-                    </div>
-                    <div class="cliente-item">
-                        <img src="assets/images/clientes/cliente-8.jpg" alt="Cliente contemplado 8" class="cliente-image">
-                    </div>
-                    <div class="cliente-item">
-                        <img src="assets/images/clientes/cliente-9.jpg" alt="Cliente contemplado 9" class="cliente-image">
-                    </div>
-                    <div class="cliente-item">
-                        <img src="assets/images/clientes/cliente-10.jpg" alt="Cliente contemplado 10" class="cliente-image">
-                    </div>
+                    <?php
+                    // Gerar imagens dos clientes dinamicamente usando configurações
+                    for ($i = 1; $i <= 10; $i++) {
+                        $imageKey = "client_image_$i";
+                        $imagePath = getConfigImageUrl($imageKey, "assets/images/clientes/cliente-$i.jpg");
+                        ?>
+                        <div class="cliente-item">
+                            <img src="<?= escapeConfig($imagePath) ?>" alt="Cliente contemplado <?= $i ?>" class="cliente-image">
+                        </div>
+                        <?php
+                    }
+                    ?>
                 </div>
 
                 <!-- Navigation Controls -->

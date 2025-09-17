@@ -225,6 +225,32 @@ $currentPage = 'site-config';
             border: 1px solid var(--border);
         }
 
+        .client-images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .client-image-item {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            background: #fafafa;
+        }
+
+        .client-image-item .form-label {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .client-image-item .current-image {
+            max-width: 100%;
+            max-height: 120px;
+            width: 100%;
+            object-fit: cover;
+        }
+
         .save-btn {
             background: var(--primary);
             color: var(--primary-foreground);
@@ -321,6 +347,14 @@ $currentPage = 'site-config';
                     <i class="fas fa-external-link-alt"></i>
                     Visualizar Site
                 </a>
+                <a href="test-api-js.html" target="_blank" class="preview-btn">
+                    <i class="fas fa-bug"></i>
+                    Debug API
+                </a>
+                <a href="add_client_images_config.php" target="_blank" class="preview-btn">
+                    <i class="fas fa-plus"></i>
+                    Instalar Imagens Clientes
+                </a>
             </div>
 
             <div class="success-message" id="successMessage">
@@ -405,9 +439,50 @@ $currentPage = 'site-config';
                     <form id="configForm-${section}" onsubmit="saveConfigurations(event, '${section}')">
             `;
 
-            sectionConfigs.forEach(config => {
-                formHtml += generateFieldHtml(config);
-            });
+            // Para a seção de clientes, criar layout especial para imagens
+            if (section === 'clients') {
+                const textConfigs = sectionConfigs.filter(config => !config.config_key.includes('client_image_'));
+                const imageConfigs = sectionConfigs.filter(config => config.config_key.includes('client_image_'));
+
+                // Adicionar campos de texto primeiro
+                textConfigs.forEach(config => {
+                    formHtml += generateFieldHtml(config);
+                });
+
+                // Adicionar seção especial para imagens dos clientes
+                if (imageConfigs.length > 0) {
+                    formHtml += `
+                        <div style="margin: 2rem 0;">
+                            <h3 style="margin-bottom: 1rem; color: var(--foreground);">
+                                <i class="fas fa-images"></i> Imagens dos Clientes Contemplados
+                            </h3>
+                            <p style="color: var(--muted-foreground); margin-bottom: 1rem;">
+                                Faça upload das fotos dos clientes que realizaram o sonho do carro novo.
+                            </p>
+                            <div class="client-images-grid">
+                    `;
+
+                    imageConfigs.forEach(config => {
+                        const clientNumber = config.config_key.replace('client_image_', '');
+                        formHtml += `
+                            <div class="client-image-item">
+                                <div class="form-label">Cliente ${clientNumber}</div>
+                                ${generateFieldHtml(config, true)}
+                            </div>
+                        `;
+                    });
+
+                    formHtml += `
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                // Layout normal para outras seções
+                sectionConfigs.forEach(config => {
+                    formHtml += generateFieldHtml(config);
+                });
+            }
 
             formHtml += `
                         <button type="submit" class="save-btn">
@@ -421,7 +496,7 @@ $currentPage = 'site-config';
             return formHtml;
         }
 
-        function generateFieldHtml(config) {
+        function generateFieldHtml(config, isCompact = false) {
             const fieldId = `field-${config.config_key}`;
 
             let inputHtml = '';
@@ -485,19 +560,32 @@ $currentPage = 'site-config';
                     `;
             }
 
-            return `
-                <div class="form-group">
-                    <label for="${fieldId}" class="form-label">
-                        ${config.display_name}
-                    </label>
-                    ${config.description ? `
-                        <div class="form-description">
+            if (isCompact) {
+                // Layout compacto para imagens dos clientes
+                return `
+                    ${!config.description || config.description.includes('cliente') ? '' : `
+                        <div class="form-description" style="font-size: 0.75rem; margin-bottom: 0.5rem;">
                             ${config.description}
                         </div>
-                    ` : ''}
+                    `}
                     ${inputHtml}
-                </div>
-            `;
+                `;
+            } else {
+                // Layout completo normal
+                return `
+                    <div class="form-group">
+                        <label for="${fieldId}" class="form-label">
+                            ${config.display_name}
+                        </label>
+                        ${config.description ? `
+                            <div class="form-description">
+                                ${config.description}
+                            </div>
+                        ` : ''}
+                        ${inputHtml}
+                    </div>
+                `;
+            }
         }
 
         function previewMedia(input, configKey, isVideo = false) {

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste JavaScript API</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .success { background: #e8f5e8; }
+        .error { background: #ffe8e8; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste JavaScript da API</h1>
+
+    <div>
+        <button onclick="testGet()">Teste GET (buscar configs)</button>
+        <button onclick="testPost()">Teste POST (salvar simples)</button>
+        <button onclick="testPostWithFile()">Teste POST com arquivo</button>
+        <button onclick="testDebugAPI()">Teste API Debug (sem auth)</button>
+        <button onclick="testDebugInfo()">Info Debug</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        function addResult(title, content, isError = false) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = 'result ' + (isError ? 'error' : 'success');
+            div.innerHTML = `<h3>${title}</h3><pre>${content}</pre>`;
+            results.appendChild(div);
+        }
+
+        async function testGet() {
+            try {
+                const response = await fetch('api/site-config.php?action=get');
+                const data = await response.json();
+                addResult('Teste GET', JSON.stringify(data, null, 2));
+            } catch (error) {
+                addResult('Erro GET', error.message, true);
+            }
+        }
+
+        async function testPost() {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'save');
+                formData.append('section', 'hero');
+                formData.append('hero_title_main', 'Teste JS');
+
+                const response = await fetch('api/site-config.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                addResult('Teste POST Simples', JSON.stringify(data, null, 2), !data.success);
+            } catch (error) {
+                addResult('Erro POST', error.message, true);
+            }
+        }
+
+        async function testPostWithFile() {
+            try {
+                // Criar arquivo fake para teste
+                const fileData = new Blob(['fake video data'], { type: 'video/mp4' });
+                const file = new File([fileData], 'test.mp4', { type: 'video/mp4' });
+
+                const formData = new FormData();
+                formData.append('action', 'save');
+                formData.append('section', 'hero');
+                formData.append('hero_video', file);
+                formData.append('hero_video_current', 'assets/videos/old.mp4');
+
+                console.log('Enviando FormData com:', {
+                    action: formData.get('action'),
+                    section: formData.get('section'),
+                    file: formData.get('hero_video')
+                });
+
+                const response = await fetch('api/site-config.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                addResult('Teste POST com Arquivo', JSON.stringify(data, null, 2), !data.success);
+            } catch (error) {
+                addResult('Erro POST com Arquivo', error.message, true);
+            }
+        }
+
+        async function testDebugAPI() {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'save');
+                formData.append('section', 'hero');
+                formData.append('hero_title_main', 'Teste Debug');
+
+                const response = await fetch('api/site-config-debug.php?skip_auth=1', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                addResult('Teste API Debug (sem auth)', JSON.stringify(data, null, 2), !data.success);
+            } catch (error) {
+                addResult('Erro API Debug', error.message, true);
+            }
+        }
+
+        async function testDebugInfo() {
+            try {
+                const response = await fetch('api/site-config-debug.php?debug=1&skip_auth=1');
+                const data = await response.json();
+                addResult('Info Debug', JSON.stringify(data, null, 2));
+            } catch (error) {
+                addResult('Erro Info Debug', error.message, true);
+            }
+        }
+
+        // Adicionar informações da página
+        window.onload = function() {
+            addResult('Informações da Página', `
+URL: ${window.location.href}
+User Agent: ${navigator.userAgent}
+            `);
+        };
+    </script>
+
+    <hr>
+    <p><a href="site-config.php">← Voltar para configurações</a></p>
+</body>
+</html>

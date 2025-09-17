@@ -102,6 +102,18 @@ try {
         ['clients_title_highlight', 'Contemplados', 'text', 'clients', 'Título Destacado Clientes', 'Segunda parte do título (com gradiente)'],
         ['clients_subtitle', 'Veja alguns dos nossos clientes que realizaram o sonho do carro novo! 🚗✨', 'text', 'clients', 'Subtítulo Clientes', 'Subtítulo da seção'],
 
+        // Client Images
+        ['client_image_1', 'assets/images/clientes/cliente-1.jpg', 'image', 'clients', 'Imagem Cliente 1', 'Foto do primeiro cliente contemplado'],
+        ['client_image_2', 'assets/images/clientes/cliente-2.jpg', 'image', 'clients', 'Imagem Cliente 2', 'Foto do segundo cliente contemplado'],
+        ['client_image_3', 'assets/images/clientes/cliente-3.jpg', 'image', 'clients', 'Imagem Cliente 3', 'Foto do terceiro cliente contemplado'],
+        ['client_image_4', 'assets/images/clientes/cliente-4.jpg', 'image', 'clients', 'Imagem Cliente 4', 'Foto do quarto cliente contemplado'],
+        ['client_image_5', 'assets/images/clientes/cliente-5.jpg', 'image', 'clients', 'Imagem Cliente 5', 'Foto do quinto cliente contemplado'],
+        ['client_image_6', 'assets/images/clientes/cliente-6.jpg', 'image', 'clients', 'Imagem Cliente 6', 'Foto do sexto cliente contemplado'],
+        ['client_image_7', 'assets/images/clientes/cliente-7.jpg', 'image', 'clients', 'Imagem Cliente 7', 'Foto do sétimo cliente contemplado'],
+        ['client_image_8', 'assets/images/clientes/cliente-8.jpg', 'image', 'clients', 'Imagem Cliente 8', 'Foto do oitavo cliente contemplado'],
+        ['client_image_9', 'assets/images/clientes/cliente-9.jpg', 'image', 'clients', 'Imagem Cliente 9', 'Foto do nono cliente contemplado'],
+        ['client_image_10', 'assets/images/clientes/cliente-10.jpg', 'image', 'clients', 'Imagem Cliente 10', 'Foto do décimo cliente contemplado'],
+
         // Career
         ['career_title', 'Trabalhe com a', 'text', 'career', 'Título Carreira', 'Primeira parte do título'],
         ['career_title_highlight', 'Hype Consórcios', 'text', 'career', 'Título Destacado Carreira', 'Segunda parte do título (com gradiente)'],
