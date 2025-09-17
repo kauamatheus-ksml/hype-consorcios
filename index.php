@@ -1,11 +1,18 @@
+<?php
+// Carregar configurações do site
+require_once 'includes/site-config-functions.php';
+
+// Carregar todas as configurações
+$configs = getAllSiteConfigs();
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hype Consórcios - Você tem sonhos nós temos a chave</title>
-    <meta name="description" content="Realize o sonho do carro novo com o Consórcio Volkswagen. Parceiro autorizado com as melhores condições. Simule agora!">
-    <meta name="keywords" content="consórcio de veículos, consórcio volkswagen, consórcio carros, consórcio sem juros, embracon, carta contemplada, consórcio leves premium pesados">
+    <title><?= escapeConfig(getSiteConfig('site_title', 'Hype Consórcios - Você tem sonhos nós temos a chave')) ?></title>
+    <meta name="description" content="<?= escapeConfig(getSiteConfig('site_description', 'Realize o sonho do carro novo com o Consórcio Volkswagen. Parceiro autorizado com as melhores condições. Simule agora!')) ?>">
+    <meta name="keywords" content="<?= escapeConfig(getSiteConfig('site_keywords', 'consórcio de veículos, consórcio volkswagen, consórcio carros, consórcio sem juros, embracon, carta contemplada, consórcio leves premium pesados')) ?>">
     <link rel="canonical" href="https://hypeconsorcios.com.br/">
     <link rel="icon" type="image/x-icon" href="assets/images/logo.ico">
 
@@ -18,22 +25,22 @@
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 
     <!-- Open Graph - SEO Social -->
-    <meta property="og:title" content="Hype Consórcios - Você tem sonhos nós temos a chave">
-    <meta property="og:description" content="Realize o sonho do carro novo com o Consórcio Volkswagen. Parceiro autorizado com as melhores condições e 40+ anos de tradição.">
+    <meta property="og:title" content="<?= escapeConfig(getSiteConfig('site_title', 'Hype Consórcios - Você tem sonhos nós temos a chave')) ?>">
+    <meta property="og:description" content="<?= escapeConfig(getSiteConfig('site_description', 'Realize o sonho do carro novo com o Consórcio Volkswagen. Parceiro autorizado com as melhores condições e 40+ anos de tradição.')) ?>">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://hypeconsorcios.com.br/">
-    <meta property="og:image" content="https://hypeconsorcios.com.br/assets/images/consorcio-jaragua-do-sul-og.jpg">
+    <meta property="og:image" content="<?= escapeConfig(getSiteConfig('og_image', 'https://hypeconsorcios.com.br/assets/images/consorcio-jaragua-do-sul-og.jpg')) ?>">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Consórcio de Veículos Jaraguá do Sul - Hype Consórcios">
-    <meta property="og:site_name" content="Hype Consórcios">
+    <meta property="og:site_name" content="<?= escapeConfig(getSiteConfig('company_name', 'Hype Consórcios')) ?>">
     <meta property="og:locale" content="pt_BR">
-    
+
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Hype Consórcios - Você tem sonhos nós temos a chave">
-    <meta name="twitter:description" content="Realize o sonho do carro novo com o Consórcio Volkswagen. Parceiro autorizado com as melhores condições e 40+ anos de tradição.">
-    <meta name="twitter:image" content="https://hypeconsorcios.com.br/assets/images/consorcio-jaragua-do-sul-og.jpg">
+    <meta name="twitter:title" content="<?= escapeConfig(getSiteConfig('site_title', 'Hype Consórcios - Você tem sonhos nós temos a chave')) ?>">
+    <meta name="twitter:description" content="<?= escapeConfig(getSiteConfig('site_description', 'Realize o sonho do carro novo com o Consórcio Volkswagen. Parceiro autorizado com as melhores condições e 40+ anos de tradição.')) ?>">
+    <meta name="twitter:image" content="<?= escapeConfig(getSiteConfig('og_image', 'https://hypeconsorcios.com.br/assets/images/consorcio-jaragua-do-sul-og.jpg')) ?>">
 
     <!-- Schema.org LocalBusiness - Dados Estruturados -->
     <script type="application/ld+json">
@@ -167,11 +174,11 @@
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '744541735127276');
+    fbq('init', '752388217802160');
     fbq('track', 'PageView');
     </script>
     <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=744541735127276&ev=PageView&noscript=1"
+    src="https://www.facebook.com/tr?id=752388217802160&ev=PageView&noscript=1"
     /></noscript>
     <!-- End Meta Pixel Code -->
 
@@ -249,12 +256,12 @@
                 </div>
                 
                 <h1 class="hero-title">
-                    Você tem sonhos 
-                    <span class="gradient-text">nós temos a chave</span>
+                    <?= escapeConfig(getSiteConfig('hero_title_main', 'Você tem sonhos')) ?>
+                    <span class="gradient-text"><?= escapeConfig(getSiteConfig('hero_title_highlight', 'nós temos a chave')) ?></span>
                 </h1>
-                
+
                 <p class="hero-subtitle">
-                    Com parcelas que você nunca imaginou. Seu carro novo há clique de você.
+                    <?= escapeConfig(getSiteConfig('hero_subtitle', 'Com parcelas que você nunca imaginou. Seu carro novo há clique de você.')) ?>
                 </p>
 
                 <div class="hero-buttons">
@@ -283,7 +290,7 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">
-                    Descubra nossa <span class="gradient-text">linha completa de crédito veicular</span>
+                    <?= escapeConfig(getSiteConfig('cars_title', 'Descubra nossa')) ?> <span class="gradient-text"><?= escapeConfig(getSiteConfig('cars_title_highlight', 'linha completa de crédito veicular')) ?></span>
                 </h2>
             </div>
 
@@ -292,25 +299,25 @@
                 $cars = [
                     [
                         'name' => 'Veículos Leves',
-                        'price' => 'Parcelas a partir de 811,25',
-                        'description' => 'Realize o sonho do seu carro novo ou seminovo (até 10 anos de uso), da marca e modelo que você escolher. Aqui, seu plano cabe no bolso e seu sonho sai do papel!',
-                        'image' => 'assets/images/polo-blue.jpg',
+                        'price' => getSiteConfig('leves_price', 'Parcelas a partir de 811,25'),
+                        'description' => getSiteConfig('leves_description', 'Realize o sonho do seu carro novo ou seminovo (até 10 anos de uso), da marca e modelo que você escolher. Aqui, seu plano cabe no bolso e seu sonho sai do papel!'),
+                        'image' => getConfigImageUrl('leves_image', 'assets/images/polo-blue.jpg'),
                         'features' => ['Sem entrada', 'Sem juros', 'Usar seu carro usado como lance', 'Lance embutido de até 25% da própria carta'],
                         'link' => 'leves.php'
                     ],
                     [
                         'name' => 'Veículos Premium',
-                        'price' => 'Parcelas a partir de 1.480,00',
-                        'description' => 'Adquira seu carro premium de forma inteligente, sem comprometer seu patrimônio. O veículo dos seus sonhos está mais próximo do que você imagina!',
-                        'image' => 'assets/images/mercedes.jpg',
+                        'price' => getSiteConfig('premium_price', 'Parcelas a partir de 1.480,00'),
+                        'description' => getSiteConfig('premium_description', 'Adquira seu carro premium de forma inteligente, sem comprometer seu patrimônio. O veículo dos seus sonhos está mais próximo do que você imagina!'),
+                        'image' => getConfigImageUrl('premium_image', 'assets/images/mercedes.jpg'),
                         'features' => ['Planos personalizados', 'Opção de lance "troca de chaves"', 'Contemplação programada'],
                         'link' => 'premio.php'
                     ],
                     [
                         'name' => 'Veículos Pesados',
-                        'price' => 'Parcelas a partir de 2.530,00',
-                        'description' => 'Invista no crescimento do seu negócio com a aquisição de caminhões e carretas novos ou seminovos. Com a carta de crédito para pesados, sua frota ganha mais força para acelerar resultados.',
-                        'image' => 'assets/images/caminhao.jpg',
+                        'price' => getSiteConfig('pesados_price', 'Parcelas a partir de 2.530,00'),
+                        'description' => getSiteConfig('pesados_description', 'Invista no crescimento do seu negócio com a aquisição de caminhões e carretas novos ou seminovos. Com a carta de crédito para pesados, sua frota ganha mais força para acelerar resultados.'),
+                        'image' => getConfigImageUrl('pesados_image', 'assets/images/caminhao.jpg'),
                         'features' => ['Veículos pesados com até 8 anos de uso', 'Aceitamos seu caminhão usado como parte de pagamento', 'Lance embutido de até 25% da própria carta'],
                         'link' => 'pesados.php'
                     ]
@@ -355,17 +362,17 @@
             <div class="about-content">
                 <div class="about-text">
                     <h2 class="section-title">
-                        Por que escolher a 
-                        <span class="gradient-text">Hype Consórcios?</span>
+                        <?= escapeConfig(getSiteConfig('about_title', 'Por que escolher a')) ?>
+                        <span class="gradient-text"><?= escapeConfig(getSiteConfig('about_title_highlight', 'Hype Consórcios?')) ?></span>
                     </h2>
                     <p class="section-subtitle">
-                        Na Hype Consórcios, oferecemos uma assessoria exclusiva em todo o processo de contemplação — desde a assinatura do contrato até a entrega do seu veículo.
+                        <?= escapeConfig(getSiteConfig('about_subtitle', 'Na Hype Consórcios, oferecemos uma assessoria exclusiva em todo o processo de contemplação — desde a assinatura do contrato até a entrega do seu veículo.')) ?>
                     </p>
                     <p class="section-text">
-                        Somos representantes de uma marca consolidada nacionalmente: o Consórcio Volkswagen, administrado pela Embracon, especialista em consórcios e responsável pela entrega de mais de 700 mil bens desde 1960.
+                        <?= escapeConfig(getSiteConfig('about_text1', 'Somos representantes de uma marca consolidada nacionalmente: o Consórcio Volkswagen, administrado pela Embracon, especialista em consórcios e responsável pela entrega de mais de 700 mil bens desde 1960.')) ?>
                     </p>
                     <p class="section-text">
-                        Nosso diferencial está no atendimento ágil, transparente e personalizado, sempre focado nas necessidades de cada cliente. Afinal, nosso propósito vai muito além de comercializar consórcios: queremos realizar o seu sonho.
+                        <?= escapeConfig(getSiteConfig('about_text2', 'Nosso diferencial está no atendimento ágil, transparente e personalizado, sempre focado nas necessidades de cada cliente. Afinal, nosso propósito vai muito além de comercializar consórcios: queremos realizar o seu sonho.')) ?>
                     </p>
                 </div>
             </div>
