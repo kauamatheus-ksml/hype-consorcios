@@ -847,6 +847,269 @@ $currentPage = 'site-config';
                 errorDiv.style.display = 'none';
             }, 5000);
         }
+
+        // FAQ Management Functions
+        let currentFaqs = [];
+        let editingFaqId = null;
+
+        async function loadFaqs() {
+            try {
+                const response = await fetch('api/faq.php?action=list');
+                const data = await response.json();
+
+                if (data.success) {
+                    currentFaqs = data.data;
+                    renderFaqList();
+                } else {
+                    showError('Erro ao carregar FAQs: ' + data.message);
+                }
+            } catch (error) {
+                showError('Erro de conexão: ' + error.message);
+            }
+        }
+
+        function renderFaqList() {
+            const faqList = document.getElementById('faqList');
+
+            if (currentFaqs.length === 0) {
+                faqList.innerHTML = '<p style="text-align: center; color: var(--muted-foreground);">Nenhuma FAQ encontrada. Clique em "Nova Pergunta" para adicionar a primeira.</p>';
+                return;
+            }
+
+            faqList.innerHTML = currentFaqs.map(faq => `
+                <div class="faq-item" data-id="${faq.id}">
+                    <div class="faq-item-header" onclick="toggleFaqForm(${faq.id})">
+                        <div style="display: flex; align-items: center;">
+                            <i class="fas fa-grip-vertical drag-handle"></i>
+                            <span class="faq-question">${faq.question}</span>
+                            <span style="margin-left: 1rem; font-size: 0.75rem; color: var(--muted-foreground);">Ordem: ${faq.display_order}</span>
+                        </div>
+                        <div class="faq-actions" onclick="event.stopPropagation()">
+                            <button class="btn-toggle ${faq.is_active ? '' : 'inactive'}" onclick="toggleFaqStatus(${faq.id}, ${faq.is_active})">
+                                ${faq.is_active ? 'Ativo' : 'Inativo'}
+                            </button>
+                            <button class="btn-edit" onclick="editFaq(${faq.id})">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn-delete" onclick="deleteFaq(${faq.id})">
+                                <i class="fas fa-trash"></i> Excluir
+                            </button>
+                        </div>
+                    </div>
+                    <div class="faq-form" id="faq-form-${faq.id}">
+                        <div class="form-group">
+                            <label class="form-label">Pergunta:</label>
+                            <input type="text" class="form-input" id="question-${faq.id}" value="${faq.question}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Resposta:</label>
+                            <textarea class="form-textarea" id="answer-${faq.id}" rows="4">${faq.answer}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ordem de Exibição:</label>
+                            <input type="number" class="form-input" id="order-${faq.id}" value="${faq.display_order}" min="0">
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="cancelEdit(${faq.id})">Cancelar</button>
+                            <button type="button" class="btn btn-primary" onclick="saveFaq(${faq.id})">Salvar</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addNewFaq() {
+            const newFaqHtml = `
+                <div class="faq-item" data-id="new">
+                    <div class="faq-form active">
+                        <h4 style="margin-bottom: 1rem; color: var(--foreground);">Nova Pergunta Frequente</h4>
+                        <div class="form-group">
+                            <label class="form-label">Pergunta:</label>
+                            <input type="text" class="form-input" id="question-new" placeholder="Digite a pergunta...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Resposta:</label>
+                            <textarea class="form-textarea" id="answer-new" rows="4" placeholder="Digite a resposta..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ordem de Exibição:</label>
+                            <input type="number" class="form-input" id="order-new" value="${currentFaqs.length + 1}" min="0">
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="cancelNewFaq()">Cancelar</button>
+                            <button type="button" class="btn btn-primary" onclick="createFaq()">Criar FAQ</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const faqList = document.getElementById('faqList');
+            faqList.insertAdjacentHTML('afterbegin', newFaqHtml);
+        }
+
+        function toggleFaqForm(faqId) {
+            const form = document.getElementById(`faq-form-${faqId}`);
+            form.classList.toggle('active');
+        }
+
+        function editFaq(faqId) {
+            const form = document.getElementById(`faq-form-${faqId}`);
+            form.classList.add('active');
+            editingFaqId = faqId;
+        }
+
+        function cancelEdit(faqId) {
+            const form = document.getElementById(`faq-form-${faqId}`);
+            form.classList.remove('active');
+            editingFaqId = null;
+
+            // Restaurar valores originais
+            const faq = currentFaqs.find(f => f.id == faqId);
+            if (faq) {
+                document.getElementById(`question-${faqId}`).value = faq.question;
+                document.getElementById(`answer-${faqId}`).value = faq.answer;
+                document.getElementById(`order-${faqId}`).value = faq.display_order;
+            }
+        }
+
+        function cancelNewFaq() {
+            const newFaqItem = document.querySelector('[data-id="new"]');
+            if (newFaqItem) {
+                newFaqItem.remove();
+            }
+        }
+
+        async function createFaq() {
+            const question = document.getElementById('question-new').value.trim();
+            const answer = document.getElementById('answer-new').value.trim();
+            const displayOrder = document.getElementById('order-new').value;
+
+            if (!question || !answer) {
+                showError('Pergunta e resposta são obrigatórias');
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'create');
+                formData.append('question', question);
+                formData.append('answer', answer);
+                formData.append('display_order', displayOrder);
+                formData.append('is_active', '1');
+
+                const response = await fetch('api/faq.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess('FAQ criada com sucesso!');
+                    loadFaqs(); // Recarregar lista
+                } else {
+                    showError('Erro ao criar FAQ: ' + data.message);
+                }
+            } catch (error) {
+                showError('Erro de conexão: ' + error.message);
+            }
+        }
+
+        async function saveFaq(faqId) {
+            const question = document.getElementById(`question-${faqId}`).value.trim();
+            const answer = document.getElementById(`answer-${faqId}`).value.trim();
+            const displayOrder = document.getElementById(`order-${faqId}`).value;
+
+            if (!question || !answer) {
+                showError('Pergunta e resposta são obrigatórias');
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'update');
+                formData.append('id', faqId);
+                formData.append('question', question);
+                formData.append('answer', answer);
+                formData.append('display_order', displayOrder);
+                formData.append('is_active', '1');
+
+                const response = await fetch('api/faq.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess('FAQ atualizada com sucesso!');
+                    loadFaqs(); // Recarregar lista
+                } else {
+                    showError('Erro ao atualizar FAQ: ' + data.message);
+                }
+            } catch (error) {
+                showError('Erro de conexão: ' + error.message);
+            }
+        }
+
+        async function deleteFaq(faqId) {
+            if (!confirm('Tem certeza que deseja excluir esta FAQ? Esta ação não pode ser desfeita.')) {
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'delete');
+                formData.append('id', faqId);
+
+                const response = await fetch('api/faq.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess('FAQ excluída com sucesso!');
+                    loadFaqs(); // Recarregar lista
+                } else {
+                    showError('Erro ao excluir FAQ: ' + data.message);
+                }
+            } catch (error) {
+                showError('Erro de conexão: ' + error.message);
+            }
+        }
+
+        async function toggleFaqStatus(faqId, currentStatus) {
+            const newStatus = currentStatus ? 0 : 1;
+
+            try {
+                const faq = currentFaqs.find(f => f.id == faqId);
+                const formData = new FormData();
+                formData.append('action', 'update');
+                formData.append('id', faqId);
+                formData.append('question', faq.question);
+                formData.append('answer', faq.answer);
+                formData.append('display_order', faq.display_order);
+                formData.append('is_active', newStatus);
+
+                const response = await fetch('api/faq.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess(`FAQ ${newStatus ? 'ativada' : 'desativada'} com sucesso!`);
+                    loadFaqs(); // Recarregar lista
+                } else {
+                    showError('Erro ao alterar status: ' + data.message);
+                }
+            } catch (error) {
+                showError('Erro de conexão: ' + error.message);
+            }
+        }
     </script>
 
     <!-- Sidebar Scripts -->
