@@ -439,10 +439,10 @@ $currentPage = 'site-config';
                     break;
 
                 case 'image':
-                    const isVideo = config.config_key.includes('video');
+                    const isVideo = config.config_key.includes('video') || (config.config_value && (config.config_value.includes('.mp4') || config.config_value.includes('.webm') || config.config_value.includes('.avi')));
                     const fileType = isVideo ? 'vídeo' : 'imagem';
                     const acceptType = isVideo ? 'video/*' : 'image/*';
-                    const icon = isVideo ? 'fa-video' : 'fa-upload';
+                    const icon = isVideo ? 'fa-video' : 'fa-image';
 
                     inputHtml = `
                         <div class="file-input-wrapper">

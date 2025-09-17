@@ -185,8 +185,8 @@ function handleSaveConfigs($conn) {
                     $file = $_FILES[$configKey];
                     $fileName = time() . '_' . preg_replace('/[^a-zA-Z0-9\.\-_]/', '', $file['name']);
 
-                    // Validar tipo de arquivo baseado na configuração
-                    if (strpos($configKey, 'video') !== false) {
+                    // Validar tipo de arquivo baseado na configuração ou tipo MIME
+                    if (strpos($configKey, 'video') !== false || strpos($file['type'], 'video/') === 0) {
                         // Para vídeos
                         $allowedTypes = ['video/mp4', 'video/webm', 'video/avi', 'video/mov'];
                         $maxSize = 50 * 1024 * 1024; // 50MB para vídeos

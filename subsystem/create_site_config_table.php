@@ -42,7 +42,7 @@ try {
         ['hero_title_main', 'Você tem sonhos', 'text', 'hero', 'Título Principal do Hero', 'Primeira parte do título principal da página'],
         ['hero_title_highlight', 'nós temos a chave', 'text', 'hero', 'Título Destacado do Hero', 'Segunda parte do título (com gradiente)'],
         ['hero_subtitle', 'Com parcelas que você nunca imaginou. Seu carro novo há clique de você.', 'textarea', 'hero', 'Subtítulo do Hero', 'Texto descritivo abaixo do título'],
-        ['hero_video', 'assets/videos/test-drive-hero.mp4', 'text', 'hero', 'Vídeo de Fundo', 'Caminho para o vídeo de fundo'],
+        ['hero_video', 'assets/videos/test-drive-hero.mp4', 'image', 'hero', 'Vídeo de Fundo', 'Upload do vídeo de fundo'],
         ['hero_logo', 'assets/images/logo.png', 'image', 'hero', 'Logo no Hero', 'Logo flutuante no hero'],
 
         // Meta Tags
