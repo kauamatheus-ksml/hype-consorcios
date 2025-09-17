@@ -440,7 +440,7 @@ $configs = getAllSiteConfigs();
 
                 <div class="career-grid">
                     <div class="career-image">
-                        <img src="assets/images/contarte.png" alt="Trabalhe conosco">
+                        <img src="<?= escapeConfig(getConfigImageUrl('career_image', 'assets/images/contarte.png')) ?>" alt="Trabalhe conosco">
                     </div>
                     <div class="career-description">
                         <p>Se você é comunicativo, tem espírito empreendedor e gosta de ajudar pessoas a realizarem sonhos, venha fazer parte do nosso time de consultores de consórcio.</p>
