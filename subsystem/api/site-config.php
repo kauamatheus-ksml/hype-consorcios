@@ -157,11 +157,16 @@ function handleSaveConfigs($conn) {
         $sectionConfigs = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
         $updatedConfigs = [];
-        $uploadDir = '../../assets/images/admin/';
+        $baseUploadDir = '../../assets/';
+        $imageUploadDir = $baseUploadDir . 'images/admin/';
+        $videoUploadDir = $baseUploadDir . 'videos/admin/';
 
-        // Criar diretório de upload se não existir
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
+        // Criar diretórios de upload se não existirem
+        if (!is_dir($imageUploadDir)) {
+            mkdir($imageUploadDir, 0755, true);
+        }
+        if (!is_dir($videoUploadDir)) {
+            mkdir($videoUploadDir, 0755, true);
         }
 
         // Preparar statement de atualização
@@ -179,18 +184,30 @@ function handleSaveConfigs($conn) {
                 if (isset($_FILES[$configKey]) && $_FILES[$configKey]['error'] === UPLOAD_ERR_OK) {
                     $file = $_FILES[$configKey];
                     $fileName = time() . '_' . preg_replace('/[^a-zA-Z0-9\.\-_]/', '', $file['name']);
-                    $targetPath = $uploadDir . $fileName;
-                    $relativePath = 'assets/images/admin/' . $fileName;
 
-                    // Validar tipo de arquivo
-                    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                    if (!in_array($file['type'], $allowedTypes)) {
-                        throw new Exception('Tipo de arquivo não permitido para ' . $configKey);
+                    // Validar tipo de arquivo baseado na configuração
+                    if (strpos($configKey, 'video') !== false) {
+                        // Para vídeos
+                        $allowedTypes = ['video/mp4', 'video/webm', 'video/avi', 'video/mov'];
+                        $maxSize = 50 * 1024 * 1024; // 50MB para vídeos
+                        $targetPath = $videoUploadDir . $fileName;
+                        $relativePath = 'assets/videos/admin/' . $fileName;
+                    } else {
+                        // Para imagens
+                        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                        $maxSize = 5 * 1024 * 1024; // 5MB para imagens
+                        $targetPath = $imageUploadDir . $fileName;
+                        $relativePath = 'assets/images/admin/' . $fileName;
                     }
 
-                    // Validar tamanho (max 5MB)
-                    if ($file['size'] > 5 * 1024 * 1024) {
-                        throw new Exception('Arquivo muito grande para ' . $configKey . ' (máximo 5MB)');
+                    if (!in_array($file['type'], $allowedTypes)) {
+                        throw new Exception('Tipo de arquivo não permitido para ' . $configKey . '. Tipos aceitos: ' . implode(', ', $allowedTypes));
+                    }
+
+                    // Validar tamanho
+                    if ($file['size'] > $maxSize) {
+                        $maxSizeMB = $maxSize / (1024 * 1024);
+                        throw new Exception('Arquivo muito grande para ' . $configKey . ' (máximo ' . $maxSizeMB . 'MB)');
                     }
 
                     if (move_uploaded_file($file['tmp_name'], $targetPath)) {

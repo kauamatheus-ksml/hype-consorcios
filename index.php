@@ -236,15 +236,24 @@ $configs = getAllSiteConfigs();
     <!-- Hero Section -->
     <section id="inicio" class="hero-section">
         <div class="hero-video-container">
+            <?php
+            $heroVideo = getSiteConfig('hero_video', 'assets/videos/test-drive-hero.mp4');
+            $videoExtension = pathinfo($heroVideo, PATHINFO_EXTENSION);
+            ?>
             <video class="hero-video" autoplay muted loop playsinline>
-                <source src="assets/videos/test-drive-hero.mp4" type="video/mp4">
-                <source src="assets/videos/test-drive-hero.webm" type="video/webm">
+                <source src="<?= escapeConfig($heroVideo) ?>" type="video/<?= $videoExtension === 'webm' ? 'webm' : 'mp4' ?>">
+                <?php if ($videoExtension !== 'webm'): ?>
+                <source src="<?= escapeConfig(str_replace('.mp4', '.webm', $heroVideo)) ?>" type="video/webm">
+                <?php endif; ?>
             </video>
             <div class="hero-overlay"></div>
-            
+
             <!-- Hero Logo Floating -->
             <div class="hero-logo-float">
-                <img src="assets/images/logo.png" alt="Hype Consórcios" class="hero-logo">
+                <?php
+                $heroLogo = getConfigImageUrl('hero_logo', 'assets/images/logo.png');
+                ?>
+                <img src="<?= escapeConfig($heroLogo) ?>" alt="Hype Consórcios" class="hero-logo">
             </div>
         </div>
         

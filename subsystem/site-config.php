@@ -218,6 +218,13 @@ $currentPage = 'site-config';
             border: 1px solid var(--border);
         }
 
+        .current-media-container video {
+            max-width: 300px;
+            max-height: 200px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
         .save-btn {
             background: var(--primary);
             color: var(--primary-foreground);
@@ -432,6 +439,11 @@ $currentPage = 'site-config';
                     break;
 
                 case 'image':
+                    const isVideo = config.config_key.includes('video');
+                    const fileType = isVideo ? 'vídeo' : 'imagem';
+                    const acceptType = isVideo ? 'video/*' : 'image/*';
+                    const icon = isVideo ? 'fa-video' : 'fa-upload';
+
                     inputHtml = `
                         <div class="file-input-wrapper">
                             <input
@@ -439,19 +451,23 @@ $currentPage = 'site-config';
                                 id="${fieldId}"
                                 name="${config.config_key}"
                                 class="file-input"
-                                accept="image/*"
-                                onchange="previewImage(this, '${config.config_key}')"
+                                accept="${acceptType}"
+                                onchange="previewMedia(this, '${config.config_key}', ${isVideo})"
                             >
                             <div class="file-input-display">
-                                <i class="fas fa-upload"></i>
-                                <span>Escolher nova imagem</span>
+                                <i class="fas ${icon}"></i>
+                                <span>Escolher novo ${fileType}</span>
                             </div>
                         </div>
                         <input type="hidden" name="${config.config_key}_current" value="${config.config_value || ''}">
                         ${config.config_value ? `
-                            <div class="current-image-container">
-                                <p style="margin: 0.5rem 0 0.25rem 0; font-size: 0.875rem; color: var(--muted-foreground);">Imagem atual:</p>
-                                <img src="../${config.config_value}" alt="Imagem atual" class="current-image" id="preview-${config.config_key}">
+                            <div class="current-media-container">
+                                <p style="margin: 0.5rem 0 0.25rem 0; font-size: 0.875rem; color: var(--muted-foreground);">${fileType.charAt(0).toUpperCase() + fileType.slice(1)} atual:</p>
+                                ${isVideo ? `
+                                    <video src="../${config.config_value}" class="current-image" id="preview-${config.config_key}" controls style="max-width: 300px; max-height: 200px;"></video>
+                                ` : `
+                                    <img src="../${config.config_value}" alt="Imagem atual" class="current-image" id="preview-${config.config_key}">
+                                `}
                             </div>
                         ` : ''}
                     `;
@@ -484,19 +500,29 @@ $currentPage = 'site-config';
             `;
         }
 
-        function previewImage(input, configKey) {
+        function previewMedia(input, configKey, isVideo = false) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const preview = document.getElementById(`preview-${configKey}`);
+                    const mediaType = isVideo ? 'vídeo' : 'imagem';
+
                     if (preview) {
                         preview.src = e.target.result;
+                        if (isVideo) {
+                            preview.load(); // Recarregar o vídeo
+                        }
                     } else {
                         // Criar preview se não existir
                         const container = input.closest('.file-input-wrapper').parentNode;
-                        const previewHtml = `
-                            <div class="current-image-container">
-                                <p style="margin: 0.5rem 0 0.25rem 0; font-size: 0.875rem; color: var(--muted-foreground);">Nova imagem:</p>
+                        const previewHtml = isVideo ? `
+                            <div class="current-media-container">
+                                <p style="margin: 0.5rem 0 0.25rem 0; font-size: 0.875rem; color: var(--muted-foreground);">Novo ${mediaType}:</p>
+                                <video src="${e.target.result}" class="current-image" id="preview-${configKey}" controls style="max-width: 300px; max-height: 200px;"></video>
+                            </div>
+                        ` : `
+                            <div class="current-media-container">
+                                <p style="margin: 0.5rem 0 0.25rem 0; font-size: 0.875rem; color: var(--muted-foreground);">Nova ${mediaType}:</p>
                                 <img src="${e.target.result}" alt="Nova imagem" class="current-image" id="preview-${configKey}">
                             </div>
                         `;

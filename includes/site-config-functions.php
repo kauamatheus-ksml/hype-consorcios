@@ -89,16 +89,23 @@ function configImageExists($configKey) {
 }
 
 /**
- * Obtém URL completa da imagem ou fallback
+ * Obtém URL completa da imagem/vídeo ou fallback
  */
 function getConfigImageUrl($configKey, $fallback = '') {
-    $imagePath = getSiteConfig($configKey);
+    $filePath = getSiteConfig($configKey);
 
-    if (!empty($imagePath) && file_exists(__DIR__ . '/../' . $imagePath)) {
-        return $imagePath;
+    if (!empty($filePath) && file_exists(__DIR__ . '/../' . $filePath)) {
+        return $filePath;
     }
 
     return $fallback;
+}
+
+/**
+ * Alias para manter compatibilidade
+ */
+function getConfigMediaUrl($configKey, $fallback = '') {
+    return getConfigImageUrl($configKey, $fallback);
 }
 
 /**
