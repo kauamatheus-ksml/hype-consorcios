@@ -564,7 +564,12 @@ $currentPage = 'site-config';
                         currentConfigs = { ...currentConfigs, ...data.configs };
                     }
                 } else {
-                    showError('Erro ao salvar: ' + data.message);
+                    let errorMessage = 'Erro ao salvar: ' + data.message;
+                    if (data.debug) {
+                        console.log('Debug info:', data.debug);
+                        errorMessage += '\n\nInfo de debug no console.';
+                    }
+                    showError(errorMessage);
                 }
 
             } catch (error) {

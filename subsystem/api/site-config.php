@@ -53,6 +53,11 @@ try {
 
     $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
+    // Debug: Log para verificar o que está sendo recebido
+    error_log("site-config.php - Action: " . $action);
+    error_log("site-config.php - POST: " . print_r($_POST, true));
+    error_log("site-config.php - FILES: " . print_r($_FILES, true));
+
     switch ($action) {
         case 'get':
             handleGetConfigs($conn);
@@ -71,7 +76,14 @@ try {
             http_response_code(400);
             echo json_encode([
                 'success' => false,
-                'message' => 'Ação não especificada ou inválida'
+                'message' => 'Ação não especificada ou inválida',
+                'debug' => [
+                    'action_received' => $action,
+                    'post_keys' => array_keys($_POST),
+                    'get_keys' => array_keys($_GET),
+                    'files_keys' => array_keys($_FILES),
+                    'method' => $_SERVER['REQUEST_METHOD'] ?? 'unknown'
+                ]
             ]);
     }
 
