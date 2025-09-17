@@ -342,11 +342,7 @@ $configs = getAllSiteConfigs();
                         <h3 class="car-name">Consórcio para <?= $car['name'] ?></h3>
                         <div class="car-price"><?= $car['price'] ?></div>
                         <p class="car-description"><?= $car['description'] ?></p>
-                        <ul class="car-features">
-                            <?php foreach($car['features'] as $feature): ?>
-                                <li>• <?= $feature ?></li>
-                            <?php endforeach; ?>
-                        </ul>
+                        
                         <a href="<?= $car['link'] ?>" class="btn btn-primary">
                             Saiba Mais
                         </a>
