@@ -347,14 +347,6 @@ $currentPage = 'site-config';
                     <i class="fas fa-external-link-alt"></i>
                     Visualizar Site
                 </a>
-                <a href="test-api-js.html" target="_blank" class="preview-btn">
-                    <i class="fas fa-bug"></i>
-                    Debug API
-                </a>
-                <a href="add_client_images_config.php" target="_blank" class="preview-btn">
-                    <i class="fas fa-plus"></i>
-                    Instalar Imagens Clientes
-                </a>
                 <a href="backup_configs.php" target="_blank" class="preview-btn" style="background: #28a745;">
                     <i class="fas fa-download"></i>
                     Backup Configurações
