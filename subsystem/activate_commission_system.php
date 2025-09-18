@@ -195,7 +195,14 @@ try {
     // 7. Criar índice para relatórios
     echo "\n7️⃣ Otimizando banco de dados...\n";
 
-    $conn->exec("CREATE INDEX IF NOT EXISTS idx_sales_date_month ON sales (YEAR(sale_date), MONTH(sale_date))");
+    // Verificar se índice existe antes de criar
+    $stmt = $conn->query("SHOW INDEX FROM sales WHERE Key_name = 'idx_sales_date_month'");
+    if ($stmt->rowCount() == 0) {
+        $conn->exec("CREATE INDEX idx_sales_date_month ON sales (sale_date)");
+        echo "   ✅ Índice idx_sales_date_month criado\n";
+    } else {
+        echo "   ✅ Índice idx_sales_date_month já existe\n";
+    }
     echo "   ✅ Índices criados para relatórios mensais\n";
 
     echo "\n🎉 SISTEMA ATIVADO COM SUCESSO!\n\n";

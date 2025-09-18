@@ -34,7 +34,18 @@ VALUES ('default_commission_rate', '1.5', 'Taxa de comissão padrão do sistema 
 ON DUPLICATE KEY UPDATE setting_value = '1.5';
 
 -- Criar índice para otimizar consultas por data para relatórios mensais
-CREATE INDEX IF NOT EXISTS idx_sales_date_month ON sales (YEAR(sale_date), MONTH(sale_date));
+-- Verificar se o índice já existe antes de criar
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+     WHERE table_schema = DATABASE()
+     AND table_name = 'sales'
+     AND index_name = 'idx_sales_date_month') > 0,
+    'SELECT "Índice já existe"',
+    'CREATE INDEX idx_sales_date_month ON sales (sale_date)'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- Criar tabela de configurações de comissão por vendedor
 CREATE TABLE IF NOT EXISTS seller_commission_settings (
