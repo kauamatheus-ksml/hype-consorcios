@@ -250,7 +250,7 @@ function handleGetSaleDetails($conn, $userRole, $userId) {
 
 function handleCreateSale($conn, $userId) {
     $input = json_decode(file_get_contents('php://input'), true);
-    
+
     // Validação - apenas campos obrigatórios básicos
     $requiredFields = ['customer_name', 'sale_value', 'vehicle_sold', 'payment_type'];
     foreach ($requiredFields as $field) {
@@ -258,14 +258,29 @@ function handleCreateSale($conn, $userId) {
             throw new Exception("Campo '{$field}' é obrigatório");
         }
     }
-    
-    // Verificar se o lead existe (opcional)
+
+    $leadId = null;
+
+    // Verificar se o lead existe ou criar um novo
     if (!empty($input['lead_id'])) {
         $stmt = $conn->prepare("SELECT id FROM leads WHERE id = ?");
         $stmt->execute([$input['lead_id']]);
         if (!$stmt->fetch()) {
             throw new Exception('Lead não encontrado');
         }
+        $leadId = $input['lead_id'];
+    } else {
+        // Criar um lead temporário para armazenar as informações do cliente
+        $stmt = $conn->prepare("
+            INSERT INTO leads (name, email, phone, status, created_at)
+            VALUES (?, ?, ?, 'converted', NOW())
+        ");
+        $stmt->execute([
+            $input['customer_name'],
+            $input['email'] ?? null,
+            $input['phone'] ?? null
+        ]);
+        $leadId = $conn->lastInsertId();
     }
     
     // Calcular comissão se percentual foi fornecido
@@ -277,22 +292,19 @@ function handleCreateSale($conn, $userId) {
     // Inserir venda
     $stmt = $conn->prepare("
         INSERT INTO sales (
-            lead_id, seller_id, customer_name, email, phone,
-            sale_value, commission_percentage, commission_value, 
+            lead_id, seller_id,
+            sale_value, commission_percentage, commission_value,
             vehicle_sold, payment_type, down_payment,
-            financing_months, monthly_payment, contract_number, 
+            financing_months, monthly_payment, contract_number,
             notes, status, sale_date, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
     ");
     
     $saleDate = !empty($input['sale_date']) ? $input['sale_date'] : date('Y-m-d');
     
     $result = $stmt->execute([
-        !empty($input['lead_id']) ? $input['lead_id'] : null,
+        $leadId,
         $input['seller_id'] ?? $userId,
-        $input['customer_name'],
-        $input['email'] ?? null,
-        $input['phone'] ?? null,
         $input['sale_value'],
         $input['commission_percentage'] ?? 0,
         $commission_value,
@@ -310,19 +322,17 @@ function handleCreateSale($conn, $userId) {
     if ($result) {
         $saleId = $conn->lastInsertId();
         
-        // Atualizar status do lead para convertido (somente se houver lead_id)
-        if (!empty($input['lead_id'])) {
-            $stmt = $conn->prepare("UPDATE leads SET status = 'converted' WHERE id = ?");
-            $stmt->execute([$input['lead_id']]);
-            
-            // Registrar interação no lead
-            $stmt = $conn->prepare("
-                INSERT INTO lead_interactions (lead_id, user_id, interaction_type, description)
-                VALUES (?, ?, 'note', ?)
-            ");
-            $description = "Lead convertido em venda - Valor: R$ " . number_format($input['sale_value'], 2, ',', '.');
-            $stmt->execute([$input['lead_id'], $userId, $description]);
-        }
+        // Atualizar status do lead para convertido e registrar interação
+        $stmt = $conn->prepare("UPDATE leads SET status = 'converted' WHERE id = ?");
+        $stmt->execute([$leadId]);
+
+        // Registrar interação no lead
+        $stmt = $conn->prepare("
+            INSERT INTO lead_interactions (lead_id, user_id, interaction_type, description)
+            VALUES (?, ?, 'note', ?)
+        ");
+        $description = "Lead convertido em venda - Valor: R$ " . number_format($input['sale_value'], 2, ',', '.');
+        $stmt->execute([$leadId, $userId, $description]);
         
         echo json_encode([
             'success' => true,
