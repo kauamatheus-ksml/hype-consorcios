@@ -880,6 +880,12 @@ $currentPage = 'sales';
                         <i class="fas fa-plus"></i>
                         Nova Venda
                     </button>
+                    <?php if ($userRole === 'admin'): ?>
+                    <a href="commission_settings.php" class="btn-secondary" target="_blank" style="text-decoration: none;">
+                        <i class="fas fa-users-cog"></i>
+                        Configurar Comissões
+                    </a>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -1107,8 +1113,8 @@ $currentPage = 'sales';
                                            oninput="calculateCommission()" id="commissionPercentageInput" style="flex: 1;">
                                     <button type="button" id="adminCommissionBtn" onclick="openCommissionSettings()"
                                             style="display: none; padding: 0.5rem; background: #f59e0b; color: white; border: none; border-radius: 4px; cursor: pointer;"
-                                            title="Configurar taxa padrão (Admin)">
-                                        <i class="fas fa-cog"></i>
+                                            title="Gerenciar Comissões dos Vendedores (Admin)">
+                                        <i class="fas fa-users-cog"></i>
                                     </button>
                                 </div>
                                 <small class="field-hint">Taxa padrão do sistema</small>
@@ -2094,25 +2100,30 @@ $currentPage = 'sales';
             summaryDiv.style.display = 'none';
         }
 
-        // Função para carregar configuração padrão de comissão (para admin)
-        async function loadDefaultCommissionRate() {
+        // Função para carregar configuração de comissão do vendedor atual
+        async function loadSellerCommissionRate() {
             try {
-                // Buscar taxa padrão do sistema
-                const response = await fetch('api/system_settings.php?setting=default_commission_rate');
+                // Buscar configuração específica do vendedor
+                const response = await fetch(`api/seller_commission.php?action=get&seller_id=${currentUser.id}`);
                 if (response.ok) {
                     const result = await response.json();
-                    if (result.success && result.value) {
-                        const commissionInput = document.querySelector('input[name="commission_percentage"]');
-                        commissionInput.value = result.value;
+                    if (result.success && result.config) {
+                        const config = result.config;
 
-                        // Se for admin, permitir edição e mostrar botão de configuração
+                        // Preencher campos com a configuração do vendedor
+                        document.querySelector('input[name="commission_percentage"]').value = config.commission_percentage || 1.5;
+                        document.querySelector('select[name="commission_installments"]').value = config.commission_installments || 5;
+
+                        // Configurar permissões
+                        const commissionInput = document.querySelector('input[name="commission_percentage"]');
+                        const hint = commissionInput.parentElement.nextElementSibling;
+
                         if (currentUser && currentUser.role === 'admin') {
                             commissionInput.readOnly = false;
                             commissionInput.style.backgroundColor = '';
                             commissionInput.style.cursor = '';
-                            const hint = commissionInput.parentElement.nextElementSibling;
                             if (hint && hint.classList.contains('field-hint')) {
-                                hint.textContent = 'Como admin, você pode alterar esta taxa ou configurar o padrão';
+                                hint.innerHTML = `Sua configuração: ${config.commission_percentage}% em ${config.commission_installments}x • <a href="commission_settings.php" target="_blank" style="color: var(--primary);">Gerenciar Comissões</a>`;
                             }
 
                             // Mostrar botão de configuração
@@ -2124,13 +2135,46 @@ $currentPage = 'sales';
                             commissionInput.readOnly = true;
                             commissionInput.style.backgroundColor = '#f8fafc';
                             commissionInput.style.cursor = 'not-allowed';
+                            if (hint && hint.classList.contains('field-hint')) {
+                                hint.textContent = `Sua configuração: ${config.commission_percentage}% em ${config.commission_installments}x`;
+                            }
                         }
+
+                        // Verificar se há configurações especiais
+                        if (config.bonus_percentage > 0 && config.bonus_threshold > 0) {
+                            const bonusInfo = document.createElement('div');
+                            bonusInfo.style.cssText = 'margin-top: 0.5rem; padding: 0.5rem; background: #fef3c7; border-radius: 4px; font-size: 0.75rem; color: #92400e;';
+                            bonusInfo.innerHTML = `<i class="fas fa-trophy"></i> Bônus: +${config.bonus_percentage}% para vendas acima de R$ ${parseFloat(config.bonus_threshold).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+
+                            const commissionGroup = commissionInput.closest('.form-group');
+                            commissionGroup.appendChild(bonusInfo);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Erro ao carregar configuração de comissão do vendedor:', error);
+                // Fallback para configuração padrão
+                await loadDefaultCommissionRate();
+            }
+        }
+
+        // Função para carregar configuração padrão de comissão (fallback)
+        async function loadDefaultCommissionRate() {
+            try {
+                // Buscar taxa padrão do sistema
+                const response = await fetch('api/system_settings.php?setting=default_commission_rate');
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.value) {
+                        document.querySelector('input[name="commission_percentage"]').value = result.value;
+                        document.querySelector('select[name="commission_installments"]').value = 5;
                     }
                 }
             } catch (error) {
                 console.warn('Erro ao carregar taxa de comissão padrão:', error);
                 // Usar valor padrão de 1.5%
                 document.querySelector('input[name="commission_percentage"]').value = 1.5;
+                document.querySelector('select[name="commission_installments"]').value = 5;
             }
         }
 
@@ -2182,29 +2226,21 @@ $currentPage = 'sales';
             document.querySelector('input[name="commission_value"]').value = '';
             document.querySelector('input[name="monthly_commission"]').value = '';
 
-            // Carregar configuração de comissão
-            loadDefaultCommissionRate();
+            // Carregar configuração de comissão do vendedor
+            loadSellerCommissionRate();
         }
 
         // ===== FUNÇÕES DE CONFIGURAÇÃO DE COMISSÃO (ADMIN) =====
 
-        // Abrir modal de configuração de comissão
+        // Abrir configuração de comissão (redirecionar para página dedicada)
         function openCommissionSettings() {
             if (currentUser.role !== 'admin') {
-                showNotification('Apenas administradores podem alterar esta configuração', 'error');
+                showNotification('Apenas administradores podem alterar configurações de comissão', 'error');
                 return;
             }
 
-            const modal = document.getElementById('commissionSettingsModal');
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-
-            // Carregar valor atual
-            loadDefaultCommissionRate().then(() => {
-                const currentRate = document.querySelector('input[name="commission_percentage"]').value;
-                document.getElementById('defaultCommissionInput').value = currentRate;
-                updateCommissionExample();
-            });
+            // Abrir página de configuração em nova aba
+            window.open('commission_settings.php', '_blank');
         }
 
         // Fechar modal de configuração

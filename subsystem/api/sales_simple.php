@@ -262,12 +262,32 @@ function handleCreateSale($conn, $userId) {
         }
     }
 
-    // Definir valores padrão para comissão se não fornecidos
+    // Buscar configuração de comissão do vendedor
+    $sellerId = $input['seller_id'] ?? $userId;
+    $stmt = $conn->prepare("SELECT * FROM seller_commission_settings WHERE seller_id = ? AND is_active = 1");
+    $stmt->execute([$sellerId]);
+    $sellerConfig = $stmt->fetch();
+
+    // Se não há configuração específica, criar uma padrão
+    if (!$sellerConfig) {
+        $stmt = $conn->prepare("
+            INSERT INTO seller_commission_settings (seller_id, commission_percentage, commission_installments, created_by)
+            VALUES (?, 1.5, 5, ?)
+        ");
+        $stmt->execute([$sellerId, $userId]);
+
+        // Buscar novamente
+        $stmt = $conn->prepare("SELECT * FROM seller_commission_settings WHERE seller_id = ?");
+        $stmt->execute([$sellerId]);
+        $sellerConfig = $stmt->fetch();
+    }
+
+    // Usar configuração do vendedor se não foram fornecidos valores específicos
     if (!isset($input['commission_percentage'])) {
-        $input['commission_percentage'] = 1.5; // Padrão 1.5%
+        $input['commission_percentage'] = $sellerConfig['commission_percentage'] ?? 1.5;
     }
     if (!isset($input['commission_installments'])) {
-        $input['commission_installments'] = 5; // Padrão 5 parcelas
+        $input['commission_installments'] = $sellerConfig['commission_installments'] ?? 5;
     }
 
     $leadId = null;
@@ -294,16 +314,33 @@ function handleCreateSale($conn, $userId) {
         $leadId = $conn->lastInsertId();
     }
     
-    // Calcular comissão se percentual foi fornecido
+    // Calcular comissão com base na configuração do vendedor
     $commission_value = 0;
     $monthly_commission = 0;
+    $finalCommissionPercentage = $input['commission_percentage'];
 
     if (!empty($input['commission_percentage']) && !empty($input['sale_value'])) {
-        $commission_value = ($input['sale_value'] * $input['commission_percentage']) / 100;
+        $saleValue = floatval($input['sale_value']);
+        $basePercentage = floatval($input['commission_percentage']);
+
+        // Verificar se há bônus aplicável
+        if ($sellerConfig &&
+            $sellerConfig['bonus_percentage'] > 0 &&
+            $sellerConfig['bonus_threshold'] > 0 &&
+            $saleValue >= $sellerConfig['bonus_threshold']) {
+
+            $finalCommissionPercentage = $basePercentage + floatval($sellerConfig['bonus_percentage']);
+        }
+
+        // Calcular valor da comissão
+        $commission_value = ($saleValue * $finalCommissionPercentage) / 100;
 
         // Calcular comissão mensal
         $commission_installments = !empty($input['commission_installments']) ? $input['commission_installments'] : 5;
         $monthly_commission = $commission_value / $commission_installments;
+
+        // Atualizar o percentual final usado (incluindo bônus se aplicável)
+        $input['commission_percentage'] = $finalCommissionPercentage;
     }
     
     // Inserir venda

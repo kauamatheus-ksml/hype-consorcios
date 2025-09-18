@@ -35,3 +35,38 @@ ON DUPLICATE KEY UPDATE setting_value = '1.5';
 
 -- Criar índice para otimizar consultas por data para relatórios mensais
 CREATE INDEX IF NOT EXISTS idx_sales_date_month ON sales (YEAR(sale_date), MONTH(sale_date));
+
+-- Criar tabela de configurações de comissão por vendedor
+CREATE TABLE IF NOT EXISTS seller_commission_settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    seller_id INT NOT NULL,
+    commission_percentage DECIMAL(5,2) DEFAULT 1.50,
+    commission_installments INT DEFAULT 5,
+    min_sale_value DECIMAL(12,2) DEFAULT 0.00,
+    max_sale_value DECIMAL(12,2) NULL,
+    bonus_percentage DECIMAL(5,2) DEFAULT 0.00,
+    bonus_threshold DECIMAL(12,2) NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by INT,
+    updated_by INT,
+    UNIQUE KEY unique_seller (seller_id),
+    INDEX idx_seller_id (seller_id),
+    INDEX idx_is_active (is_active),
+    FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Criar configurações padrão para vendedores existentes
+INSERT INTO seller_commission_settings (seller_id, commission_percentage, commission_installments, created_by)
+SELECT
+    id as seller_id,
+    1.50 as commission_percentage,
+    5 as commission_installments,
+    (SELECT id FROM users WHERE role = 'admin' LIMIT 1) as created_by
+FROM users
+WHERE role IN ('seller', 'manager')
+AND id NOT IN (SELECT seller_id FROM seller_commission_settings);
