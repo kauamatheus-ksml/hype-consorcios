@@ -149,10 +149,17 @@ FileETag None
     Deny from all
 </FilesMatch>
 
-# Proteger diretório do sistema
+# Proteger apenas subdiretórios específicos do subsystem (não o subsystem inteiro)
 RedirectMatch 403 ^/subsystem/config/
 RedirectMatch 403 ^/subsystem/classes/
 RedirectMatch 403 ^/subsystem/logs/
+RedirectMatch 403 ^/subsystem/dev-tools/
+
+# Permitir acesso ao subsystem principal e arquivos autorizados
+<Directory "/subsystem">
+    # O .htaccess interno do subsystem irá controlar o acesso específico
+    AllowOverride All
+</Directory>
 
 # ===============================
 # MIME TYPES PARA SEO
