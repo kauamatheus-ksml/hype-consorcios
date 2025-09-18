@@ -6,9 +6,79 @@
 
 session_start();
 
-// Verificar se é admin
-if (!isset($_SESSION['logged_in']) || $_SESSION['user_role'] !== 'admin') {
-    die('❌ Acesso negado. Faça login como administrador.');
+// Debug das variáveis de sessão
+echo "<h2>🔍 Debug das Variáveis de Sessão</h2>";
+echo "<pre>";
+echo "SESSION logged_in: " . (isset($_SESSION['logged_in']) ? ($_SESSION['logged_in'] ? 'true' : 'false') : 'não definido') . "\n";
+echo "SESSION user_role: " . ($_SESSION['user_role'] ?? 'não definido') . "\n";
+echo "SESSION user_id: " . ($_SESSION['user_id'] ?? 'não definido') . "\n";
+echo "Todas as variáveis de sessão:\n";
+print_r($_SESSION);
+echo "</pre>";
+
+// Verificações mais flexíveis para admin
+$isAdmin = false;
+$adminId = null;
+
+// Tentar diferentes formas de verificar se é admin
+if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+    $isAdmin = true;
+    $adminId = $_SESSION['user_id'] ?? 1;
+} elseif (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+    $isAdmin = true;
+    $adminId = $_SESSION['user_id'] ?? $_SESSION['id'] ?? 1;
+} elseif (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+    // Se está logado, vamos verificar no banco se é admin
+    require_once __DIR__ . '/config/database.php';
+    try {
+        $database = new Database();
+        $conn = $database->getConnection();
+
+        $userId = $_SESSION['user_id'] ?? $_SESSION['id'] ?? null;
+        if ($userId) {
+            $stmt = $conn->prepare("SELECT role FROM users WHERE id = ?");
+            $stmt->execute([$userId]);
+            $user = $stmt->fetch();
+
+            if ($user && $user['role'] === 'admin') {
+                $isAdmin = true;
+                $adminId = $userId;
+                echo "<div style='background: #dcfce7; padding: 1rem; margin: 1rem 0; border-radius: 8px;'>";
+                echo "✅ Admin verificado via banco de dados";
+                echo "</div>";
+            }
+        }
+    } catch (Exception $e) {
+        echo "<div style='background: #fef2f2; padding: 1rem; margin: 1rem 0; border-radius: 8px;'>";
+        echo "❌ Erro ao verificar usuário no banco: " . $e->getMessage();
+        echo "</div>";
+    }
+}
+
+if (!$isAdmin) {
+    echo "<div style='background: #fef2f2; border: 1px solid #ef4444; padding: 1rem; border-radius: 8px; margin: 1rem 0;'>";
+    echo "<h3 style='color: #991b1b; margin: 0;'>❌ Acesso Negado</h3>";
+    echo "<p style='color: #991b1b; margin: 0.5rem 0 0 0;'>";
+    echo "Este script requer privilégios de administrador.<br>";
+    echo "Verifique se você está logado como admin e tente novamente.<br><br>";
+    echo "<strong>Soluções:</strong><br>";
+    echo "1. Faça logout e login novamente como admin<br>";
+    echo "2. Ou execute o SQL manualmente no banco de dados<br>";
+    echo "3. Ou edite este arquivo e comente a verificação de permissão";
+    echo "</p>";
+    echo "</div>";
+
+    echo "<details style='margin: 1rem 0;'>";
+    echo "<summary style='cursor: pointer; padding: 0.5rem; background: #f3f4f6; border-radius: 4px;'>🔧 Executar SQL Manualmente</summary>";
+    echo "<div style='margin-top: 1rem; padding: 1rem; background: #1f2937; color: #f8fafc; border-radius: 8px;'>";
+    echo "<p>Se preferir, execute este SQL diretamente no seu banco de dados:</p>";
+    echo "<textarea readonly style='width: 100%; height: 200px; font-family: monospace; margin: 1rem 0; padding: 0.5rem;'>";
+    include __DIR__ . '/database_migration_commission.sql';
+    echo "</textarea>";
+    echo "</div>";
+    echo "</details>";
+
+    die();
 }
 
 require_once __DIR__ . '/config/database.php';
@@ -93,7 +163,7 @@ try {
     // 5. Criar configurações para vendedores existentes
     echo "\n5️⃣ Criando configurações para vendedores...\n";
 
-    $adminId = $_SESSION['user_id'];
+    // $adminId já foi definido acima na verificação
 
     $stmt = $conn->prepare("
         INSERT INTO seller_commission_settings (seller_id, commission_percentage, commission_installments, created_by)
