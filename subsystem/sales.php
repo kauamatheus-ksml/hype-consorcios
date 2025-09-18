@@ -469,32 +469,96 @@ $currentPage = 'sales';
             border-color: var(--primary);
         }
 
+        /* Field hints and calculation summary */
+        .field-hint {
+            display: block;
+            margin-top: 0.25rem;
+            font-size: 0.75rem;
+            color: var(--muted-foreground);
+            font-style: italic;
+        }
+
+        .field-hint.warning {
+            color: #d97706;
+        }
+
+        .field-hint.error {
+            color: #dc2626;
+        }
+
+        .calculation-summary {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .calculation-summary h4 {
+            margin: 0 0 0.75rem 0;
+            color: var(--foreground);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .summary-item .label {
+            font-size: 0.8rem;
+            color: var(--muted-foreground);
+            font-weight: 500;
+        }
+
+        .summary-item .value {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--foreground);
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .main-content {
                 margin-left: 0;
             }
-            
+
             .content-wrapper {
                 padding: 1rem;
             }
-            
+
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .filters-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .table-container {
                 font-size: 0.875rem;
             }
-            
+
             .controls-header {
                 flex-direction: column;
                 gap: 1rem;
                 align-items: stretch;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -1011,23 +1075,51 @@ $currentPage = 'sales';
                         <div class="form-grid">
                             <div class="form-group">
                                 <label>Valor da Venda (R$) *</label>
-                                <input type="number" name="sale_value" step="0.01" min="0" required placeholder="0,00">
+                                <input type="number" name="sale_value" step="0.01" min="0" required placeholder="0,00"
+                                       oninput="calculateFinancialValues()">
                             </div>
                             <div class="form-group">
                                 <label>Entrada (R$)</label>
-                                <input type="number" name="down_payment" step="0.01" min="0" placeholder="0,00">
+                                <input type="number" name="down_payment" step="0.01" min="0" placeholder="0,00"
+                                       oninput="calculateFinancialValues()">
+                                <small class="field-hint" id="downPaymentHint"></small>
                             </div>
                             <div class="form-group">
                                 <label>Comissão (%)</label>
-                                <input type="number" name="commission_percentage" step="0.01" min="0" max="100" placeholder="5,00">
+                                <input type="number" name="commission_percentage" step="0.01" min="0" placeholder="5,00"
+                                       oninput="calculateCommission()">
+                                <small class="field-hint" id="commissionHint"></small>
                             </div>
                             <div class="form-group">
                                 <label>Parcelas</label>
-                                <input type="number" name="financing_months" min="1" max="120" placeholder="12">
+                                <input type="number" name="financing_months" min="1" placeholder="12"
+                                       oninput="calculateFinancialValues()">
+                                <small class="field-hint">Sem limite máximo</small>
                             </div>
                             <div class="form-group">
                                 <label>Valor da Parcela (R$)</label>
-                                <input type="number" name="monthly_payment" step="0.01" min="0" placeholder="0,00">
+                                <input type="number" name="monthly_payment" step="0.01" min="0" placeholder="0,00"
+                                       oninput="calculateFromMonthlyPayment()">
+                                <small class="field-hint" id="monthlyPaymentHint"></small>
+                            </div>
+                            <div class="form-group full-width">
+                                <div class="calculation-summary" id="calculationSummary" style="display: none;">
+                                    <h4><i class="fas fa-calculator"></i> Resumo dos Cálculos</h4>
+                                    <div class="summary-grid">
+                                        <div class="summary-item">
+                                            <span class="label">Valor Financiado:</span>
+                                            <span class="value" id="financedAmount">R$ 0,00</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="label">Valor da Comissão:</span>
+                                            <span class="value" id="commissionValue">R$ 0,00</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="label">Total das Parcelas:</span>
+                                            <span class="value" id="totalInstallments">R$ 0,00</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1512,6 +1604,9 @@ $currentPage = 'sales';
                 if (dateInput) {
                     dateInput.value = new Date().toISOString().split('T')[0];
                 }
+
+                // Limpar todas as dicas e estilos
+                resetFormCalculations();
             }
             
             console.log('✅ Modal aberto');
@@ -1730,6 +1825,42 @@ $currentPage = 'sales';
                     throw new Error('Valor da venda deve ser maior que zero');
                 }
 
+                // Validações financeiras lógicas
+                if (data.down_payment && data.down_payment > data.sale_value) {
+                    throw new Error('O valor da entrada não pode ser maior que o valor da venda');
+                }
+
+                if (data.commission_percentage && (data.commission_percentage < 0 || data.commission_percentage > 100)) {
+                    throw new Error('A comissão deve estar entre 0% e 100%');
+                }
+
+                if (data.financing_months && data.financing_months < 1) {
+                    throw new Error('O número de parcelas deve ser maior que zero');
+                }
+
+                if (data.monthly_payment && data.monthly_payment < 0) {
+                    throw new Error('O valor da parcela não pode ser negativo');
+                }
+
+                // Validação de coerência entre parcelas e valores
+                if (data.financing_months && data.monthly_payment) {
+                    const financedAmount = data.sale_value - (data.down_payment || 0);
+                    const totalPaid = data.monthly_payment * data.financing_months;
+                    const difference = Math.abs(totalPaid - financedAmount);
+
+                    // Permitir uma diferença pequena para ajustes de arredondamento
+                    if (difference > (financedAmount * 0.1)) {
+                        const isHigher = totalPaid > financedAmount;
+                        const message = isHigher
+                            ? `O total das parcelas (R$ ${totalPaid.toFixed(2)}) é muito maior que o valor financiado (R$ ${financedAmount.toFixed(2)})`
+                            : `O total das parcelas (R$ ${totalPaid.toFixed(2)}) é muito menor que o valor financiado (R$ ${financedAmount.toFixed(2)})`;
+
+                        if (!confirm(message + '. Deseja continuar mesmo assim?')) {
+                            throw new Error('Operação cancelada pelo usuário');
+                        }
+                    }
+                }
+
                 // Enviar para API
                 const response = await fetch('api/sales_simple.php', {
                     method: 'POST',
@@ -1818,6 +1949,184 @@ $currentPage = 'sales';
                 setTimeout(() => notification.remove(), 300);
             }, 4000);
         }
+
+        // ===== FUNÇÕES DE CÁLCULOS FINANCEIROS =====
+
+        // Função principal para calcular valores financeiros
+        function calculateFinancialValues() {
+            const saleValue = parseFloat(document.querySelector('input[name="sale_value"]').value) || 0;
+            const downPayment = parseFloat(document.querySelector('input[name="down_payment"]').value) || 0;
+            const financingMonths = parseInt(document.querySelector('input[name="financing_months"]').value) || 0;
+            const monthlyPayment = parseFloat(document.querySelector('input[name="monthly_payment"]').value) || 0;
+
+            // Validar entrada não pode ser maior que o valor da venda
+            const downPaymentInput = document.querySelector('input[name="down_payment"]');
+            const downPaymentHint = document.getElementById('downPaymentHint');
+
+            if (downPayment > saleValue && saleValue > 0) {
+                downPaymentHint.textContent = '⚠️ Entrada não pode ser maior que o valor da venda';
+                downPaymentHint.className = 'field-hint error';
+                downPaymentInput.style.borderColor = '#dc2626';
+            } else if (downPayment > 0 && saleValue > 0) {
+                const percentage = ((downPayment / saleValue) * 100).toFixed(1);
+                downPaymentHint.textContent = `💰 ${percentage}% do valor da venda`;
+                downPaymentHint.className = 'field-hint';
+                downPaymentInput.style.borderColor = '';
+            } else {
+                downPaymentHint.textContent = '';
+                downPaymentInput.style.borderColor = '';
+            }
+
+            // Calcular valor financiado
+            const financedAmount = Math.max(0, saleValue - downPayment);
+
+            // Se temos número de parcelas mas não valor da parcela, calcular valor da parcela
+            if (financingMonths > 0 && financedAmount > 0 && !monthlyPayment) {
+                const calculatedMonthlyPayment = financedAmount / financingMonths;
+                document.querySelector('input[name="monthly_payment"]').value = calculatedMonthlyPayment.toFixed(2);
+
+                const monthlyPaymentHint = document.getElementById('monthlyPaymentHint');
+                monthlyPaymentHint.textContent = `🧮 Calculado automaticamente (${financingMonths}x)`;
+                monthlyPaymentHint.className = 'field-hint';
+            }
+
+            // Se temos valor da parcela mas não número de parcelas, calcular número de parcelas
+            if (monthlyPayment > 0 && financedAmount > 0 && !financingMonths) {
+                const calculatedMonths = Math.ceil(financedAmount / monthlyPayment);
+                document.querySelector('input[name="financing_months"]').value = calculatedMonths;
+
+                const monthlyPaymentHint = document.getElementById('monthlyPaymentHint');
+                monthlyPaymentHint.textContent = `🧮 Será pago em ${calculatedMonths} parcelas`;
+                monthlyPaymentHint.className = 'field-hint';
+            }
+
+            // Atualizar resumo dos cálculos
+            updateCalculationSummary(saleValue, downPayment, financedAmount);
+        }
+
+        // Função para calcular quando o valor da parcela é alterado
+        function calculateFromMonthlyPayment() {
+            const saleValue = parseFloat(document.querySelector('input[name="sale_value"]').value) || 0;
+            const downPayment = parseFloat(document.querySelector('input[name="down_payment"]').value) || 0;
+            const monthlyPayment = parseFloat(document.querySelector('input[name="monthly_payment"]').value) || 0;
+            const financingMonths = parseInt(document.querySelector('input[name="financing_months"]').value) || 0;
+
+            const financedAmount = Math.max(0, saleValue - downPayment);
+            const monthlyPaymentHint = document.getElementById('monthlyPaymentHint');
+
+            if (monthlyPayment > 0 && financedAmount > 0) {
+                if (!financingMonths) {
+                    // Calcular número de parcelas baseado no valor da parcela
+                    const calculatedMonths = Math.ceil(financedAmount / monthlyPayment);
+                    document.querySelector('input[name="financing_months"]').value = calculatedMonths;
+                    monthlyPaymentHint.textContent = `🧮 Será pago em ${calculatedMonths} parcelas`;
+                } else {
+                    // Verificar se o valor da parcela está coerente
+                    const expectedMonthlyPayment = financedAmount / financingMonths;
+                    const difference = Math.abs(monthlyPayment - expectedMonthlyPayment);
+
+                    if (difference > 0.01) {
+                        const totalPaid = monthlyPayment * financingMonths;
+                        const extraAmount = totalPaid - financedAmount;
+                        if (extraAmount > 0) {
+                            monthlyPaymentHint.textContent = `⚠️ Total será R$ ${extraAmount.toFixed(2)} maior que o financiado`;
+                            monthlyPaymentHint.className = 'field-hint warning';
+                        } else {
+                            monthlyPaymentHint.textContent = `⚠️ Total será R$ ${Math.abs(extraAmount).toFixed(2)} menor que o financiado`;
+                            monthlyPaymentHint.className = 'field-hint warning';
+                        }
+                    } else {
+                        monthlyPaymentHint.textContent = `✅ Valor correto para ${financingMonths} parcelas`;
+                        monthlyPaymentHint.className = 'field-hint';
+                    }
+                }
+            } else {
+                monthlyPaymentHint.textContent = '';
+                monthlyPaymentHint.className = 'field-hint';
+            }
+
+            // Atualizar resumo
+            updateCalculationSummary(saleValue, downPayment, financedAmount);
+        }
+
+        // Função para calcular comissão
+        function calculateCommission() {
+            const saleValue = parseFloat(document.querySelector('input[name="sale_value"]').value) || 0;
+            const commissionPercentage = parseFloat(document.querySelector('input[name="commission_percentage"]').value) || 0;
+            const commissionHint = document.getElementById('commissionHint');
+
+            if (saleValue > 0 && commissionPercentage > 0) {
+                const commissionValue = (saleValue * commissionPercentage) / 100;
+                commissionHint.textContent = `💰 R$ ${commissionValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+                commissionHint.className = 'field-hint';
+
+                // Atualizar resumo também
+                const downPayment = parseFloat(document.querySelector('input[name="down_payment"]').value) || 0;
+                const financedAmount = Math.max(0, saleValue - downPayment);
+                updateCalculationSummary(saleValue, downPayment, financedAmount);
+            } else {
+                commissionHint.textContent = '';
+            }
+        }
+
+        // Função para atualizar o resumo dos cálculos
+        function updateCalculationSummary(saleValue, downPayment, financedAmount) {
+            const summaryDiv = document.getElementById('calculationSummary');
+
+            if (saleValue <= 0) {
+                summaryDiv.style.display = 'none';
+                return;
+            }
+
+            summaryDiv.style.display = 'block';
+
+            // Atualizar valor financiado
+            document.getElementById('financedAmount').textContent =
+                `R$ ${financedAmount.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+
+            // Atualizar valor da comissão
+            const commissionPercentage = parseFloat(document.querySelector('input[name="commission_percentage"]').value) || 0;
+            const commissionValue = (saleValue * commissionPercentage) / 100;
+            document.getElementById('commissionValue').textContent =
+                `R$ ${commissionValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+
+            // Atualizar total das parcelas
+            const monthlyPayment = parseFloat(document.querySelector('input[name="monthly_payment"]').value) || 0;
+            const financingMonths = parseInt(document.querySelector('input[name="financing_months"]').value) || 0;
+            const totalInstallments = monthlyPayment * financingMonths;
+            document.getElementById('totalInstallments').textContent =
+                `R$ ${totalInstallments.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        }
+
+        // Função para resetar todos os cálculos e dicas
+        function resetFormCalculations() {
+            // Limpar todas as dicas
+            const hints = document.querySelectorAll('.field-hint');
+            hints.forEach(hint => {
+                hint.textContent = '';
+                hint.className = 'field-hint';
+            });
+
+            // Resetar estilos dos campos
+            const inputs = document.querySelectorAll('#newSaleForm input[type="number"]');
+            inputs.forEach(input => {
+                input.style.borderColor = '';
+            });
+
+            // Ocultar resumo de cálculos
+            const summaryDiv = document.getElementById('calculationSummary');
+            if (summaryDiv) {
+                summaryDiv.style.display = 'none';
+            }
+
+            // Adicionar dica estática sobre parcelas
+            const financingHint = document.querySelector('input[name="financing_months"]').nextElementSibling;
+            if (financingHint && financingHint.classList.contains('field-hint')) {
+                financingHint.textContent = 'Sem limite máximo';
+            }
+        }
+
+        // ===== FIM DAS FUNÇÕES DE CÁLCULOS =====
 
         // Fechar modal ao clicar fora
         document.addEventListener('click', function(e) {
