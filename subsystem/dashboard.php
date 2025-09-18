@@ -346,8 +346,22 @@ $currentPage = 'dashboard';
     <script>
         // Load dashboard stats
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Dashboard carregado');
+            console.log('🔍 Verificando elementos dos cards...');
+
+            // Verificar se os elementos existem
+            const totalSales = document.getElementById('totalSales');
+            const totalRevenue = document.getElementById('totalRevenue');
+            const totalCommissions = document.getElementById('totalCommissions');
+            const pendingSales = document.getElementById('pendingSales');
+
+            console.log('totalSales element:', totalSales);
+            console.log('totalRevenue element:', totalRevenue);
+            console.log('totalCommissions element:', totalCommissions);
+            console.log('pendingSales element:', pendingSales);
+
             loadDashboardStats();
-            
+
             // Auto-refresh stats every 5 minutes
             setInterval(loadDashboardStats, 5 * 60 * 1000);
             
@@ -368,6 +382,11 @@ $currentPage = 'dashboard';
                 
                 const data = await response.json();
                 console.log('Data received:', data);
+                console.log('Stats object:', data.stats);
+                console.log('Total sales:', data.stats?.total_sales);
+                console.log('Total revenue:', data.stats?.total_revenue);
+                console.log('Total commissions:', data.stats?.total_commissions);
+                console.log('Pending sales:', data.stats?.pending_sales);
                 
                 if (data.success) {
                     // Atualizar indicador de visualização
@@ -383,10 +402,40 @@ $currentPage = 'dashboard';
                     }
 
                     // Atualizar cards principais
-                    document.getElementById('totalSales').textContent = data.stats.total_sales || '0';
-                    document.getElementById('totalRevenue').textContent = 'R$ ' + (data.stats.total_revenue || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2});
-                    document.getElementById('totalCommissions').textContent = 'R$ ' + (data.stats.total_commissions || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2});
-                    document.getElementById('pendingSales').textContent = data.stats.pending_sales || '0';
+                    const totalSalesEl = document.getElementById('totalSales');
+                    const totalRevenueEl = document.getElementById('totalRevenue');
+                    const totalCommissionsEl = document.getElementById('totalCommissions');
+                    const pendingSalesEl = document.getElementById('pendingSales');
+
+                    console.log('🔄 Atualizando elementos...');
+
+                    if (totalSalesEl) {
+                        totalSalesEl.textContent = data.stats.total_sales || '0';
+                        console.log('✅ totalSales atualizado:', totalSalesEl.textContent);
+                    } else {
+                        console.error('❌ Elemento totalSales não encontrado');
+                    }
+
+                    if (totalRevenueEl) {
+                        totalRevenueEl.textContent = 'R$ ' + (data.stats.total_revenue || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                        console.log('✅ totalRevenue atualizado:', totalRevenueEl.textContent);
+                    } else {
+                        console.error('❌ Elemento totalRevenue não encontrado');
+                    }
+
+                    if (totalCommissionsEl) {
+                        totalCommissionsEl.textContent = 'R$ ' + (data.stats.total_commissions || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                        console.log('✅ totalCommissions atualizado:', totalCommissionsEl.textContent);
+                    } else {
+                        console.error('❌ Elemento totalCommissions não encontrado');
+                    }
+
+                    if (pendingSalesEl) {
+                        pendingSalesEl.textContent = data.stats.pending_sales || '0';
+                        console.log('✅ pendingSales atualizado:', pendingSalesEl.textContent);
+                    } else {
+                        console.error('❌ Elemento pendingSales não encontrado');
+                    }
                     
                     // Adicionar informações extras se disponíveis
                     updateRecentLeads(data.stats.recent_leads || []);

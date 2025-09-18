@@ -138,6 +138,46 @@ $currentPage = 'sales';
 
         .stat-card {
             background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--foreground);
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .stat-card {
+            background: white;
             border-radius: 12px;
             padding: 1.5rem;
             border: 1px solid var(--border);
@@ -873,9 +913,55 @@ $currentPage = 'sales';
                 
                 <div class="page-header">
                     <h1 class="page-title">Vendas</h1>
-                    <p class="page-subtitle">Gerencie todas as vendas e comissões</p>
+                    <p class="page-subtitle">
+                        Gerencie todas as vendas e comissões
+                        <span id="salesViewIndicator" style="font-weight: 600; margin-left: 8px; font-size: 0.9rem;"></span>
+                    </p>
                 </div>
-                
+
+                <!-- Stats Cards para a página de vendas -->
+                <div class="stats-grid" style="margin: 2rem 0;">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="fas fa-handshake"></i>
+                            </div>
+                        </div>
+                        <h3 class="stat-value" id="salesTotalSales">-</h3>
+                        <p class="stat-label">Total de Vendas</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                        </div>
+                        <h3 class="stat-value" id="salesTotalRevenue">-</h3>
+                        <p class="stat-label">Receita Total</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                        </div>
+                        <h3 class="stat-value" id="salesTotalCommissions">-</h3>
+                        <p class="stat-label">Comissões</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <h3 class="stat-value" id="salesPendingSales">-</h3>
+                        <p class="stat-label">Pendentes</p>
+                    </div>
+                </div>
+
                 <div class="page-actions">
                     <button class="btn-new-sale" onclick="window.openNewSaleModal()">
                         <i class="fas fa-plus"></i>
@@ -1259,9 +1345,47 @@ $currentPage = 'sales';
         let totalPages = 1;
         let currentFilters = {};
 
+        // Função para carregar estatísticas da página de vendas
+        async function loadSalesStats() {
+            try {
+                console.log('📊 Carregando estatísticas de vendas...');
+                const response = await fetch('api/dashboard_stats_simple.php');
+                const data = await response.json();
+
+                if (data.success) {
+                    // Atualizar indicador de visualização
+                    const salesViewIndicator = document.getElementById('salesViewIndicator');
+                    if (salesViewIndicator) {
+                        if (data.stats.is_admin) {
+                            salesViewIndicator.textContent = '(Global - Todos os Vendedores)';
+                            salesViewIndicator.style.color = '#059669';
+                        } else {
+                            salesViewIndicator.textContent = '(Suas Vendas)';
+                            salesViewIndicator.style.color = '#dc2626';
+                        }
+                    }
+
+                    // Atualizar cards de estatísticas na página de vendas
+                    document.getElementById('salesTotalSales').textContent = data.stats.total_sales || '0';
+                    document.getElementById('salesTotalRevenue').textContent = 'R$ ' + (data.stats.total_revenue || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                    document.getElementById('salesTotalCommissions').textContent = 'R$ ' + (data.stats.total_commissions || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                    document.getElementById('salesPendingSales').textContent = data.stats.pending_sales || '0';
+
+                    console.log('✅ Estatísticas de vendas atualizadas');
+                } else {
+                    console.error('❌ Erro ao carregar estatísticas:', data.message);
+                }
+            } catch (error) {
+                console.error('❌ Erro na requisição de estatísticas:', error);
+            }
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing sales page...');
+
+            // Carregar estatísticas
+            loadSalesStats();
             
             loadSales();
             loadStats();

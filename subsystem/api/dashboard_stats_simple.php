@@ -188,7 +188,11 @@ try {
         'stats' => $stats,
         'debug' => [
             'database_connected' => $conn ? true : false,
-            'current_time' => date('Y-m-d H:i:s')
+            'current_time' => date('Y-m-d H:i:s'),
+            'user_id' => $userId,
+            'user_role' => $userRole,
+            'is_admin' => $isAdmin,
+            'seller_filter' => $sellerFilter
         ]
     ], JSON_UNESCAPED_UNICODE);
     
