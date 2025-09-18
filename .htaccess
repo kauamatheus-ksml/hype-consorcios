@@ -5,18 +5,23 @@
 # REDIRECTS E URL AMIGÁVEIS
 # ===============================
 
-# Redirecionar HTTP para HTTPS
 RewriteEngine On
-RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Redirecionar www para não-www (ou vice-versa)
-RewriteCond %{HTTP_HOST} ^www\.hypeconsorcios\.com\.br [NC]
-RewriteRule ^(.*)$ https://hypeconsorcios.com.br/$1 [L,R=301]
+# Permitir acesso completo ao subsystem (TEMPORÁRIO PARA DEBUG)
+RewriteCond %{REQUEST_URI} ^/subsystem/
+RewriteRule . - [L]
+
+# Redirecionar HTTP para HTTPS (apenas em produção)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Redirecionar www para não-www (apenas em produção)
+# RewriteCond %{HTTP_HOST} ^www\.hypeconsorcios\.com\.br [NC]
+# RewriteRule ^(.*)$ https://hypeconsorcios.com.br/$1 [L,R=301]
 
 # URLs amigáveis para SEO
 RewriteRule ^consorcio-jaragua-do-sul/?$ consorcio-jaragua-do-sul.php [L]
-RewriteRule ^consorcio-veiculos-leves/?$ leves.php [L]  
+RewriteRule ^consorcio-veiculos-leves/?$ leves.php [L]
 RewriteRule ^consorcio-veiculos-premium/?$ premio.php [L]
 RewriteRule ^consorcio-veiculos-pesados/?$ pesados.php [L]
 
