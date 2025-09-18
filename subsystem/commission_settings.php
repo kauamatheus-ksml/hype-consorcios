@@ -1,20 +1,54 @@
 <?php
 session_start();
 
-// Verificar se está logado
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+// Verificações mais flexíveis para admin
+$isAdmin = false;
+$adminId = null;
+$userRole = null;
+$userId = null;
+
+// Tentar diferentes formas de verificar se é admin
+if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+    $isAdmin = true;
+    $adminId = $_SESSION['user_id'] ?? 1;
+    $userRole = $_SESSION['user_role'];
+    $userId = $_SESSION['user_id'];
+} elseif (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+    $isAdmin = true;
+    $adminId = $_SESSION['user_id'] ?? $_SESSION['id'] ?? 1;
+    $userRole = $_SESSION['role'];
+    $userId = $_SESSION['user_id'] ?? $_SESSION['id'];
+} elseif (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+    // Se está logado, vamos verificar no banco se é admin
+    require_once __DIR__ . '/config/database.php';
+    try {
+        $database = new Database();
+        $conn = $database->getConnection();
+
+        $currentUserId = $_SESSION['user_id'] ?? $_SESSION['id'] ?? null;
+        if ($currentUserId) {
+            $stmt = $conn->prepare("SELECT role FROM users WHERE id = ?");
+            $stmt->execute([$currentUserId]);
+            $user = $stmt->fetch();
+
+            if ($user && $user['role'] === 'admin') {
+                $isAdmin = true;
+                $adminId = $currentUserId;
+                $userRole = 'admin';
+                $userId = $currentUserId;
+            }
+        }
+    } catch (Exception $e) {
+        // Em caso de erro, continuar com verificação padrão
+    }
+}
+
+// Verificar se está logado E é admin
+if (!$isAdmin) {
+    // Se não conseguiu verificar como admin, redirecionar para login
     header('Location: ../login.php');
     exit();
 }
-
-// Verificar se é admin
-if ($_SESSION['user_role'] !== 'admin') {
-    header('Location: dashboard.php');
-    exit();
-}
-
-$userRole = $_SESSION['user_role'];
-$userId = $_SESSION['user_id'];
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
