@@ -1,0 +1,145 @@
+<!-- Nova versão completa do formulário de edição -->
+<!-- Informações do Cliente -->
+<div style="margin-bottom: 2rem;">
+    <h4 style="margin: 0 0 1rem 0; color: var(--primary); font-size: 1rem;">Informações do Cliente</h4>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+        <div>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Nome do Cliente*</label>
+            <input type="text" name="customer_name" value="${sale.customer_name || sale.lead_name || ''}" required
+                   style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;"
+                   placeholder="Nome completo">
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Email</label>
+            <input type="email" name="email" value="${sale.customer_email || sale.lead_email || ''}"
+                   style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;"
+                   placeholder="email@exemplo.com">
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Telefone</label>
+            <input type="tel" name="phone" value="${sale.customer_phone || sale.lead_phone || ''}"
+                   style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;"
+                   placeholder="(11) 99999-9999">
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+    <!-- Detalhes da Venda -->
+    <div>
+        <h4 style="margin: 0 0 1rem 0; color: var(--primary); font-size: 1rem;">Detalhes da Venda</h4>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Veículo Vendido*</label>
+                <input type="text" name="vehicle_sold" value="${sale.vehicle_sold || ''}" required
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;"
+                       placeholder="Ex: Honda Civic 2023">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Número do Contrato</label>
+                <input type="text" name="contract_number" value="${sale.contract_number || ''}"
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;"
+                       placeholder="123456789">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Tipo de Pagamento*</label>
+                <select name="payment_type" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;">
+                    <option value="consorcio" ${sale.payment_type === 'consorcio' ? 'selected' : ''}>Consórcio</option>
+                    <option value="financiamento" ${sale.payment_type === 'financiamento' ? 'selected' : ''}>Financiamento</option>
+                    <option value="vista" ${sale.payment_type === 'vista' ? 'selected' : ''}>À Vista</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Data da Venda</label>
+                <input type="date" name="sale_date" value="${sale.sale_date ? sale.sale_date.split(' ')[0] : ''}"
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Status</label>
+                <select name="status" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;">
+                    <option value="pending" ${sale.status === 'pending' ? 'selected' : ''}>Pendente</option>
+                    <option value="confirmed" ${sale.status === 'confirmed' ? 'selected' : ''}>Confirmado</option>
+                    <option value="cancelled" ${sale.status === 'cancelled' ? 'selected' : ''}>Cancelado</option>
+                    <option value="completed" ${sale.status === 'completed' ? 'selected' : ''}>Concluída</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cálculo de Comissão -->
+    <div>
+        <h4 style="margin: 0 0 1rem 0; color: var(--primary); font-size: 1rem;">Cálculo de Comissão</h4>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Valor da Venda (R$)*</label>
+                <input type="number" name="sale_value" value="${sale.sale_value || ''}" step="0.01" min="0" required
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;"
+                       placeholder="0,00" onchange="editCalculateCommission(${sale.id})">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Comissão (%)</label>
+                <input type="number" name="commission_percentage" value="${sale.commission_percentage || ''}" step="0.01" min="0" max="100"
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;"
+                       placeholder="0,00" onchange="editCalculateCommission(${sale.id})">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Valor da Comissão (R$)</label>
+                <input type="number" name="commission_value" value="${sale.commission_value || ''}" step="0.01" min="0" readonly
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem; background-color: #f8fafc; cursor: not-allowed;"
+                       placeholder="0,00">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Comissão será paga em</label>
+                <select name="commission_installments" onchange="editCalculateCommission(${sale.id})" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;">
+                    <option value="1" ${sale.commission_installments == 1 ? 'selected' : ''}>1x (à vista)</option>
+                    <option value="2" ${sale.commission_installments == 2 ? 'selected' : ''}>2x</option>
+                    <option value="3" ${sale.commission_installments == 3 ? 'selected' : ''}>3x</option>
+                    <option value="4" ${sale.commission_installments == 4 ? 'selected' : ''}>4x</option>
+                    <option value="5" ${sale.commission_installments == 5 ? 'selected' : ''}>5x</option>
+                    <option value="6" ${sale.commission_installments == 6 ? 'selected' : ''}>6x</option>
+                    <option value="10" ${sale.commission_installments == 10 ? 'selected' : ''}>10x</option>
+                    <option value="12" ${sale.commission_installments == 12 ? 'selected' : ''}>12x</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Valor por Parcela da Comissão (R$)</label>
+                <input type="number" name="monthly_commission" value="${sale.monthly_commission || ''}" step="0.01" min="0" readonly
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem; background-color: #f8fafc; cursor: not-allowed;"
+                       placeholder="0,00">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Informações de Financiamento -->
+<div style="margin-bottom: 2rem;">
+    <h4 style="margin: 0 0 1rem 0; color: var(--primary); font-size: 1rem;">Informações de Financiamento</h4>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+        <div>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Entrada (R$)</label>
+            <input type="number" name="down_payment" value="${sale.down_payment || ''}" step="0.01" min="0"
+                   style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;"
+                   placeholder="0,00">
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Meses de Financiamento</label>
+            <input type="number" name="financing_months" value="${sale.financing_months || ''}" min="1" max="120"
+                   style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;"
+                   placeholder="12">
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Parcela Mensal (R$)</label>
+            <input type="number" name="monthly_payment" value="${sale.monthly_payment || ''}" step="0.01" min="0"
+                   style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;"
+                   placeholder="0,00">
+        </div>
+    </div>
+</div>
+
+<!-- Observações -->
+<div style="margin-bottom: 2rem;">
+    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Observações</label>
+    <textarea name="notes" rows="3"
+              style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem; resize: vertical;"
+              placeholder="Observações sobre a venda...">${sale.notes || ''}</textarea>
+</div>

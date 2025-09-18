@@ -13,42 +13,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
+// Verificar autenticação
+$authenticated = false;
+$user = null;
+
+if (isset($_COOKIE['crm_session'])) {
+    require_once __DIR__ . '/../classes/Auth.php';
+    $auth = new Auth();
+    $sessionResult = $auth->validateSession($_COOKIE['crm_session']);
+
+    if ($sessionResult['success']) {
+        $authenticated = true;
+        $user = $sessionResult['user'];
+    }
+}
+
+if (!$authenticated) {
+    http_response_code(401);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Não autenticado'
+    ]);
+    exit();
+}
+
 try {
     require_once __DIR__ . '/../config/database.php';
-    
+
     $database = new Database();
     $conn = $database->getConnection();
+
+    $userRole = $user['role'] ?? 'viewer';
+    $userId = $user['id'] ?? null;
     
+    // Definir filtros baseado no papel do usuário
+    $isAdmin = ($userRole === 'admin');
+    $sellerFilter = $isAdmin ? "" : "AND seller_id = ?";
+    $leadFilter = $isAdmin ? "" : "AND assigned_to = ?";
+
     // Estatísticas básicas
     $stats = [
-        'total_leads' => 0,
         'total_sales' => 0,
-        'conversion_rate' => 0,
-        'today_leads' => 0
+        'total_revenue' => 0,
+        'total_commissions' => 0,
+        'pending_sales' => 0,
+        'user_role' => $userRole,
+        'is_admin' => $isAdmin
     ];
-    
-    // Total de leads
-    $stmt = $conn->prepare("SELECT COUNT(*) as total FROM leads");
-    $stmt->execute();
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    $stats['total_leads'] = (int)($result['total'] ?? 0);
-    
+
     // Total de vendas
-    $stmt = $conn->prepare("SELECT COUNT(*) as total FROM sales");
-    $stmt->execute();
+    $sql = "SELECT COUNT(*) as total FROM sales WHERE status != 'cancelled' $sellerFilter";
+    $stmt = $conn->prepare($sql);
+    if (!$isAdmin) {
+        $stmt->execute([$userId]);
+    } else {
+        $stmt->execute();
+    }
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     $stats['total_sales'] = (int)($result['total'] ?? 0);
-    
-    // Taxa de conversão
-    if ($stats['total_leads'] > 0) {
-        $stats['conversion_rate'] = round(($stats['total_sales'] / $stats['total_leads']) * 100, 1);
+
+    // Receita total
+    $sql = "SELECT COALESCE(SUM(sale_value), 0) as total FROM sales WHERE status = 'confirmed' $sellerFilter";
+    $stmt = $conn->prepare($sql);
+    if (!$isAdmin) {
+        $stmt->execute([$userId]);
+    } else {
+        $stmt->execute();
     }
-    
-    // Leads de hoje
-    $stmt = $conn->prepare("SELECT COUNT(*) as total FROM leads WHERE DATE(created_at) = CURDATE()");
-    $stmt->execute();
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    $stats['today_leads'] = (int)($result['total'] ?? 0);
+    $stats['total_revenue'] = (float)($result['total'] ?? 0);
+
+    // Total de comissões
+    $sql = "SELECT COALESCE(SUM(commission_value), 0) as total FROM sales WHERE status = 'confirmed' $sellerFilter";
+    $stmt = $conn->prepare($sql);
+    if (!$isAdmin) {
+        $stmt->execute([$userId]);
+    } else {
+        $stmt->execute();
+    }
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stats['total_commissions'] = (float)($result['total'] ?? 0);
+
+    // Vendas pendentes
+    $sql = "SELECT COUNT(*) as total FROM sales WHERE status = 'pending' $sellerFilter";
+    $stmt = $conn->prepare($sql);
+    if (!$isAdmin) {
+        $stmt->execute([$userId]);
+    } else {
+        $stmt->execute();
+    }
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stats['pending_sales'] = (int)($result['total'] ?? 0);
     
     // Estatísticas adicionais
     // Top vendedores do mês

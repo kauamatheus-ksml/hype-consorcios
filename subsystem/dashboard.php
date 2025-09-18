@@ -226,7 +226,10 @@ $currentPage = 'dashboard';
         <main class="main-content">
             <div class="dashboard-header">
                 <h1 class="dashboard-title">Dashboard</h1>
-                <p class="dashboard-subtitle">Bem-vindo ao sistema CRM da Hype Consórcios</p>
+                <p class="dashboard-subtitle">
+                    Bem-vindo ao sistema CRM da Hype Consórcios
+                    <span id="viewIndicator" style="font-weight: 600; margin-left: 8px; font-size: 0.9rem;"></span>
+                </p>
             </div>
 
             <!-- Stats Grid -->
@@ -234,21 +237,21 @@ $currentPage = 'dashboard';
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">
-                            <i class="fas fa-users"></i>
+                            <i class="fas fa-handshake"></i>
                         </div>
                     </div>
-                    <h3 class="stat-value" id="totalLeads">-</h3>
-                    <p class="stat-label">Total de Leads</p>
+                    <h3 class="stat-value" id="totalSales">-</h3>
+                    <p class="stat-label">Total de Vendas</p>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">
-                            <i class="fas fa-handshake"></i>
+                            <i class="fas fa-dollar-sign"></i>
                         </div>
                     </div>
-                    <h3 class="stat-value" id="totalSales">-</h3>
-                    <p class="stat-label">Vendas Realizadas</p>
+                    <h3 class="stat-value" id="totalRevenue">-</h3>
+                    <p class="stat-label">Receita Total</p>
                 </div>
 
                 <div class="stat-card">
@@ -257,18 +260,18 @@ $currentPage = 'dashboard';
                             <i class="fas fa-percentage"></i>
                         </div>
                     </div>
-                    <h3 class="stat-value" id="conversionRate">-</h3>
-                    <p class="stat-label">Taxa de Conversão</p>
+                    <h3 class="stat-value" id="totalCommissions">-</h3>
+                    <p class="stat-label">Comissões</p>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">
-                            <i class="fas fa-calendar-day"></i>
+                            <i class="fas fa-clock"></i>
                         </div>
                     </div>
-                    <h3 class="stat-value" id="todayLeads">-</h3>
-                    <p class="stat-label">Leads Hoje</p>
+                    <h3 class="stat-value" id="pendingSales">-</h3>
+                    <p class="stat-label">Pendentes</p>
                 </div>
             </div>
 
@@ -367,11 +370,23 @@ $currentPage = 'dashboard';
                 console.log('Data received:', data);
                 
                 if (data.success) {
+                    // Atualizar indicador de visualização
+                    const viewIndicator = document.getElementById('viewIndicator');
+                    if (viewIndicator) {
+                        if (data.stats.is_admin) {
+                            viewIndicator.textContent = '(Visualização Global - Todos os Vendedores)';
+                            viewIndicator.style.color = '#059669';
+                        } else {
+                            viewIndicator.textContent = '(Suas Estatísticas Pessoais)';
+                            viewIndicator.style.color = '#dc2626';
+                        }
+                    }
+
                     // Atualizar cards principais
-                    document.getElementById('totalLeads').textContent = data.stats.total_leads || '0';
                     document.getElementById('totalSales').textContent = data.stats.total_sales || '0';
-                    document.getElementById('conversionRate').textContent = (data.stats.conversion_rate || 0) + '%';
-                    document.getElementById('todayLeads').textContent = data.stats.today_leads || '0';
+                    document.getElementById('totalRevenue').textContent = 'R$ ' + (data.stats.total_revenue || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                    document.getElementById('totalCommissions').textContent = 'R$ ' + (data.stats.total_commissions || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                    document.getElementById('pendingSales').textContent = data.stats.pending_sales || '0';
                     
                     // Adicionar informações extras se disponíveis
                     updateRecentLeads(data.stats.recent_leads || []);
@@ -534,10 +549,10 @@ $currentPage = 'dashboard';
         }
 
         function showStatsError(message) {
-            document.getElementById('totalLeads').textContent = 'Erro';
             document.getElementById('totalSales').textContent = 'Erro';
-            document.getElementById('conversionRate').textContent = 'Erro';
-            document.getElementById('todayLeads').textContent = 'Erro';
+            document.getElementById('totalRevenue').textContent = 'Erro';
+            document.getElementById('totalCommissions').textContent = 'Erro';
+            document.getElementById('pendingSales').textContent = 'Erro';
             
             // Atualizar seções adicionais
             document.getElementById('recentLeads').innerHTML = '<p style="color: #dc2626;">Erro ao carregar</p>';

@@ -2108,6 +2108,26 @@ $currentPage = 'sales';
             summaryDiv.style.display = 'none';
         }
 
+        // Função para calcular comissão no modal de edição
+        function editCalculateCommission(saleId) {
+            const form = document.getElementById(`editSaleForm-${saleId}`);
+            if (!form) return;
+
+            const saleValue = parseFloat(form.querySelector('input[name="sale_value"]').value) || 0;
+            const commissionPercentage = parseFloat(form.querySelector('input[name="commission_percentage"]').value) || 1.5;
+            const commissionInstallments = parseInt(form.querySelector('select[name="commission_installments"]').value) || 5;
+
+            // Calcular valor da comissão
+            const commissionValue = (saleValue * commissionPercentage) / 100;
+
+            // Calcular valor mensal da comissão
+            const monthlyCommission = commissionValue / commissionInstallments;
+
+            // Atualizar campos calculados
+            form.querySelector('input[name="commission_value"]').value = commissionValue.toFixed(2);
+            form.querySelector('input[name="monthly_commission"]').value = monthlyCommission.toFixed(2);
+        }
+
         // Função para carregar configuração de comissão do vendedor atual
         async function loadSellerCommissionRate() {
             try {
@@ -2640,21 +2660,71 @@ $currentPage = 'sales';
                             <!-- Edit Form -->
                             <div style="padding: 1.5rem;">
                                 <form id="editSaleForm-${sale.id}">
+                                    <!-- Informações do Cliente -->
+                                    <div style="margin-bottom: 2rem;">
+                                        <h4 style="margin: 0 0 1rem 0; color: var(--primary); font-size: 1rem;">Informações do Cliente</h4>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                                            <div>
+                                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Nome do Cliente*</label>
+                                                <input type="text" name="customer_name" value="${sale.customer_name || sale.lead_name || ''}" required
+                                                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;"
+                                                       placeholder="Nome completo">
+                                            </div>
+                                            <div>
+                                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Email</label>
+                                                <input type="email" name="email" value="${sale.customer_email || sale.lead_email || ''}"
+                                                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;"
+                                                       placeholder="email@exemplo.com">
+                                            </div>
+                                            <div>
+                                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Telefone</label>
+                                                <input type="tel" name="phone" value="${sale.customer_phone || sale.lead_phone || ''}"
+                                                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;"
+                                                       placeholder="(11) 99999-9999">
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
-                                        <!-- Financial Information -->
+                                        <!-- Cálculo de Comissão -->
                                         <div>
-                                            <h4 style="margin: 0 0 1rem 0; color: var(--primary); font-size: 1rem;">Informações Financeiras</h4>
+                                            <h4 style="margin: 0 0 1rem 0; color: var(--primary); font-size: 1rem;">Cálculo de Comissão</h4>
                                             <div style="display: flex; flex-direction: column; gap: 1rem;">
                                                 <div>
                                                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Valor da Venda (R$)*</label>
-                                                    <input type="number" name="sale_value" value="${sale.sale_value || ''}" step="0.01" min="0" required 
-                                                           style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;" 
-                                                           placeholder="0,00">
+                                                    <input type="number" name="sale_value" value="${sale.sale_value || ''}" step="0.01" min="0" required
+                                                           style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;"
+                                                           placeholder="0,00" onchange="editCalculateCommission(${sale.id})">
                                                 </div>
                                                 <div>
                                                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Comissão (%)</label>
-                                                    <input type="number" name="commission_percentage" value="${sale.commission_percentage || ''}" step="0.01" min="0" max="100" 
-                                                           style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;" 
+                                                    <input type="number" name="commission_percentage" value="${sale.commission_percentage || ''}" step="0.01" min="0" max="100"
+                                                           style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;"
+                                                           placeholder="0,00" onchange="editCalculateCommission(${sale.id})">
+                                                </div>
+                                                <div>
+                                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Valor da Comissão (R$)</label>
+                                                    <input type="number" name="commission_value" value="${sale.commission_value || ''}" step="0.01" min="0" readonly
+                                                           style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem; background-color: #f8fafc; cursor: not-allowed;"
+                                                           placeholder="0,00">
+                                                </div>
+                                                <div>
+                                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Comissão será paga em</label>
+                                                    <select name="commission_installments" onchange="editCalculateCommission(${sale.id})" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;">
+                                                        <option value="1" ${sale.commission_installments == 1 ? 'selected' : ''}>1x (à vista)</option>
+                                                        <option value="2" ${sale.commission_installments == 2 ? 'selected' : ''}>2x</option>
+                                                        <option value="3" ${sale.commission_installments == 3 ? 'selected' : ''}>3x</option>
+                                                        <option value="4" ${sale.commission_installments == 4 ? 'selected' : ''}>4x</option>
+                                                        <option value="5" ${sale.commission_installments == 5 ? 'selected' : ''}>5x</option>
+                                                        <option value="6" ${sale.commission_installments == 6 ? 'selected' : ''}>6x</option>
+                                                        <option value="10" ${sale.commission_installments == 10 ? 'selected' : ''}>10x</option>
+                                                        <option value="12" ${sale.commission_installments == 12 ? 'selected' : ''}>12x</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Valor por Parcela da Comissão (R$)</label>
+                                                    <input type="number" name="monthly_commission" value="${sale.monthly_commission || ''}" step="0.01" min="0" readonly
+                                                           style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem; background-color: #f8fafc; cursor: not-allowed;"
                                                            placeholder="0,00">
                                                 </div>
                                                 <div>
@@ -2705,11 +2775,17 @@ $currentPage = 'sales';
                                                     </select>
                                                 </div>
                                                 <div>
+                                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Data da Venda</label>
+                                                    <input type="date" name="sale_date" value="${sale.sale_date ? sale.sale_date.split(' ')[0] : ''}"
+                                                           style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;">
+                                                </div>
+                                                <div>
                                                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground); font-size: 0.875rem;">Status</label>
                                                     <select name="status" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.875rem;">
                                                         <option value="pending" ${sale.status === 'pending' ? 'selected' : ''}>Pendente</option>
                                                         <option value="confirmed" ${sale.status === 'confirmed' ? 'selected' : ''}>Confirmado</option>
                                                         <option value="cancelled" ${sale.status === 'cancelled' ? 'selected' : ''}>Cancelado</option>
+                                                        <option value="completed" ${sale.status === 'completed' ? 'selected' : ''}>Concluída</option>
                                                     </select>
                                                 </div>
                                             </div>
