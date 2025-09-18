@@ -176,11 +176,14 @@ function handleGetSales($conn, $userRole, $userId) {
     
     // Buscar vendas com paginação
     $salesQuery = "
-        SELECT 
+        SELECT
             s.*,
             u.full_name as seller_name,
             l.name as customer_name,
-            l.name as lead_name
+            l.name as lead_name,
+            YEAR(s.sale_date) as sale_year,
+            MONTH(s.sale_date) as sale_month,
+            MONTHNAME(s.sale_date) as sale_month_name
         " . $baseQuery . "
         ORDER BY s.sale_date DESC
         LIMIT {$limit} OFFSET {$offset}
@@ -259,6 +262,14 @@ function handleCreateSale($conn, $userId) {
         }
     }
 
+    // Definir valores padrão para comissão se não fornecidos
+    if (!isset($input['commission_percentage'])) {
+        $input['commission_percentage'] = 1.5; // Padrão 1.5%
+    }
+    if (!isset($input['commission_installments'])) {
+        $input['commission_installments'] = 5; // Padrão 5 parcelas
+    }
+
     $leadId = null;
 
     // Verificar se o lead existe ou criar um novo
@@ -285,8 +296,14 @@ function handleCreateSale($conn, $userId) {
     
     // Calcular comissão se percentual foi fornecido
     $commission_value = 0;
+    $monthly_commission = 0;
+
     if (!empty($input['commission_percentage']) && !empty($input['sale_value'])) {
         $commission_value = ($input['sale_value'] * $input['commission_percentage']) / 100;
+
+        // Calcular comissão mensal
+        $commission_installments = !empty($input['commission_installments']) ? $input['commission_installments'] : 5;
+        $monthly_commission = $commission_value / $commission_installments;
     }
     
     // Inserir venda
@@ -294,10 +311,11 @@ function handleCreateSale($conn, $userId) {
         INSERT INTO sales (
             lead_id, seller_id,
             sale_value, commission_percentage, commission_value,
+            commission_installments, monthly_commission,
             vehicle_sold, payment_type, down_payment,
             financing_months, monthly_payment, contract_number,
             notes, status, sale_date, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
     ");
     
     $saleDate = !empty($input['sale_date']) ? $input['sale_date'] : date('Y-m-d');
@@ -306,8 +324,10 @@ function handleCreateSale($conn, $userId) {
         $leadId,
         $input['seller_id'] ?? $userId,
         $input['sale_value'],
-        $input['commission_percentage'] ?? 0,
+        $input['commission_percentage'] ?? 1.5,
         $commission_value,
+        $input['commission_installments'] ?? 5,
+        $monthly_commission,
         $input['vehicle_sold'],
         $input['payment_type'],
         $input['down_payment'] ?? null,

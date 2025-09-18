@@ -486,7 +486,8 @@ $currentPage = 'sales';
             color: #dc2626;
         }
 
-        .calculation-summary {
+        .calculation-summary,
+        .commission-summary {
             background: #f8fafc;
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -494,11 +495,21 @@ $currentPage = 'sales';
             margin-top: 1rem;
         }
 
-        .calculation-summary h4 {
+        .commission-summary {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid #0ea5e9;
+        }
+
+        .calculation-summary h4,
+        .commission-summary h4 {
             margin: 0 0 0.75rem 0;
             color: var(--foreground);
             font-size: 0.875rem;
             font-weight: 600;
+        }
+
+        .commission-summary h4 {
+            color: #0369a1;
         }
 
         .summary-grid {
@@ -527,6 +538,17 @@ $currentPage = 'sales';
             font-size: 0.85rem;
             font-weight: 600;
             color: var(--foreground);
+        }
+
+        .summary-item.highlight {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-color: #22c55e;
+        }
+
+        .summary-item.highlight .value {
+            color: #166534;
+            font-size: 0.9rem;
+            font-weight: 700;
         }
 
         /* Mobile Responsive */
@@ -1066,57 +1088,72 @@ $currentPage = 'sales';
                         </div>
                     </div>
 
-                    <!-- Seção: Valores Financeiros -->
+                    <!-- Seção: Cálculo de Comissão -->
                     <div class="form-section">
                         <h3 class="section-title">
-                            <i class="fas fa-dollar-sign"></i>
-                            Informações Financeiras
+                            <i class="fas fa-calculator"></i>
+                            Cálculo de Comissão
                         </h3>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label>Valor da Venda (R$) *</label>
                                 <input type="number" name="sale_value" step="0.01" min="0" required placeholder="0,00"
-                                       oninput="calculateFinancialValues()">
-                            </div>
-                            <div class="form-group">
-                                <label>Entrada (R$)</label>
-                                <input type="number" name="down_payment" step="0.01" min="0" placeholder="0,00"
-                                       oninput="calculateFinancialValues()">
-                                <small class="field-hint" id="downPaymentHint"></small>
+                                       oninput="calculateCommission()">
                             </div>
                             <div class="form-group">
                                 <label>Comissão (%)</label>
-                                <input type="number" name="commission_percentage" step="0.01" min="0" placeholder="5,00"
-                                       oninput="calculateCommission()">
-                                <small class="field-hint" id="commissionHint"></small>
+                                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                    <input type="number" name="commission_percentage" step="0.01" min="0" value="1.5" placeholder="1,5"
+                                           oninput="calculateCommission()" id="commissionPercentageInput" style="flex: 1;">
+                                    <button type="button" id="adminCommissionBtn" onclick="openCommissionSettings()"
+                                            style="display: none; padding: 0.5rem; background: #f59e0b; color: white; border: none; border-radius: 4px; cursor: pointer;"
+                                            title="Configurar taxa padrão (Admin)">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                </div>
+                                <small class="field-hint">Taxa padrão do sistema</small>
                             </div>
                             <div class="form-group">
-                                <label>Parcelas</label>
-                                <input type="number" name="financing_months" min="1" placeholder="12"
-                                       oninput="calculateFinancialValues()">
-                                <small class="field-hint">Sem limite máximo</small>
+                                <label>Valor da Comissão (R$)</label>
+                                <input type="number" name="commission_value" step="0.01" min="0" placeholder="0,00" readonly
+                                       style="background-color: #f8fafc; cursor: not-allowed;">
+                                <small class="field-hint" id="commissionValueHint">Calculado automaticamente</small>
                             </div>
                             <div class="form-group">
-                                <label>Valor da Parcela (R$)</label>
-                                <input type="number" name="monthly_payment" step="0.01" min="0" placeholder="0,00"
-                                       oninput="calculateFromMonthlyPayment()">
-                                <small class="field-hint" id="monthlyPaymentHint"></small>
+                                <label>Comissão será paga em</label>
+                                <select name="commission_installments" onchange="calculateCommission()">
+                                    <option value="1">1x (à vista)</option>
+                                    <option value="2">2x</option>
+                                    <option value="3">3x</option>
+                                    <option value="4">4x</option>
+                                    <option value="5" selected>5x</option>
+                                    <option value="6">6x</option>
+                                    <option value="10">10x</option>
+                                    <option value="12">12x</option>
+                                </select>
+                                <small class="field-hint">Número de parcelas para pagamento da comissão</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Valor por Parcela da Comissão (R$)</label>
+                                <input type="number" name="monthly_commission" step="0.01" min="0" placeholder="0,00" readonly
+                                       style="background-color: #f8fafc; cursor: not-allowed;">
+                                <small class="field-hint" id="monthlyCommissionHint">Calculado automaticamente</small>
                             </div>
                             <div class="form-group full-width">
-                                <div class="calculation-summary" id="calculationSummary" style="display: none;">
-                                    <h4><i class="fas fa-calculator"></i> Resumo dos Cálculos</h4>
+                                <div class="commission-summary" id="commissionSummary" style="display: none;">
+                                    <h4><i class="fas fa-money-bill-wave"></i> Resumo da Comissão</h4>
                                     <div class="summary-grid">
-                                        <div class="summary-item">
-                                            <span class="label">Valor Financiado:</span>
-                                            <span class="value" id="financedAmount">R$ 0,00</span>
+                                        <div class="summary-item highlight">
+                                            <span class="label">Comissão Total:</span>
+                                            <span class="value" id="totalCommissionDisplay">R$ 0,00</span>
                                         </div>
                                         <div class="summary-item">
-                                            <span class="label">Valor da Comissão:</span>
-                                            <span class="value" id="commissionValue">R$ 0,00</span>
+                                            <span class="label">Valor por Mês:</span>
+                                            <span class="value" id="monthlyCommissionDisplay">R$ 0,00</span>
                                         </div>
                                         <div class="summary-item">
-                                            <span class="label">Total das Parcelas:</span>
-                                            <span class="value" id="totalInstallments">R$ 0,00</span>
+                                            <span class="label">Número de Parcelas:</span>
+                                            <span class="value" id="installmentsDisplay">0x</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1145,6 +1182,54 @@ $currentPage = 'sales';
                     <button type="submit" class="btn-primary">
                         <i class="fas fa-save"></i>
                         Salvar Venda
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Configuração de Comissão (Admin) -->
+    <div class="modal-overlay" id="commissionSettingsModal" style="display: none;">
+        <div class="modal-container" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> Configuração de Comissão</h2>
+                <button class="modal-close" onclick="closeCommissionSettings()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="commissionSettingsForm">
+                <div class="modal-body">
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-percentage"></i>
+                            Taxa Padrão do Sistema
+                        </h3>
+                        <div class="form-group">
+                            <label>Taxa de Comissão Padrão (%)</label>
+                            <input type="number" name="default_commission_rate" step="0.01" min="0" max="100"
+                                   placeholder="1,5" required id="defaultCommissionInput">
+                            <small class="field-hint">Esta será a taxa padrão para todas as novas vendas</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Exemplo de Cálculo</label>
+                            <div id="commissionExample" style="padding: 1rem; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
+                                <div style="color: var(--muted-foreground); font-size: 0.875rem;">
+                                    Digite a taxa acima para ver o exemplo
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeCommissionSettings()">
+                        <i class="fas fa-times"></i>
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i>
+                        Salvar Configuração
                     </button>
                 </div>
             </form>
@@ -1374,7 +1459,10 @@ $currentPage = 'sales';
                         <div style="font-weight: 600; color: var(--primary);">
                             R$ ${parseFloat(sale.commission_value || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}
                         </div>
-                        ${sale.commission_percentage ? `<small style="color: var(--muted-foreground);">${sale.commission_percentage}%</small>` : ''}
+                        <div style="font-size: 0.75rem; color: var(--muted-foreground); margin-top: 2px;">
+                            ${sale.commission_percentage ? `${sale.commission_percentage}% • ` : ''}${sale.monthly_commission ? `R$ ${parseFloat(sale.monthly_commission).toLocaleString('pt-BR', {minimumFractionDigits: 2})}/mês` : ''}
+                            ${sale.commission_installments && sale.commission_installments > 1 ? ` • ${sale.commission_installments}x` : ''}
+                        </div>
                     </td>
                     <td>
                         <div>${sale.seller_name || 'Não atribuído'}</div>
@@ -1803,10 +1891,10 @@ $currentPage = 'sales';
                     payment_type: formData.get('payment_type'),
                     sale_date: formData.get('sale_date') || new Date().toISOString().split('T')[0],
                     sale_value: parseFloat(formData.get('sale_value')) || 0,
-                    down_payment: parseFloat(formData.get('down_payment')) || null,
-                    commission_percentage: parseFloat(formData.get('commission_percentage')) || null,
-                    financing_months: parseInt(formData.get('financing_months')) || null,
-                    monthly_payment: parseFloat(formData.get('monthly_payment')) || null,
+                    commission_percentage: parseFloat(formData.get('commission_percentage')) || 1.5,
+                    commission_value: parseFloat(formData.get('commission_value')) || 0,
+                    commission_installments: parseInt(formData.get('commission_installments')) || 5,
+                    monthly_commission: parseFloat(formData.get('monthly_commission')) || 0,
                     notes: formData.get('notes') || null,
                     seller_id: currentUser.id
                 };
@@ -1825,39 +1913,22 @@ $currentPage = 'sales';
                     throw new Error('Valor da venda deve ser maior que zero');
                 }
 
-                // Validações financeiras lógicas
-                if (data.down_payment && data.down_payment > data.sale_value) {
-                    throw new Error('O valor da entrada não pode ser maior que o valor da venda');
-                }
-
+                // Validações da comissão
                 if (data.commission_percentage && (data.commission_percentage < 0 || data.commission_percentage > 100)) {
                     throw new Error('A comissão deve estar entre 0% e 100%');
                 }
 
-                if (data.financing_months && data.financing_months < 1) {
-                    throw new Error('O número de parcelas deve ser maior que zero');
+                if (data.commission_installments && data.commission_installments < 1) {
+                    throw new Error('O número de parcelas da comissão deve ser maior que zero');
                 }
 
-                if (data.monthly_payment && data.monthly_payment < 0) {
-                    throw new Error('O valor da parcela não pode ser negativo');
-                }
+                // Validação de coerência da comissão
+                if (data.commission_value && data.commission_installments && data.monthly_commission) {
+                    const expectedTotal = data.monthly_commission * data.commission_installments;
+                    const difference = Math.abs(expectedTotal - data.commission_value);
 
-                // Validação de coerência entre parcelas e valores
-                if (data.financing_months && data.monthly_payment) {
-                    const financedAmount = data.sale_value - (data.down_payment || 0);
-                    const totalPaid = data.monthly_payment * data.financing_months;
-                    const difference = Math.abs(totalPaid - financedAmount);
-
-                    // Permitir uma diferença pequena para ajustes de arredondamento
-                    if (difference > (financedAmount * 0.1)) {
-                        const isHigher = totalPaid > financedAmount;
-                        const message = isHigher
-                            ? `O total das parcelas (R$ ${totalPaid.toFixed(2)}) é muito maior que o valor financiado (R$ ${financedAmount.toFixed(2)})`
-                            : `O total das parcelas (R$ ${totalPaid.toFixed(2)}) é muito menor que o valor financiado (R$ ${financedAmount.toFixed(2)})`;
-
-                        if (!confirm(message + '. Deseja continuar mesmo assim?')) {
-                            throw new Error('Operação cancelada pelo usuário');
-                        }
+                    if (difference > 0.01) {
+                        throw new Error('Valores de comissão inconsistentes. Verifique os cálculos.');
                     }
                 }
 
@@ -1950,128 +2021,47 @@ $currentPage = 'sales';
             }, 4000);
         }
 
-        // ===== FUNÇÕES DE CÁLCULOS FINANCEIROS =====
+        // ===== FUNÇÕES DE CÁLCULOS DE COMISSÃO =====
 
-        // Função principal para calcular valores financeiros
-        function calculateFinancialValues() {
-            const saleValue = parseFloat(document.querySelector('input[name="sale_value"]').value) || 0;
-            const downPayment = parseFloat(document.querySelector('input[name="down_payment"]').value) || 0;
-            const financingMonths = parseInt(document.querySelector('input[name="financing_months"]').value) || 0;
-            const monthlyPayment = parseFloat(document.querySelector('input[name="monthly_payment"]').value) || 0;
-
-            // Validar entrada não pode ser maior que o valor da venda
-            const downPaymentInput = document.querySelector('input[name="down_payment"]');
-            const downPaymentHint = document.getElementById('downPaymentHint');
-
-            if (downPayment > saleValue && saleValue > 0) {
-                downPaymentHint.textContent = '⚠️ Entrada não pode ser maior que o valor da venda';
-                downPaymentHint.className = 'field-hint error';
-                downPaymentInput.style.borderColor = '#dc2626';
-            } else if (downPayment > 0 && saleValue > 0) {
-                const percentage = ((downPayment / saleValue) * 100).toFixed(1);
-                downPaymentHint.textContent = `💰 ${percentage}% do valor da venda`;
-                downPaymentHint.className = 'field-hint';
-                downPaymentInput.style.borderColor = '';
-            } else {
-                downPaymentHint.textContent = '';
-                downPaymentInput.style.borderColor = '';
-            }
-
-            // Calcular valor financiado
-            const financedAmount = Math.max(0, saleValue - downPayment);
-
-            // Se temos número de parcelas mas não valor da parcela, calcular valor da parcela
-            if (financingMonths > 0 && financedAmount > 0 && !monthlyPayment) {
-                const calculatedMonthlyPayment = financedAmount / financingMonths;
-                document.querySelector('input[name="monthly_payment"]').value = calculatedMonthlyPayment.toFixed(2);
-
-                const monthlyPaymentHint = document.getElementById('monthlyPaymentHint');
-                monthlyPaymentHint.textContent = `🧮 Calculado automaticamente (${financingMonths}x)`;
-                monthlyPaymentHint.className = 'field-hint';
-            }
-
-            // Se temos valor da parcela mas não número de parcelas, calcular número de parcelas
-            if (monthlyPayment > 0 && financedAmount > 0 && !financingMonths) {
-                const calculatedMonths = Math.ceil(financedAmount / monthlyPayment);
-                document.querySelector('input[name="financing_months"]').value = calculatedMonths;
-
-                const monthlyPaymentHint = document.getElementById('monthlyPaymentHint');
-                monthlyPaymentHint.textContent = `🧮 Será pago em ${calculatedMonths} parcelas`;
-                monthlyPaymentHint.className = 'field-hint';
-            }
-
-            // Atualizar resumo dos cálculos
-            updateCalculationSummary(saleValue, downPayment, financedAmount);
-        }
-
-        // Função para calcular quando o valor da parcela é alterado
-        function calculateFromMonthlyPayment() {
-            const saleValue = parseFloat(document.querySelector('input[name="sale_value"]').value) || 0;
-            const downPayment = parseFloat(document.querySelector('input[name="down_payment"]').value) || 0;
-            const monthlyPayment = parseFloat(document.querySelector('input[name="monthly_payment"]').value) || 0;
-            const financingMonths = parseInt(document.querySelector('input[name="financing_months"]').value) || 0;
-
-            const financedAmount = Math.max(0, saleValue - downPayment);
-            const monthlyPaymentHint = document.getElementById('monthlyPaymentHint');
-
-            if (monthlyPayment > 0 && financedAmount > 0) {
-                if (!financingMonths) {
-                    // Calcular número de parcelas baseado no valor da parcela
-                    const calculatedMonths = Math.ceil(financedAmount / monthlyPayment);
-                    document.querySelector('input[name="financing_months"]').value = calculatedMonths;
-                    monthlyPaymentHint.textContent = `🧮 Será pago em ${calculatedMonths} parcelas`;
-                } else {
-                    // Verificar se o valor da parcela está coerente
-                    const expectedMonthlyPayment = financedAmount / financingMonths;
-                    const difference = Math.abs(monthlyPayment - expectedMonthlyPayment);
-
-                    if (difference > 0.01) {
-                        const totalPaid = monthlyPayment * financingMonths;
-                        const extraAmount = totalPaid - financedAmount;
-                        if (extraAmount > 0) {
-                            monthlyPaymentHint.textContent = `⚠️ Total será R$ ${extraAmount.toFixed(2)} maior que o financiado`;
-                            monthlyPaymentHint.className = 'field-hint warning';
-                        } else {
-                            monthlyPaymentHint.textContent = `⚠️ Total será R$ ${Math.abs(extraAmount).toFixed(2)} menor que o financiado`;
-                            monthlyPaymentHint.className = 'field-hint warning';
-                        }
-                    } else {
-                        monthlyPaymentHint.textContent = `✅ Valor correto para ${financingMonths} parcelas`;
-                        monthlyPaymentHint.className = 'field-hint';
-                    }
-                }
-            } else {
-                monthlyPaymentHint.textContent = '';
-                monthlyPaymentHint.className = 'field-hint';
-            }
-
-            // Atualizar resumo
-            updateCalculationSummary(saleValue, downPayment, financedAmount);
-        }
-
-        // Função para calcular comissão
+        // Função principal para calcular comissão
         function calculateCommission() {
             const saleValue = parseFloat(document.querySelector('input[name="sale_value"]').value) || 0;
-            const commissionPercentage = parseFloat(document.querySelector('input[name="commission_percentage"]').value) || 0;
-            const commissionHint = document.getElementById('commissionHint');
+            const commissionPercentage = parseFloat(document.querySelector('input[name="commission_percentage"]').value) || 1.5;
+            const commissionInstallments = parseInt(document.querySelector('select[name="commission_installments"]').value) || 5;
 
-            if (saleValue > 0 && commissionPercentage > 0) {
-                const commissionValue = (saleValue * commissionPercentage) / 100;
-                commissionHint.textContent = `💰 R$ ${commissionValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-                commissionHint.className = 'field-hint';
+            // Calcular valor da comissão
+            const commissionValue = (saleValue * commissionPercentage) / 100;
 
-                // Atualizar resumo também
-                const downPayment = parseFloat(document.querySelector('input[name="down_payment"]').value) || 0;
-                const financedAmount = Math.max(0, saleValue - downPayment);
-                updateCalculationSummary(saleValue, downPayment, financedAmount);
+            // Calcular valor mensal da comissão
+            const monthlyCommission = commissionValue / commissionInstallments;
+
+            // Atualizar campos calculados
+            document.querySelector('input[name="commission_value"]').value = commissionValue.toFixed(2);
+            document.querySelector('input[name="monthly_commission"]').value = monthlyCommission.toFixed(2);
+
+            // Atualizar hints
+            const commissionValueHint = document.getElementById('commissionValueHint');
+            const monthlyCommissionHint = document.getElementById('monthlyCommissionHint');
+
+            if (saleValue > 0) {
+                commissionValueHint.textContent = `${commissionPercentage}% de R$ ${saleValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+                commissionValueHint.className = 'field-hint';
+
+                monthlyCommissionHint.textContent = `R$ ${commissionValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})} ÷ ${commissionInstallments} parcelas`;
+                monthlyCommissionHint.className = 'field-hint';
+
+                // Mostrar resumo da comissão
+                updateCommissionSummary(saleValue, commissionValue, monthlyCommission, commissionInstallments, commissionPercentage);
             } else {
-                commissionHint.textContent = '';
+                commissionValueHint.textContent = 'Calculado automaticamente';
+                monthlyCommissionHint.textContent = 'Calculado automaticamente';
+                hideCommissionSummary();
             }
         }
 
-        // Função para atualizar o resumo dos cálculos
-        function updateCalculationSummary(saleValue, downPayment, financedAmount) {
-            const summaryDiv = document.getElementById('calculationSummary');
+        // Função para atualizar o resumo da comissão
+        function updateCommissionSummary(saleValue, commissionValue, monthlyCommission, installments, percentage) {
+            const summaryDiv = document.getElementById('commissionSummary');
 
             if (saleValue <= 0) {
                 summaryDiv.style.display = 'none';
@@ -2080,22 +2070,68 @@ $currentPage = 'sales';
 
             summaryDiv.style.display = 'block';
 
-            // Atualizar valor financiado
-            document.getElementById('financedAmount').textContent =
-                `R$ ${financedAmount.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-
-            // Atualizar valor da comissão
-            const commissionPercentage = parseFloat(document.querySelector('input[name="commission_percentage"]').value) || 0;
-            const commissionValue = (saleValue * commissionPercentage) / 100;
-            document.getElementById('commissionValue').textContent =
+            // Atualizar valores do resumo
+            document.getElementById('totalCommissionDisplay').textContent =
                 `R$ ${commissionValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
 
-            // Atualizar total das parcelas
-            const monthlyPayment = parseFloat(document.querySelector('input[name="monthly_payment"]').value) || 0;
-            const financingMonths = parseInt(document.querySelector('input[name="financing_months"]').value) || 0;
-            const totalInstallments = monthlyPayment * financingMonths;
-            document.getElementById('totalInstallments').textContent =
-                `R$ ${totalInstallments.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('monthlyCommissionDisplay').textContent =
+                `R$ ${monthlyCommission.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+
+            document.getElementById('installmentsDisplay').textContent = `${installments}x`;
+
+            // Adicionar exemplo na dica
+            const hint = document.getElementById('monthlyCommissionHint');
+            if (installments > 1) {
+                hint.textContent = `Exemplo: Vendeu R$ ${saleValue.toLocaleString('pt-BR')} • ${percentage}% = R$ ${commissionValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})} • ÷${installments} = R$ ${monthlyCommission.toLocaleString('pt-BR', {minimumFractionDigits: 2})} por mês`;
+            } else {
+                hint.textContent = `Comissão paga à vista: R$ ${commissionValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            }
+        }
+
+        // Função para ocultar resumo da comissão
+        function hideCommissionSummary() {
+            const summaryDiv = document.getElementById('commissionSummary');
+            summaryDiv.style.display = 'none';
+        }
+
+        // Função para carregar configuração padrão de comissão (para admin)
+        async function loadDefaultCommissionRate() {
+            try {
+                // Buscar taxa padrão do sistema
+                const response = await fetch('api/system_settings.php?setting=default_commission_rate');
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.value) {
+                        const commissionInput = document.querySelector('input[name="commission_percentage"]');
+                        commissionInput.value = result.value;
+
+                        // Se for admin, permitir edição e mostrar botão de configuração
+                        if (currentUser && currentUser.role === 'admin') {
+                            commissionInput.readOnly = false;
+                            commissionInput.style.backgroundColor = '';
+                            commissionInput.style.cursor = '';
+                            const hint = commissionInput.parentElement.nextElementSibling;
+                            if (hint && hint.classList.contains('field-hint')) {
+                                hint.textContent = 'Como admin, você pode alterar esta taxa ou configurar o padrão';
+                            }
+
+                            // Mostrar botão de configuração
+                            const adminBtn = document.getElementById('adminCommissionBtn');
+                            if (adminBtn) {
+                                adminBtn.style.display = 'block';
+                            }
+                        } else {
+                            commissionInput.readOnly = true;
+                            commissionInput.style.backgroundColor = '#f8fafc';
+                            commissionInput.style.cursor = 'not-allowed';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Erro ao carregar taxa de comissão padrão:', error);
+                // Usar valor padrão de 1.5%
+                document.querySelector('input[name="commission_percentage"]').value = 1.5;
+            }
         }
 
         // Função para resetar todos os cálculos e dicas
@@ -2113,18 +2149,183 @@ $currentPage = 'sales';
                 input.style.borderColor = '';
             });
 
-            // Ocultar resumo de cálculos
-            const summaryDiv = document.getElementById('calculationSummary');
-            if (summaryDiv) {
-                summaryDiv.style.display = 'none';
+            // Ocultar resumos
+            const calculationSummary = document.getElementById('calculationSummary');
+            if (calculationSummary) {
+                calculationSummary.style.display = 'none';
             }
 
-            // Adicionar dica estática sobre parcelas
-            const financingHint = document.querySelector('input[name="financing_months"]').nextElementSibling;
-            if (financingHint && financingHint.classList.contains('field-hint')) {
-                financingHint.textContent = 'Sem limite máximo';
+            const commissionSummary = document.getElementById('commissionSummary');
+            if (commissionSummary) {
+                commissionSummary.style.display = 'none';
+            }
+
+            // Resetar dicas padrão
+            const commissionPercentageHint = document.querySelector('input[name="commission_percentage"]').nextElementSibling;
+            if (commissionPercentageHint && commissionPercentageHint.classList.contains('field-hint')) {
+                commissionPercentageHint.textContent = 'Taxa padrão do sistema';
+            }
+
+            const commissionValueHint = document.getElementById('commissionValueHint');
+            if (commissionValueHint) {
+                commissionValueHint.textContent = 'Calculado automaticamente';
+            }
+
+            const monthlyCommissionHint = document.getElementById('monthlyCommissionHint');
+            if (monthlyCommissionHint) {
+                monthlyCommissionHint.textContent = 'Calculado automaticamente';
+            }
+
+            // Resetar valores padrão
+            document.querySelector('input[name="commission_percentage"]').value = '1.5';
+            document.querySelector('select[name="commission_installments"]').value = '5';
+            document.querySelector('input[name="commission_value"]').value = '';
+            document.querySelector('input[name="monthly_commission"]').value = '';
+
+            // Carregar configuração de comissão
+            loadDefaultCommissionRate();
+        }
+
+        // ===== FUNÇÕES DE CONFIGURAÇÃO DE COMISSÃO (ADMIN) =====
+
+        // Abrir modal de configuração de comissão
+        function openCommissionSettings() {
+            if (currentUser.role !== 'admin') {
+                showNotification('Apenas administradores podem alterar esta configuração', 'error');
+                return;
+            }
+
+            const modal = document.getElementById('commissionSettingsModal');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+
+            // Carregar valor atual
+            loadDefaultCommissionRate().then(() => {
+                const currentRate = document.querySelector('input[name="commission_percentage"]').value;
+                document.getElementById('defaultCommissionInput').value = currentRate;
+                updateCommissionExample();
+            });
+        }
+
+        // Fechar modal de configuração
+        function closeCommissionSettings() {
+            const modal = document.getElementById('commissionSettingsModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Atualizar exemplo de cálculo
+        function updateCommissionExample() {
+            const rate = parseFloat(document.getElementById('defaultCommissionInput').value) || 0;
+            const exampleDiv = document.getElementById('commissionExample');
+
+            if (rate > 0) {
+                const saleValue = 50000; // Exemplo: R$ 50.000
+                const commissionValue = (saleValue * rate) / 100;
+                const monthlyCommission = commissionValue / 5; // 5 parcelas padrão
+
+                exampleDiv.innerHTML = `
+                    <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--foreground);">
+                        Exemplo: Venda de R$ ${saleValue.toLocaleString('pt-BR')}
+                    </div>
+                    <div style="margin-bottom: 0.25rem;">
+                        • ${rate}% = R$ ${commissionValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                    </div>
+                    <div style="margin-bottom: 0.25rem;">
+                        • Paga em 5x = R$ ${monthlyCommission.toLocaleString('pt-BR', {minimumFractionDigits: 2})} por mês
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--muted-foreground); margin-top: 0.5rem;">
+                        Esta taxa será aplicada automaticamente a todas as novas vendas
+                    </div>
+                `;
+            } else {
+                exampleDiv.innerHTML = '<div style="color: var(--muted-foreground); font-size: 0.875rem;">Digite a taxa acima para ver o exemplo</div>';
             }
         }
+
+        // Salvar configuração de comissão
+        async function saveCommissionSettings(event) {
+            event.preventDefault();
+
+            const form = document.getElementById('commissionSettingsForm');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            try {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+                const formData = new FormData(form);
+                const rate = parseFloat(formData.get('default_commission_rate'));
+
+                if (rate < 0 || rate > 100) {
+                    throw new Error('A taxa deve estar entre 0% e 100%');
+                }
+
+                const response = await fetch('api/system_settings.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        setting_key: 'default_commission_rate',
+                        setting_value: rate,
+                        description: 'Taxa de comissão padrão do sistema (%)'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Atualizar campo no formulário principal
+                    document.querySelector('input[name="commission_percentage"]').value = rate;
+
+                    showNotification('Taxa de comissão padrão atualizada com sucesso!', 'success');
+
+                    setTimeout(() => {
+                        closeCommissionSettings();
+                        // Recalcular comissão com nova taxa
+                        calculateCommission();
+                    }, 1500);
+                } else {
+                    throw new Error(result.message || 'Erro ao salvar configuração');
+                }
+
+            } catch (error) {
+                console.error('Erro ao salvar configuração:', error);
+                showNotification('Erro ao salvar configuração: ' + error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        // Event listeners para configuração de comissão
+        document.addEventListener('DOMContentLoaded', function() {
+            // Listener para atualizar exemplo em tempo real
+            const defaultCommissionInput = document.getElementById('defaultCommissionInput');
+            if (defaultCommissionInput) {
+                defaultCommissionInput.addEventListener('input', updateCommissionExample);
+            }
+
+            // Listener para salvar configuração
+            const commissionSettingsForm = document.getElementById('commissionSettingsForm');
+            if (commissionSettingsForm) {
+                commissionSettingsForm.addEventListener('submit', saveCommissionSettings);
+            }
+
+            // Fechar modal ao clicar fora
+            const commissionModal = document.getElementById('commissionSettingsModal');
+            if (commissionModal) {
+                commissionModal.addEventListener('click', function(e) {
+                    if (e.target === commissionModal) {
+                        closeCommissionSettings();
+                    }
+                });
+            }
+        });
+
+        // ===== FIM DAS FUNÇÕES DE CONFIGURAÇÃO =====
 
         // ===== FIM DAS FUNÇÕES DE CÁLCULOS =====
 
