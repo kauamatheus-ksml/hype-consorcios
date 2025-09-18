@@ -381,6 +381,49 @@ $currentPage = 'site-config';
         .faq-item.dragging {
             opacity: 0.5;
         }
+
+        /* Order Controls */
+        .order-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-right: 1rem;
+            padding: 0.25rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .btn-order {
+            background: none;
+            border: none;
+            padding: 0.125rem 0.25rem;
+            cursor: pointer;
+            color: #6b7280;
+            font-size: 0.75rem;
+            border-radius: 3px;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+
+        .btn-order:hover:not(:disabled) {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-order:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .order-number {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #374151;
+            padding: 0.125rem 0;
+            min-width: 16px;
+            text-align: center;
+        }
             max-height: 120px;
             width: 100%;
             object-fit: cover;
@@ -895,13 +938,20 @@ $currentPage = 'site-config';
                 return;
             }
 
-            faqList.innerHTML = currentFaqs.map(faq => `
+            faqList.innerHTML = currentFaqs.map((faq, index) => `
                 <div class="faq-item" data-id="${faq.id}">
                     <div class="faq-item-header" onclick="toggleFaqForm(${faq.id})">
                         <div style="display: flex; align-items: center;">
-                            <i class="fas fa-grip-vertical drag-handle"></i>
+                            <div class="order-controls" onclick="event.stopPropagation()">
+                                <button class="btn-order" onclick="moveFaq(${faq.id}, 'up')" title="Mover para cima" ${index === 0 ? 'disabled' : ''}>
+                                    <i class="fas fa-chevron-up"></i>
+                                </button>
+                                <span class="order-number">${faq.display_order}</span>
+                                <button class="btn-order" onclick="moveFaq(${faq.id}, 'down')" title="Mover para baixo" ${index === currentFaqs.length - 1 ? 'disabled' : ''}>
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
                             <span class="faq-question">${faq.question}</span>
-                            <span style="margin-left: 1rem; font-size: 0.75rem; color: var(--muted-foreground);">Ordem: ${faq.display_order}</span>
                         </div>
                         <div class="faq-actions" onclick="event.stopPropagation()">
                             <button class="btn-toggle ${faq.is_active ? '' : 'inactive'}" onclick="toggleFaqStatus(${faq.id}, ${faq.is_active})">
@@ -1124,6 +1174,48 @@ $currentPage = 'site-config';
                     loadFaqs(); // Recarregar lista
                 } else {
                     showError('Erro ao alterar status: ' + data.message);
+                }
+            } catch (error) {
+                showError('Erro de conexão: ' + error.message);
+            }
+        }
+
+        async function moveFaq(faqId, direction) {
+            const faq = currentFaqs.find(f => f.id == faqId);
+            if (!faq) return;
+
+            const currentIndex = currentFaqs.findIndex(f => f.id == faqId);
+            let newOrder;
+
+            if (direction === 'up' && currentIndex > 0) {
+                newOrder = currentFaqs[currentIndex - 1].display_order;
+            } else if (direction === 'down' && currentIndex < currentFaqs.length - 1) {
+                newOrder = currentFaqs[currentIndex + 1].display_order;
+            } else {
+                return; // Não pode mover
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'update');
+                formData.append('id', faqId);
+                formData.append('question', faq.question);
+                formData.append('answer', faq.answer);
+                formData.append('display_order', newOrder);
+                formData.append('is_active', faq.is_active);
+
+                const response = await fetch('api/faq.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess('Ordem alterada com sucesso!');
+                    loadFaqs(); // Recarregar lista
+                } else {
+                    showError('Erro ao alterar ordem: ' + data.message);
                 }
             } catch (error) {
                 showError('Erro de conexão: ' + error.message);
