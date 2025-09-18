@@ -855,15 +855,34 @@ $currentPage = 'site-config';
         async function loadFaqs() {
             try {
                 const response = await fetch('api/faq.php?action=list');
-                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const text = await response.text();
+
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (jsonError) {
+                    console.error('Resposta não é JSON válido:', text);
+                    showError('Erro: A API retornou dados inválidos. Verifique se você está logado como admin.');
+                    return;
+                }
 
                 if (data.success) {
                     currentFaqs = data.data;
                     renderFaqList();
                 } else {
-                    showError('Erro ao carregar FAQs: ' + data.message);
+                    if (data.needsSetup) {
+                        showError(data.message + ' <a href="create_faq_table.php" target="_blank">Clique aqui para configurar</a>');
+                    } else {
+                        showError('Erro ao carregar FAQs: ' + data.message);
+                    }
                 }
             } catch (error) {
+                console.error('Erro na requisição:', error);
                 showError('Erro de conexão: ' + error.message);
             }
         }

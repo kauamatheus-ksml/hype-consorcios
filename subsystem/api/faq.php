@@ -5,23 +5,56 @@
  */
 
 require_once '../config/database.php';
-require_once '../includes/session.php';
 
-// Verificar se o usuário está logado como admin
-if (!isLoggedIn() || $_SESSION['role'] !== 'admin') {
+// Iniciar sessão se não estiver ativa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Verificar autenticação
+$authenticated = false;
+$user = null;
+
+if (isset($_COOKIE['crm_session'])) {
+    require_once '../classes/Auth.php';
+    $auth = new Auth();
+    $sessionResult = $auth->validateSession($_COOKIE['crm_session']);
+
+    if ($sessionResult['success']) {
+        $authenticated = true;
+        $user = $sessionResult['user'];
+    }
+} elseif (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+    $authenticated = true;
+    $user = [
+        'role' => $_SESSION['user_role'] ?? 'viewer',
+        'full_name' => $_SESSION['user_name'] ?? $_SESSION['username'] ?? 'Usuário'
+    ];
+}
+
+// Verificar se está autenticado e é admin
+if (!$authenticated || ($user['role'] ?? '') !== 'admin') {
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'Acesso negado']);
     exit;
 }
 
+// Configurar para não mostrar warnings/notices como HTML
+error_reporting(E_ERROR | E_PARSE);
+ini_set('display_errors', 0);
+
 header('Content-Type: application/json');
 
-$database = new Database();
-$conn = $database->getConnection();
+try {
+    $database = new Database();
+    $conn = $database->getConnection();
 
-if (!$conn) {
+    if (!$conn) {
+        throw new Exception('Falha na conexão com o banco de dados');
+    }
+} catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Erro na conexão com o banco']);
+    echo json_encode(['success' => false, 'message' => 'Erro na conexão: ' . $e->getMessage()]);
     exit;
 }
 
@@ -32,10 +65,31 @@ try {
     switch ($method) {
         case 'GET':
             if ($action === 'list') {
-                // Listar todas as FAQs
-                $stmt = $conn->query("SELECT * FROM faqs ORDER BY display_order, id");
-                $faqs = $stmt->fetchAll();
-                echo json_encode(['success' => true, 'data' => $faqs]);
+                // Verificar se tabela existe primeiro
+                try {
+                    $stmt = $conn->query("SHOW TABLES LIKE 'faqs'");
+                    $tableExists = $stmt->rowCount() > 0;
+
+                    if (!$tableExists) {
+                        echo json_encode([
+                            'success' => false,
+                            'message' => 'Tabela de FAQs não encontrada. Execute create_faq_table.php primeiro.',
+                            'needsSetup' => true
+                        ]);
+                        break;
+                    }
+
+                    // Listar todas as FAQs
+                    $stmt = $conn->query("SELECT * FROM faqs ORDER BY display_order, id");
+                    $faqs = $stmt->fetchAll();
+                    echo json_encode(['success' => true, 'data' => $faqs]);
+                } catch (Exception $e) {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Erro ao acessar tabela: ' . $e->getMessage(),
+                        'needsSetup' => true
+                    ]);
+                }
             } else {
                 // Buscar FAQ específica
                 $id = $_GET['id'] ?? 0;
