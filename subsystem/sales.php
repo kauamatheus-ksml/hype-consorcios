@@ -334,6 +334,7 @@ $currentPage = 'sales';
         .status-pending { background-color: #fef3c7; color: #d97706; }
         .status-confirmed { background-color: #d1fae5; color: #065f46; }
         .status-cancelled { background-color: #fee2e2; color: #991b1b; }
+        .status-completed { background-color: #dbeafe; color: #1d4ed8; }
 
         /* Action buttons */
         .action-buttons {
@@ -1595,7 +1596,8 @@ $currentPage = 'sales';
             const labels = {
                 'pending': 'Pendente',
                 'confirmed': 'Confirmado',
-                'cancelled': 'Cancelado'
+                'cancelled': 'Cancelado',
+                'completed': 'Concluída'
             };
             return labels[status?.toLowerCase()] || status;
         }

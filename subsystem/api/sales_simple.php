@@ -372,7 +372,7 @@ function handleCreateSale($conn, $userId) {
         $input['monthly_payment'] ?? null,
         $input['contract_number'] ?? null,
         $input['notes'] ?? null,
-        $input['status'] ?? 'completed',
+        $input['status'] ?? 'confirmed',
         $saleDate
     ]);
     
