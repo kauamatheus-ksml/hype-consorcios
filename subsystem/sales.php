@@ -1126,8 +1126,12 @@ $currentPage = 'sales';
                                 <small class="field-hint" id="commissionValueHint">Calculado automaticamente</small>
                             </div>
                             <div class="form-group">
-                                <label>Comissão será paga em</label>
-                                <select name="commission_installments" onchange="calculateCommission()">
+                                <label>Comissão será paga em
+                                    <span style="font-size: 0.8rem; color: var(--muted-foreground);">
+                                        (Configurado pelo administrador)
+                                    </span>
+                                </label>
+                                <select name="commission_installments" onchange="calculateCommission()" disabled style="background-color: #f8fafc; cursor: not-allowed;">
                                     <option value="1">1x (à vista)</option>
                                     <option value="2">2x</option>
                                     <option value="3">3x</option>
@@ -1137,7 +1141,9 @@ $currentPage = 'sales';
                                     <option value="10">10x</option>
                                     <option value="12">12x</option>
                                 </select>
-                                <small class="field-hint">Número de parcelas para pagamento da comissão</small>
+                                <small class="field-hint" style="color: var(--muted-foreground);">
+                                    O número de parcelas é definido pelo administrador para cada vendedor
+                                </small>
                             </div>
                             <div class="form-group">
                                 <label>Valor por Parcela da Comissão (R$)</label>
@@ -2116,12 +2122,19 @@ $currentPage = 'sales';
 
                         // Configurar permissões
                         const commissionInput = document.querySelector('input[name="commission_percentage"]');
+                        const installmentsSelect = document.querySelector('select[name="commission_installments"]');
                         const hint = commissionInput.parentElement.nextElementSibling;
 
                         if (currentUser && currentUser.role === 'admin') {
+                            // Admin pode editar porcentagem e parcelas
                             commissionInput.readOnly = false;
                             commissionInput.style.backgroundColor = '';
                             commissionInput.style.cursor = '';
+
+                            installmentsSelect.disabled = false;
+                            installmentsSelect.style.backgroundColor = '';
+                            installmentsSelect.style.cursor = '';
+
                             if (hint && hint.classList.contains('field-hint')) {
                                 hint.innerHTML = `Sua configuração: ${config.commission_percentage}% em ${config.commission_installments}x • <a href="commission_settings.php" target="_blank" style="color: var(--primary);">Gerenciar Comissões</a>`;
                             }
@@ -2132,9 +2145,15 @@ $currentPage = 'sales';
                                 adminBtn.style.display = 'block';
                             }
                         } else {
+                            // Vendedor só vê os valores, não pode editar
                             commissionInput.readOnly = true;
                             commissionInput.style.backgroundColor = '#f8fafc';
                             commissionInput.style.cursor = 'not-allowed';
+
+                            installmentsSelect.disabled = true;
+                            installmentsSelect.style.backgroundColor = '#f8fafc';
+                            installmentsSelect.style.cursor = 'not-allowed';
+
                             if (hint && hint.classList.contains('field-hint')) {
                                 hint.textContent = `Sua configuração: ${config.commission_percentage}% em ${config.commission_installments}x`;
                             }

@@ -351,8 +351,8 @@ function handleCreateSale($conn, $userId) {
             commission_installments, monthly_commission,
             vehicle_sold, payment_type, down_payment,
             financing_months, monthly_payment, contract_number,
-            notes, status, sale_date, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            notes, status, sale_date
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
     
     $saleDate = !empty($input['sale_date']) ? $input['sale_date'] : date('Y-m-d');
