@@ -30,6 +30,11 @@ $isAdmin = true;
 $adminId = $user['id'];
 $userRole = $user['role'];
 $userId = $user['id'];
+$userName = $user['full_name'] ?? 'Usuário';
+
+// Incluir componente da sidebar
+require_once 'components/sidebar.php';
+$currentPage = 'commission_settings';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -38,6 +43,10 @@ $userId = $user['id'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configurações de Comissão - Hype Consórcios</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Sidebar Styles -->
+    <?= getSidebarStyles() ?>
+
     <style>
         :root {
             --primary: #2563eb;
@@ -48,6 +57,8 @@ $userId = $user['id'];
             --border: #e2e8f0;
             --foreground: #0f172a;
             --background: #ffffff;
+            --dark: #1e293b;
+            --dark-foreground: #f8fafc;
         }
 
         * {
@@ -61,6 +72,25 @@ $userId = $user['id'];
             background: #f8fafc;
             color: var(--foreground);
             line-height: 1.6;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
         }
 
         .container {
@@ -364,7 +394,14 @@ $userId = $user['id'];
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="dashboard-container" id="dashboardContainer">
+        <?php renderMobileMenuButton(); ?>
+
+        <?php renderSidebar($currentPage, $userRole, $userName); ?>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
         <div class="header">
             <div>
                 <h1><i class="fas fa-users-cog"></i> Configurações de Comissão por Vendedor</h1>
@@ -739,5 +776,11 @@ $userId = $user['id'];
         // Carregar vendedores ao inicializar
         loadSellers();
     </script>
+
+    <!-- Sidebar Scripts -->
+    <?= getSidebarScripts() ?>
+            </div>
+        </main>
+    </div>
 </body>
 </html>

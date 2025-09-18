@@ -64,6 +64,13 @@ function renderSidebar($currentPage, $userRole, $userName) {
         
         <?php if (in_array($userRole, ['admin'])): ?>
         <div class="nav-item">
+            <a href="commission_settings.php" class="nav-link <?= $currentPage === 'commission_settings' ? 'active' : '' ?>">
+                <i class="fas fa-percentage nav-icon"></i>
+                Configurações de Comissão
+            </a>
+        </div>
+
+        <div class="nav-item">
             <a href="site-config.php" class="nav-link <?= $currentPage === 'site-config' ? 'active' : '' ?>">
                 <i class="fas fa-cog nav-icon"></i>
                 Configurações do Site
