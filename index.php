@@ -136,30 +136,44 @@ $configs = getAllSiteConfigs();
         "@context": "https://schema.org",
         "@type": "FAQPage",
         "mainEntity": [
-            {
-                "@type": "Question",
-                "name": "Como funciona o consórcio de veículos?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "O consórcio é um sistema de autofinanciamento onde um grupo de pessoas se une para adquirir bens. Mensalmente, cada participante paga uma parcela e alguns são contemplados por sorteio ou lance."
+            <?php
+            try {
+                require_once 'subsystem/config/database.php';
+                $database = new Database();
+                $conn = $database->getConnection();
+
+                if ($conn) {
+                    $stmt = $conn->query("SELECT * FROM faqs WHERE is_active = 1 ORDER BY display_order, id LIMIT 10");
+                    $schemaFaqs = $stmt->fetchAll();
+                } else {
+                    $schemaFaqs = [];
                 }
-            },
-            {
-                "@type": "Question", 
-                "name": "Quais são as vantagens do consórcio de veículos?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "As principais vantagens são: sem juros, parcelas menores, sem consulta ao SPC/Serasa, possibilidade de usar FGTS, e você pode ser contemplado a qualquer momento."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Posso usar o FGTS para pagamento do consórcio?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Sim! Você pode usar o FGTS tanto para dar lance quanto para amortizar parcelas do seu consórcio, seguindo as regras da Caixa Econômica Federal."
-                }
+            } catch (Exception $e) {
+                $schemaFaqs = [
+                    [
+                        'question' => 'Como funciona o consórcio de veículos?',
+                        'answer' => 'O consórcio é um sistema de autofinanciamento onde um grupo de pessoas se une para adquirir bens. Mensalmente, cada participante paga uma parcela e alguns são contemplados por sorteio ou lance.'
+                    ]
+                ];
             }
+
+            if (!empty($schemaFaqs)) {
+                $schemaItems = [];
+                foreach ($schemaFaqs as $faq) {
+                    $schemaItems[] = [
+                        "@type" => "Question",
+                        "name" => $faq['question'],
+                        "acceptedAnswer" => [
+                            "@type" => "Answer",
+                            "text" => $faq['answer']
+                        ]
+                    ];
+                }
+                echo json_encode($schemaItems, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            } else {
+                echo '[]';
+            }
+            ?>
         ]
     }
     </script>
@@ -490,37 +504,50 @@ $configs = getAllSiteConfigs();
 
             <div class="faq-container">
                 <?php
-                $faqs = [
-                    [
-                        'question' => 'Como funciona o consórcio de veículos?',
-                        'answer' => 'O consórcio é um sistema de autofinanciamento onde um grupo de pessoas se une para adquirir bens. Mensalmente, cada participante paga uma parcela e alguns são contemplados por sorteio ou lance.'
-                    ],
-                    [
-                        'question' => 'Quais são as vantagens do consórcio?',
-                        'answer' => 'As principais vantagens são: sem juros, parcelas menores, sem consulta ao SPC/Serasa, possibilidade de usar FGTS, e você pode ser contemplado a qualquer momento.'
-                    ],
-                    [
-                        'question' => 'Posso usar o FGTS para pagamento?',
-                        'answer' => 'Sim! Você pode usar o FGTS tanto para dar lance quanto para amortizar parcelas do seu consórcio, seguindo as regras da Caixa Econômica Federal.'
-                    ],
-                    [
-                        'question' => 'Como funciona a contemplação?',
-                        'answer' => 'A contemplação pode acontecer por sorteio mensal (gratuito) ou por lance (oferta de valor). Quanto maior o lance, maiores as chances de contemplação.'
-                    ]
-                ];
+                try {
+                    require_once 'subsystem/config/database.php';
+                    $database = new Database();
+                    $conn = $database->getConnection();
 
-                foreach($faqs as $index => $faq):
-                ?>
-                <div class="faq-item">
-                    <button class="faq-question" onclick="toggleFAQ(<?= $index ?>)">
-                        <span><?= $faq['question'] ?></span>
-                        <i class="fas fa-chevron-down faq-icon" id="faq-icon-<?= $index ?>"></i>
-                    </button>
-                    <div class="faq-answer" id="faq-answer-<?= $index ?>">
-                        <p><?= $faq['answer'] ?></p>
+                    if ($conn) {
+                        $stmt = $conn->query("SELECT * FROM faqs WHERE is_active = 1 ORDER BY display_order, id");
+                        $faqs = $stmt->fetchAll();
+                    } else {
+                        $faqs = [];
+                    }
+                } catch (Exception $e) {
+                    // Fallback para FAQs estáticas em caso de erro
+                    $faqs = [
+                        [
+                            'question' => 'Como funciona o consórcio de veículos?',
+                            'answer' => 'O consórcio é um sistema de autofinanciamento onde um grupo de pessoas se une para adquirir bens. Mensalmente, cada participante paga uma parcela e alguns são contemplados por sorteio ou lance.'
+                        ],
+                        [
+                            'question' => 'Quais são as vantagens do consórcio?',
+                            'answer' => 'As principais vantagens são: sem juros, parcelas menores, sem consulta ao SPC/Serasa, possibilidade de usar FGTS, e você pode ser contemplado a qualquer momento.'
+                        ]
+                    ];
+                }
+
+                if (empty($faqs)): ?>
+                    <div class="faq-item">
+                        <div class="faq-answer" style="display: block; text-align: center; padding: 2rem;">
+                            <p>Nenhuma pergunta frequente encontrada no momento.</p>
+                        </div>
                     </div>
-                </div>
-                <?php endforeach; ?>
+                <?php else:
+                    foreach($faqs as $index => $faq): ?>
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(<?= $index ?>)">
+                            <span><?= htmlspecialchars($faq['question']) ?></span>
+                            <i class="fas fa-chevron-down faq-icon" id="faq-icon-<?= $index ?>"></i>
+                        </button>
+                        <div class="faq-answer" id="faq-answer-<?= $index ?>">
+                            <p><?= htmlspecialchars($faq['answer']) ?></p>
+                        </div>
+                    </div>
+                    <?php endforeach;
+                endif; ?>
             </div>
 
             <div class="faq-cta">
