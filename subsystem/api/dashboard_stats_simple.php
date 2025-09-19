@@ -63,13 +63,13 @@ try {
         $filterValue = null;
     } elseif ($isAdmin && $selectedSellerId) {
         // Admin vendo vendedor específico
-        $sellerFilter = "AND seller_id = ?";
-        $leadFilter = "AND assigned_to = ?";
+        $sellerFilter = "AND s.seller_id = ?";
+        $leadFilter = "AND l.assigned_to = ?";
         $filterValue = $selectedSellerId;
     } else {
         // Vendedor vendo seus próprios dados
-        $sellerFilter = "AND seller_id = ?";
-        $leadFilter = "AND assigned_to = ?";
+        $sellerFilter = "AND s.seller_id = ?";
+        $leadFilter = "AND l.assigned_to = ?";
         $filterValue = $userId;
     }
 
@@ -90,7 +90,7 @@ try {
     ];
 
     // Total de vendas
-    $sql = "SELECT COUNT(*) as total FROM sales WHERE status != 'cancelled' $sellerFilter";
+    $sql = "SELECT COUNT(*) as total FROM sales s WHERE s.status != 'cancelled' $sellerFilter";
     $stmt = $conn->prepare($sql);
     if ($filterValue) {
         $stmt->execute([$filterValue]);
@@ -101,7 +101,7 @@ try {
     $stats['total_sales'] = (int)($result['total'] ?? 0);
 
     // Receita total
-    $sql = "SELECT COALESCE(SUM(sale_value), 0) as total FROM sales WHERE status = 'confirmed' $sellerFilter";
+    $sql = "SELECT COALESCE(SUM(s.sale_value), 0) as total FROM sales s WHERE s.status = 'confirmed' $sellerFilter";
     $stmt = $conn->prepare($sql);
     if ($filterValue) {
         $stmt->execute([$filterValue]);
@@ -140,7 +140,7 @@ try {
     $stats['total_commissions'] = $totalCommissions;
 
     // Vendas pendentes
-    $sql = "SELECT COUNT(*) as total FROM sales WHERE status = 'pending' $sellerFilter";
+    $sql = "SELECT COUNT(*) as total FROM sales s WHERE s.status = 'pending' $sellerFilter";
     $stmt = $conn->prepare($sql);
     if ($filterValue) {
         $stmt->execute([$filterValue]);
@@ -151,7 +151,7 @@ try {
     $stats['pending_sales'] = (int)($result['total'] ?? 0);
 
     // Total de leads
-    $sql = "SELECT COUNT(*) as total FROM leads WHERE 1=1 $leadFilter";
+    $sql = "SELECT COUNT(*) as total FROM leads l WHERE 1=1 $leadFilter";
     $stmt = $conn->prepare($sql);
     if ($filterValue) {
         $stmt->execute([$filterValue]);
@@ -162,7 +162,7 @@ try {
     $stats['total_leads'] = (int)($result['total'] ?? 0);
 
     // Leads este mês
-    $sql = "SELECT COUNT(*) as total FROM leads WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) $leadFilter";
+    $sql = "SELECT COUNT(*) as total FROM leads l WHERE MONTH(l.created_at) = MONTH(CURRENT_DATE()) AND YEAR(l.created_at) = YEAR(CURRENT_DATE()) $leadFilter";
     $stmt = $conn->prepare($sql);
     if ($filterValue) {
         $stmt->execute([$filterValue]);
@@ -173,7 +173,7 @@ try {
     $stats['leads_this_month'] = (int)($result['total'] ?? 0);
 
     // Vendas este mês
-    $sql = "SELECT COUNT(*) as total FROM sales WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND status != 'cancelled' $sellerFilter";
+    $sql = "SELECT COUNT(*) as total FROM sales s WHERE MONTH(s.created_at) = MONTH(CURRENT_DATE()) AND YEAR(s.created_at) = YEAR(CURRENT_DATE()) AND s.status != 'cancelled' $sellerFilter";
     $stmt = $conn->prepare($sql);
     if ($filterValue) {
         $stmt->execute([$filterValue]);
