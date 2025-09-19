@@ -919,48 +919,7 @@ $currentPage = 'sales';
                     </p>
                 </div>
 
-                <!-- Stats Cards para a página de vendas -->
-                <div class="stats-grid" style="margin: 2rem 0;">
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-icon">
-                                <i class="fas fa-handshake"></i>
-                            </div>
-                        </div>
-                        <h3 class="stat-value" id="salesTotalSales">-</h3>
-                        <p class="stat-label">Total de Vendas</p>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-icon">
-                                <i class="fas fa-dollar-sign"></i>
-                            </div>
-                        </div>
-                        <h3 class="stat-value" id="salesTotalRevenue">-</h3>
-                        <p class="stat-label">Receita Total</p>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-icon">
-                                <i class="fas fa-percentage"></i>
-                            </div>
-                        </div>
-                        <h3 class="stat-value" id="salesTotalCommissions">-</h3>
-                        <p class="stat-label">Comissões</p>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                        </div>
-                        <h3 class="stat-value" id="salesPendingSales">-</h3>
-                        <p class="stat-label">Pendentes</p>
-                    </div>
-                </div>
+                
 
                 <div class="page-actions">
                     <button class="btn-new-sale" onclick="window.openNewSaleModal()">
