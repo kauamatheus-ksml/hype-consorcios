@@ -57,6 +57,10 @@ try {
         'total_revenue' => 0,
         'total_commissions' => 0,
         'pending_sales' => 0,
+        'total_leads' => 0,
+        'leads_this_month' => 0,
+        'sales_this_month' => 0,
+        'conversion_rate' => 0,
         'user_role' => $userRole,
         'is_admin' => $isAdmin
     ];
@@ -104,7 +108,45 @@ try {
     }
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     $stats['pending_sales'] = (int)($result['total'] ?? 0);
-    
+
+    // Total de leads
+    $sql = "SELECT COUNT(*) as total FROM leads $leadFilter";
+    $stmt = $conn->prepare($sql);
+    if (!$isAdmin) {
+        $stmt->execute([$userId]);
+    } else {
+        $stmt->execute();
+    }
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stats['total_leads'] = (int)($result['total'] ?? 0);
+
+    // Leads este mês
+    $sql = "SELECT COUNT(*) as total FROM leads WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) $leadFilter";
+    $stmt = $conn->prepare($sql);
+    if (!$isAdmin) {
+        $stmt->execute([$userId]);
+    } else {
+        $stmt->execute();
+    }
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stats['leads_this_month'] = (int)($result['total'] ?? 0);
+
+    // Vendas este mês
+    $sql = "SELECT COUNT(*) as total FROM sales WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND status != 'cancelled' $sellerFilter";
+    $stmt = $conn->prepare($sql);
+    if (!$isAdmin) {
+        $stmt->execute([$userId]);
+    } else {
+        $stmt->execute();
+    }
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stats['sales_this_month'] = (int)($result['total'] ?? 0);
+
+    // Taxa de conversão
+    if ($stats['total_leads'] > 0) {
+        $stats['conversion_rate'] = round(($stats['total_sales'] / $stats['total_leads']) * 100, 2);
+    }
+
     // Estatísticas adicionais
     // Top vendedores do mês
     $stmt = $conn->prepare("
