@@ -87,16 +87,45 @@ try {
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     $stats['total_revenue'] = (float)($result['total'] ?? 0);
 
-    // Total de comissões
-    $sql = "SELECT COALESCE(SUM(commission_value), 0) as total FROM sales WHERE status = 'confirmed' $sellerFilter";
-    $stmt = $conn->prepare($sql);
-    if (!$isAdmin) {
-        $stmt->execute([$userId]);
-    } else {
+    // Comissões do mês atual (recalculadas com base nas configurações atuais)
+    if ($isAdmin) {
+        // Para admin: soma de todas as comissões do mês
+        $sql = "SELECT
+                    s.seller_id,
+                    s.sale_value,
+                    COALESCE(cs.commission_percentage, 1.50) as commission_percentage
+                FROM sales s
+                LEFT JOIN commission_settings cs ON s.seller_id = cs.user_id
+                WHERE s.status = 'confirmed'
+                AND MONTH(s.created_at) = MONTH(CURRENT_DATE())
+                AND YEAR(s.created_at) = YEAR(CURRENT_DATE())";
+        $stmt = $conn->prepare($sql);
         $stmt->execute();
+    } else {
+        // Para vendedor: apenas suas próprias comissões do mês
+        $sql = "SELECT
+                    s.seller_id,
+                    s.sale_value,
+                    COALESCE(cs.commission_percentage, 1.50) as commission_percentage
+                FROM sales s
+                LEFT JOIN commission_settings cs ON s.seller_id = cs.user_id
+                WHERE s.status = 'confirmed'
+                AND s.seller_id = ?
+                AND MONTH(s.created_at) = MONTH(CURRENT_DATE())
+                AND YEAR(s.created_at) = YEAR(CURRENT_DATE())";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$userId]);
     }
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    $stats['total_commissions'] = (float)($result['total'] ?? 0);
+
+    $commissionResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $totalCommissions = 0;
+
+    foreach ($commissionResults as $commission) {
+        $commissionValue = ($commission['sale_value'] * $commission['commission_percentage']) / 100;
+        $totalCommissions += $commissionValue;
+    }
+
+    $stats['total_commissions'] = $totalCommissions;
 
     // Vendas pendentes
     $sql = "SELECT COUNT(*) as total FROM sales WHERE status = 'pending' $sellerFilter";

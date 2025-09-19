@@ -247,41 +247,11 @@ $currentPage = 'dashboard';
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">
-                            <i class="fas fa-handshake"></i>
-                        </div>
-                    </div>
-                    <h3 class="stat-value" id="totalSales">-</h3>
-                    <p class="stat-label">Total de Vendas</p>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon">
-                            <i class="fas fa-dollar-sign"></i>
-                        </div>
-                    </div>
-                    <h3 class="stat-value" id="totalRevenue">-</h3>
-                    <p class="stat-label">Receita Total</p>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon">
                             <i class="fas fa-percentage"></i>
                         </div>
                     </div>
                     <h3 class="stat-value" id="totalCommissions">-</h3>
-                    <p class="stat-label">Comissões</p>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                    </div>
-                    <h3 class="stat-value" id="pendingSales">-</h3>
-                    <p class="stat-label">Vendas Pendentes</p>
+                    <p class="stat-label">Comissões Este Mês</p>
                 </div>
 
                 <div class="stat-card">
@@ -391,19 +361,13 @@ $currentPage = 'dashboard';
 
             // Verificar se os elementos existem
             const totalLeads = document.getElementById('totalLeads');
-            const totalSales = document.getElementById('totalSales');
-            const totalRevenue = document.getElementById('totalRevenue');
             const totalCommissions = document.getElementById('totalCommissions');
-            const pendingSales = document.getElementById('pendingSales');
             const conversionRate = document.getElementById('conversionRate');
             const leadsThisMonth = document.getElementById('leadsThisMonth');
             const salesThisMonth = document.getElementById('salesThisMonth');
 
             console.log('totalLeads element:', totalLeads);
-            console.log('totalSales element:', totalSales);
-            console.log('totalRevenue element:', totalRevenue);
             console.log('totalCommissions element:', totalCommissions);
-            console.log('pendingSales element:', pendingSales);
             console.log('conversionRate element:', conversionRate);
             console.log('leadsThisMonth element:', leadsThisMonth);
             console.log('salesThisMonth element:', salesThisMonth);
@@ -451,10 +415,7 @@ $currentPage = 'dashboard';
 
                     // Atualizar cards principais
                     const totalLeadsEl = document.getElementById('totalLeads');
-                    const totalSalesEl = document.getElementById('totalSales');
-                    const totalRevenueEl = document.getElementById('totalRevenue');
                     const totalCommissionsEl = document.getElementById('totalCommissions');
-                    const pendingSalesEl = document.getElementById('pendingSales');
                     const conversionRateEl = document.getElementById('conversionRate');
                     const leadsThisMonthEl = document.getElementById('leadsThisMonth');
                     const salesThisMonthEl = document.getElementById('salesThisMonth');
@@ -466,24 +427,9 @@ $currentPage = 'dashboard';
                         console.log('✅ totalLeads atualizado:', totalLeadsEl.textContent);
                     }
 
-                    if (totalSalesEl) {
-                        totalSalesEl.textContent = data.stats.total_sales || '0';
-                        console.log('✅ totalSales atualizado:', totalSalesEl.textContent);
-                    }
-
-                    if (totalRevenueEl) {
-                        totalRevenueEl.textContent = 'R$ ' + (data.stats.total_revenue || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2});
-                        console.log('✅ totalRevenue atualizado:', totalRevenueEl.textContent);
-                    }
-
                     if (totalCommissionsEl) {
                         totalCommissionsEl.textContent = 'R$ ' + (data.stats.total_commissions || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2});
                         console.log('✅ totalCommissions atualizado:', totalCommissionsEl.textContent);
-                    }
-
-                    if (pendingSalesEl) {
-                        pendingSalesEl.textContent = data.stats.pending_sales || '0';
-                        console.log('✅ pendingSales atualizado:', pendingSalesEl.textContent);
                     }
 
                     if (conversionRateEl) {
@@ -663,10 +609,7 @@ $currentPage = 'dashboard';
 
         function showStatsError(message) {
             document.getElementById('totalLeads').textContent = 'Erro';
-            document.getElementById('totalSales').textContent = 'Erro';
-            document.getElementById('totalRevenue').textContent = 'Erro';
             document.getElementById('totalCommissions').textContent = 'Erro';
-            document.getElementById('pendingSales').textContent = 'Erro';
             document.getElementById('conversionRate').textContent = 'Erro';
             document.getElementById('leadsThisMonth').textContent = 'Erro';
             document.getElementById('salesThisMonth').textContent = 'Erro';
