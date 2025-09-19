@@ -45,11 +45,33 @@ try {
 
     $userRole = $user['role'] ?? 'viewer';
     $userId = $user['id'] ?? null;
-    
+
+    // Verificar se admin está filtrando por vendedor específico
+    $selectedSellerId = null;
+    if ($userRole === 'admin' && isset($_GET['seller_id']) && !empty($_GET['seller_id'])) {
+        $selectedSellerId = (int)$_GET['seller_id'];
+    }
+
     // Definir filtros baseado no papel do usuário
     $isAdmin = ($userRole === 'admin');
-    $sellerFilter = $isAdmin ? "" : "AND seller_id = ?";
-    $leadFilter = $isAdmin ? "" : "AND assigned_to = ?";
+    $isGlobalView = $isAdmin && $selectedSellerId === null;
+
+    if ($isGlobalView) {
+        // Admin vendo dados globais
+        $sellerFilter = "";
+        $leadFilter = "";
+        $filterValue = null;
+    } elseif ($isAdmin && $selectedSellerId) {
+        // Admin vendo vendedor específico
+        $sellerFilter = "AND seller_id = ?";
+        $leadFilter = "AND assigned_to = ?";
+        $filterValue = $selectedSellerId;
+    } else {
+        // Vendedor vendo seus próprios dados
+        $sellerFilter = "AND seller_id = ?";
+        $leadFilter = "AND assigned_to = ?";
+        $filterValue = $userId;
+    }
 
     // Estatísticas básicas
     $stats = [
@@ -62,14 +84,16 @@ try {
         'sales_this_month' => 0,
         'conversion_rate' => 0,
         'user_role' => $userRole,
-        'is_admin' => $isAdmin
+        'is_admin' => $isAdmin,
+        'is_global_view' => $isGlobalView,
+        'selected_seller_id' => $selectedSellerId
     ];
 
     // Total de vendas
     $sql = "SELECT COUNT(*) as total FROM sales WHERE status != 'cancelled' $sellerFilter";
     $stmt = $conn->prepare($sql);
-    if (!$isAdmin) {
-        $stmt->execute([$userId]);
+    if ($filterValue) {
+        $stmt->execute([$filterValue]);
     } else {
         $stmt->execute();
     }
@@ -79,8 +103,8 @@ try {
     // Receita total
     $sql = "SELECT COALESCE(SUM(sale_value), 0) as total FROM sales WHERE status = 'confirmed' $sellerFilter";
     $stmt = $conn->prepare($sql);
-    if (!$isAdmin) {
-        $stmt->execute([$userId]);
+    if ($filterValue) {
+        $stmt->execute([$filterValue]);
     } else {
         $stmt->execute();
     }
@@ -88,33 +112,21 @@ try {
     $stats['total_revenue'] = (float)($result['total'] ?? 0);
 
     // Comissões do mês atual (recalculadas com base nas configurações atuais)
-    if ($isAdmin) {
-        // Para admin: soma de todas as comissões do mês
-        $sql = "SELECT
-                    s.seller_id,
-                    s.sale_value,
-                    COALESCE(scs.commission_percentage, 1.50) as commission_percentage
-                FROM sales s
-                LEFT JOIN seller_commission_settings scs ON s.seller_id = scs.seller_id AND scs.is_active = 1
-                WHERE s.status = 'confirmed'
-                AND MONTH(s.created_at) = MONTH(CURRENT_DATE())
-                AND YEAR(s.created_at) = YEAR(CURRENT_DATE())";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
+    $sql = "SELECT
+                s.seller_id,
+                s.sale_value,
+                COALESCE(scs.commission_percentage, 1.50) as commission_percentage
+            FROM sales s
+            LEFT JOIN seller_commission_settings scs ON s.seller_id = scs.seller_id AND scs.is_active = 1
+            WHERE s.status = 'confirmed'
+            AND MONTH(s.created_at) = MONTH(CURRENT_DATE())
+            AND YEAR(s.created_at) = YEAR(CURRENT_DATE())
+            $sellerFilter";
+    $stmt = $conn->prepare($sql);
+    if ($filterValue) {
+        $stmt->execute([$filterValue]);
     } else {
-        // Para vendedor: apenas suas próprias comissões do mês
-        $sql = "SELECT
-                    s.seller_id,
-                    s.sale_value,
-                    COALESCE(scs.commission_percentage, 1.50) as commission_percentage
-                FROM sales s
-                LEFT JOIN seller_commission_settings scs ON s.seller_id = scs.seller_id AND scs.is_active = 1
-                WHERE s.status = 'confirmed'
-                AND s.seller_id = ?
-                AND MONTH(s.created_at) = MONTH(CURRENT_DATE())
-                AND YEAR(s.created_at) = YEAR(CURRENT_DATE())";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$userId]);
+        $stmt->execute();
     }
 
     $commissionResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -130,8 +142,8 @@ try {
     // Vendas pendentes
     $sql = "SELECT COUNT(*) as total FROM sales WHERE status = 'pending' $sellerFilter";
     $stmt = $conn->prepare($sql);
-    if (!$isAdmin) {
-        $stmt->execute([$userId]);
+    if ($filterValue) {
+        $stmt->execute([$filterValue]);
     } else {
         $stmt->execute();
     }
@@ -139,10 +151,10 @@ try {
     $stats['pending_sales'] = (int)($result['total'] ?? 0);
 
     // Total de leads
-    $sql = "SELECT COUNT(*) as total FROM leads $leadFilter";
+    $sql = "SELECT COUNT(*) as total FROM leads WHERE 1=1 $leadFilter";
     $stmt = $conn->prepare($sql);
-    if (!$isAdmin) {
-        $stmt->execute([$userId]);
+    if ($filterValue) {
+        $stmt->execute([$filterValue]);
     } else {
         $stmt->execute();
     }
@@ -152,8 +164,8 @@ try {
     // Leads este mês
     $sql = "SELECT COUNT(*) as total FROM leads WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) $leadFilter";
     $stmt = $conn->prepare($sql);
-    if (!$isAdmin) {
-        $stmt->execute([$userId]);
+    if ($filterValue) {
+        $stmt->execute([$filterValue]);
     } else {
         $stmt->execute();
     }
@@ -163,8 +175,8 @@ try {
     // Vendas este mês
     $sql = "SELECT COUNT(*) as total FROM sales WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND status != 'cancelled' $sellerFilter";
     $stmt = $conn->prepare($sql);
-    if (!$isAdmin) {
-        $stmt->execute([$userId]);
+    if ($filterValue) {
+        $stmt->execute([$filterValue]);
     } else {
         $stmt->execute();
     }
@@ -174,6 +186,23 @@ try {
     // Taxa de conversão
     if ($stats['total_leads'] > 0) {
         $stats['conversion_rate'] = round(($stats['total_sales'] / $stats['total_leads']) * 100, 2);
+    }
+
+    // Lista de vendedores (apenas para admin)
+    $stats['sellers'] = [];
+    if ($isAdmin) {
+        $stmt = $conn->prepare("
+            SELECT
+                id,
+                full_name,
+                username
+            FROM users
+            WHERE role IN ('seller', 'manager', 'admin')
+            AND status = 'active'
+            ORDER BY full_name
+        ");
+        $stmt->execute();
+        $stats['sellers'] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
     // Estatísticas adicionais

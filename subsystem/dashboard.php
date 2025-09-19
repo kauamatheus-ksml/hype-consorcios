@@ -225,11 +225,35 @@ $currentPage = 'dashboard';
         <!-- Main Content -->
         <main class="main-content">
             <div class="dashboard-header">
-                <h1 class="dashboard-title">Dashboard</h1>
-                <p class="dashboard-subtitle">
-                    Bem-vindo ao sistema CRM da Hype Consórcios
-                    <span id="viewIndicator" style="font-weight: 600; margin-left: 8px; font-size: 0.9rem;"></span>
-                </p>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h1 class="dashboard-title">Dashboard</h1>
+                        <p class="dashboard-subtitle">
+                            Bem-vindo ao sistema CRM da Hype Consórcios
+                            <span id="viewIndicator" style="font-weight: 600; margin-left: 8px; font-size: 0.9rem;"></span>
+                        </p>
+                    </div>
+
+                    <?php if ($userRole === 'admin'): ?>
+                    <div style="min-width: 250px;">
+                        <label for="sellerFilter" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--foreground);">
+                            Visualizar dados de:
+                        </label>
+                        <select id="sellerFilter" style="
+                            width: 100%;
+                            padding: 0.75rem;
+                            border: 1px solid var(--border);
+                            border-radius: 6px;
+                            background: white;
+                            color: var(--foreground);
+                            font-size: 0.875rem;
+                            cursor: pointer;
+                        ">
+                            <option value="">🌐 Todos os Vendedores (Visão Global)</option>
+                        </select>
+                    </div>
+                    <?php endif; ?>
+                </div>
             </div>
 
             <!-- Stats Grid -->
@@ -386,10 +410,14 @@ $currentPage = 'dashboard';
             addRefreshButton();
         });
 
-        async function loadDashboardStats() {
+        async function loadDashboardStats(sellerId = null) {
             try {
                 console.log('Carregando estatísticas...');
-                const response = await fetch('api/dashboard_stats_simple.php');
+                let url = 'api/dashboard_stats_simple.php';
+                if (sellerId) {
+                    url += `?seller_id=${sellerId}`;
+                }
+                const response = await fetch(url);
                 console.log('Response status:', response.status);
                 
                 const data = await response.json();
@@ -401,12 +429,25 @@ $currentPage = 'dashboard';
                 console.log('Pending sales:', data.stats?.pending_sales);
                 
                 if (data.success) {
+                    // Preencher lista de vendedores (apenas para admin)
+                    if (data.stats.is_admin && data.stats.sellers) {
+                        populateSellerSelect(data.stats.sellers);
+                    }
+
                     // Atualizar indicador de visualização
                     const viewIndicator = document.getElementById('viewIndicator');
                     if (viewIndicator) {
                         if (data.stats.is_admin) {
-                            viewIndicator.textContent = '(Visualização Global - Todos os Vendedores)';
-                            viewIndicator.style.color = '#059669';
+                            if (data.stats.is_global_view) {
+                                viewIndicator.textContent = '(Visualização Global - Todos os Vendedores)';
+                                viewIndicator.style.color = '#059669';
+                            } else {
+                                // Buscar nome do vendedor selecionado
+                                const selectedSeller = data.stats.sellers?.find(s => s.id == data.stats.selected_seller_id);
+                                const sellerName = selectedSeller ? selectedSeller.full_name : 'Vendedor';
+                                viewIndicator.textContent = `(Visualizando: ${sellerName})`;
+                                viewIndicator.style.color = '#2563eb';
+                            }
                         } else {
                             viewIndicator.textContent = '(Suas Estatísticas Pessoais)';
                             viewIndicator.style.color = '#dc2626';
@@ -675,7 +716,10 @@ $currentPage = 'dashboard';
                 const icon = this.querySelector('i');
                 icon.style.animation = 'spin 1s linear infinite';
                 
-                loadDashboardStats().then(() => {
+                const sellerSelect = document.getElementById('sellerFilter');
+                const selectedSellerId = sellerSelect ? sellerSelect.value : null;
+
+                loadDashboardStats(selectedSellerId || null).then(() => {
                     icon.style.animation = '';
                 });
             });
@@ -689,11 +733,42 @@ $currentPage = 'dashboard';
             const lastUpdateDiv = document.getElementById('lastUpdate');
             if (lastUpdateDiv) {
                 const now = new Date();
-                const timeString = now.toLocaleTimeString('pt-BR', { 
-                    hour: '2-digit', 
+                const timeString = now.toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
                     minute: '2-digit'
                 });
                 lastUpdateDiv.textContent = `Última atualização: ${timeString}`;
+            }
+        }
+
+        // Função para preencher o select de vendedores
+        function populateSellerSelect(sellers) {
+            const sellerSelect = document.getElementById('sellerFilter');
+            if (!sellerSelect) return;
+
+            // Limpar opções existentes (exceto a primeira)
+            while (sellerSelect.children.length > 1) {
+                sellerSelect.removeChild(sellerSelect.lastChild);
+            }
+
+            // Adicionar vendedores
+            sellers.forEach(seller => {
+                const option = document.createElement('option');
+                option.value = seller.id;
+                option.textContent = `👤 ${seller.full_name} (${seller.username})`;
+                sellerSelect.appendChild(option);
+            });
+
+            // Adicionar event listener se ainda não foi adicionado
+            if (!sellerSelect.hasAttribute('data-listener-added')) {
+                sellerSelect.addEventListener('change', function() {
+                    const selectedSellerId = this.value;
+                    console.log('Mudando visualização para vendedor:', selectedSellerId);
+
+                    // Recarregar estatísticas com filtro
+                    loadDashboardStats(selectedSellerId || null);
+                });
+                sellerSelect.setAttribute('data-listener-added', 'true');
             }
         }
 
