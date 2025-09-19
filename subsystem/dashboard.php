@@ -412,21 +412,42 @@ $currentPage = 'dashboard';
 
         async function loadDashboardStats(sellerId = null) {
             try {
-                console.log('Carregando estatísticas...');
+                console.log('🔄 Carregando estatísticas...');
                 let url = 'api/dashboard_stats_simple.php';
                 if (sellerId) {
                     url += `?seller_id=${sellerId}`;
+                    console.log('📊 Filtrando por vendedor ID:', sellerId);
                 }
+                console.log('🌐 URL da requisição:', url);
+
+                // Mostrar loading nos cards
+                setLoadingState(true);
+
                 const response = await fetch(url);
-                console.log('Response status:', response.status);
-                
+                console.log('📡 Response status:', response.status);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
                 const data = await response.json();
-                console.log('Data received:', data);
-                console.log('Stats object:', data.stats);
-                console.log('Total sales:', data.stats?.total_sales);
-                console.log('Total revenue:', data.stats?.total_revenue);
-                console.log('Total commissions:', data.stats?.total_commissions);
-                console.log('Pending sales:', data.stats?.pending_sales);
+                console.log('📦 Data received:', data);
+
+                if (data.debug) {
+                    console.log('🔍 Debug info:', data.debug);
+                }
+
+                if (data.stats) {
+                    console.log('📊 Stats object:', data.stats);
+                    console.log('📈 Metrics:', {
+                        total_leads: data.stats.total_leads,
+                        total_sales: data.stats.total_sales,
+                        total_commissions: data.stats.total_commissions,
+                        leads_this_month: data.stats.leads_this_month,
+                        sales_this_month: data.stats.sales_this_month,
+                        conversion_rate: data.stats.conversion_rate
+                    });
+                }
                 
                 if (data.success) {
                     // Preencher lista de vendedores (apenas para admin)
@@ -463,28 +484,37 @@ $currentPage = 'dashboard';
 
                     console.log('🔄 Atualizando elementos...');
 
+                    // Atualizar com animação e formatação adequada
                     if (totalLeadsEl) {
-                        totalLeadsEl.textContent = data.stats.total_leads || '0';
+                        const value = parseInt(data.stats.total_leads) || 0;
+                        totalLeadsEl.textContent = value.toLocaleString('pt-BR');
                         console.log('✅ totalLeads atualizado:', totalLeadsEl.textContent);
                     }
 
                     if (totalCommissionsEl) {
-                        totalCommissionsEl.textContent = 'R$ ' + (data.stats.total_commissions || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                        const value = parseFloat(data.stats.total_commissions) || 0;
+                        totalCommissionsEl.textContent = value.toLocaleString('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL'
+                        });
                         console.log('✅ totalCommissions atualizado:', totalCommissionsEl.textContent);
                     }
 
                     if (conversionRateEl) {
-                        conversionRateEl.textContent = (data.stats.conversion_rate || 0) + '%';
+                        const value = parseFloat(data.stats.conversion_rate) || 0;
+                        conversionRateEl.textContent = value.toFixed(1) + '%';
                         console.log('✅ conversionRate atualizado:', conversionRateEl.textContent);
                     }
 
                     if (leadsThisMonthEl) {
-                        leadsThisMonthEl.textContent = data.stats.leads_this_month || '0';
+                        const value = parseInt(data.stats.leads_this_month) || 0;
+                        leadsThisMonthEl.textContent = value.toLocaleString('pt-BR');
                         console.log('✅ leadsThisMonth atualizado:', leadsThisMonthEl.textContent);
                     }
 
                     if (salesThisMonthEl) {
-                        salesThisMonthEl.textContent = data.stats.sales_this_month || '0';
+                        const value = parseInt(data.stats.sales_this_month) || 0;
+                        salesThisMonthEl.textContent = value.toLocaleString('pt-BR');
                         console.log('✅ salesThisMonth atualizado:', salesThisMonthEl.textContent);
                     }
                     
@@ -496,15 +526,38 @@ $currentPage = 'dashboard';
                     // Atualizar horário da última atualização
                     updateLastUpdateTime();
                     
-                    console.log('Estatísticas carregadas com sucesso!');
+                    setLoadingState(false);
+                    console.log('✅ Estatísticas carregadas com sucesso!');
                 } else {
-                    console.error('Erro na resposta:', data.message);
+                    console.error('❌ Erro na resposta:', data.message);
+                    setLoadingState(false);
                     showStatsError('Erro ao carregar dados: ' + data.message);
                 }
             } catch (error) {
-                console.error('Erro ao carregar estatísticas:', error);
+                console.error('💥 Erro ao carregar estatísticas:', error);
+                setLoadingState(false);
                 showStatsError('Erro de conexão: ' + error.message);
             }
+        }
+
+        // Função para mostrar/esconder loading nos cards
+        function setLoadingState(isLoading) {
+            const elements = [
+                'totalLeads', 'totalCommissions', 'conversionRate',
+                'leadsThisMonth', 'salesThisMonth'
+            ];
+
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (isLoading) {
+                        element.textContent = '⏳';
+                        element.style.opacity = '0.6';
+                    } else {
+                        element.style.opacity = '1';
+                    }
+                }
+            });
         }
         
         function updateRecentLeads(leads) {

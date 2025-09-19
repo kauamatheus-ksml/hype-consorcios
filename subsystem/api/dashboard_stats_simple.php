@@ -292,7 +292,20 @@ try {
             'user_id' => $userId,
             'user_role' => $userRole,
             'is_admin' => $isAdmin,
-            'seller_filter' => $sellerFilter
+            'is_global_view' => $isGlobalView,
+            'selected_seller_id' => $selectedSellerId,
+            'seller_filter' => $sellerFilter,
+            'lead_filter' => $leadFilter,
+            'filter_value' => $filterValue,
+            'query_results' => [
+                'total_sales' => $stats['total_sales'],
+                'total_revenue' => $stats['total_revenue'],
+                'total_commissions' => $stats['total_commissions'],
+                'pending_sales' => $stats['pending_sales'],
+                'total_leads' => $stats['total_leads'],
+                'leads_this_month' => $stats['leads_this_month'],
+                'sales_this_month' => $stats['sales_this_month']
+            ]
         ]
     ], JSON_UNESCAPED_UNICODE);
     
