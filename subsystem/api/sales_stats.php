@@ -84,17 +84,44 @@ try {
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     $stats['total'] = (int)($result['total'] ?? 0);
     
-    // Receita total e comissões
-    $stmt = $conn->prepare("
-        SELECT 
-            SUM(sale_value) as total_revenue,
-            SUM(commission_value) as total_commission
-        " . $baseQuery
-    );
+    // Receita total (apenas vendas confirmadas)
+    $revenueQuery = str_replace("FROM sales s LEFT JOIN users u ON s.seller_id = u.id WHERE 1=1",
+                               "FROM sales s LEFT JOIN users u ON s.seller_id = u.id WHERE s.status = 'confirmed'",
+                               $baseQuery);
+
+    $stmt = $conn->prepare("SELECT SUM(s.sale_value) as total_revenue " . $revenueQuery);
     $stmt->execute($params);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     $stats['revenue'] = (float)($result['total_revenue'] ?? 0);
-    $stats['commission'] = (float)($result['total_commission'] ?? 0);
+
+    // Comissões (recalculadas com base nas configurações atuais)
+    $commissionQuery = "
+        SELECT
+            s.seller_id,
+            s.sale_value,
+            COALESCE(scs.commission_percentage, 1.50) as commission_percentage
+        FROM sales s
+        LEFT JOIN seller_commission_settings scs ON s.seller_id = scs.seller_id AND scs.is_active = 1
+        WHERE s.status = 'confirmed'";
+
+    if (!in_array($userRole, ['admin', 'manager'])) {
+        $commissionQuery .= " AND s.seller_id = ?";
+        $commissionParams = [$userId];
+    } else {
+        $commissionParams = [];
+    }
+
+    $stmt = $conn->prepare($commissionQuery);
+    $stmt->execute($commissionParams);
+    $commissionResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $totalCommissions = 0;
+    foreach ($commissionResults as $commission) {
+        $commissionValue = ($commission['sale_value'] * $commission['commission_percentage']) / 100;
+        $totalCommissions += $commissionValue;
+    }
+
+    $stats['commission'] = $totalCommissions;
     
     // Vendas por status
     $stmt = $conn->prepare("

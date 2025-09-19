@@ -1451,22 +1451,104 @@ $currentPage = 'sales';
 
         async function loadStats() {
             try {
+                console.log('📊 Carregando estatísticas de vendas...');
+
+                // Mostrar loading nos cards
+                setStatsLoading(true);
+
                 const response = await fetch('api/sales_stats.php');
+                console.log('📡 Response status:', response.status);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
                 const data = await response.json();
-                
+                console.log('📦 Data received:', data);
+
                 if (data.success) {
-                    document.getElementById('totalSales').textContent = data.stats.total || '0';
-                    document.getElementById('totalRevenue').textContent = 
-                        'R$ ' + (parseFloat(data.stats.revenue || 0)).toLocaleString('pt-BR', {minimumFractionDigits: 2});
-                    document.getElementById('totalCommission').textContent = 
-                        'R$ ' + (parseFloat(data.stats.commission || 0)).toLocaleString('pt-BR', {minimumFractionDigits: 2});
-                    document.getElementById('pendingSales').textContent = data.stats.pending || '0';
+                    console.log('📈 Stats:', data.stats);
+
+                    // Atualizar cards com formatação adequada
+                    const totalSalesEl = document.getElementById('totalSales');
+                    const totalRevenueEl = document.getElementById('totalRevenue');
+                    const totalCommissionEl = document.getElementById('totalCommission');
+                    const pendingSalesEl = document.getElementById('pendingSales');
+
+                    if (totalSalesEl) {
+                        const value = parseInt(data.stats.total) || 0;
+                        totalSalesEl.textContent = value.toLocaleString('pt-BR');
+                        console.log('✅ Total Sales atualizado:', totalSalesEl.textContent);
+                    }
+
+                    if (totalRevenueEl) {
+                        const value = parseFloat(data.stats.revenue) || 0;
+                        totalRevenueEl.textContent = value.toLocaleString('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL'
+                        });
+                        console.log('✅ Total Revenue atualizado:', totalRevenueEl.textContent);
+                    }
+
+                    if (totalCommissionEl) {
+                        const value = parseFloat(data.stats.commission) || 0;
+                        totalCommissionEl.textContent = value.toLocaleString('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL'
+                        });
+                        console.log('✅ Total Commission atualizado:', totalCommissionEl.textContent);
+                    }
+
+                    if (pendingSalesEl) {
+                        const value = parseInt(data.stats.pending) || 0;
+                        pendingSalesEl.textContent = value.toLocaleString('pt-BR');
+                        console.log('✅ Pending Sales atualizado:', pendingSalesEl.textContent);
+                    }
+
+                    setStatsLoading(false);
+                    console.log('✅ Estatísticas carregadas com sucesso!');
                 } else {
-                    console.error('Error loading stats:', data.message);
+                    console.error('❌ Erro na resposta:', data.message);
+                    setStatsLoading(false);
+                    showStatsError('Erro ao carregar estatísticas: ' + data.message);
                 }
             } catch (error) {
-                console.error('Error loading stats:', error);
+                console.error('💥 Erro ao carregar estatísticas:', error);
+                setStatsLoading(false);
+                showStatsError('Erro de conexão: ' + error.message);
             }
+        }
+
+        // Função para mostrar/esconder loading nos cards
+        function setStatsLoading(isLoading) {
+            const elements = ['totalSales', 'totalRevenue', 'totalCommission', 'pendingSales'];
+
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (isLoading) {
+                        element.textContent = '⏳';
+                        element.style.opacity = '0.6';
+                    } else {
+                        element.style.opacity = '1';
+                    }
+                }
+            });
+        }
+
+        // Função para mostrar erro nos cards
+        function showStatsError(message) {
+            const elements = ['totalSales', 'totalRevenue', 'totalCommission', 'pendingSales'];
+
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = 'Erro';
+                    element.style.color = '#dc2626';
+                }
+            });
+
+            console.error('📊 Erro nas estatísticas:', message);
         }
 
         async function loadSellers() {
