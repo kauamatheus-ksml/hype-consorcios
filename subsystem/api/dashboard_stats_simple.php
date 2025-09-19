@@ -93,9 +93,9 @@ try {
         $sql = "SELECT
                     s.seller_id,
                     s.sale_value,
-                    COALESCE(cs.commission_percentage, 1.50) as commission_percentage
+                    COALESCE(scs.commission_percentage, 1.50) as commission_percentage
                 FROM sales s
-                LEFT JOIN commission_settings cs ON s.seller_id = cs.user_id
+                LEFT JOIN seller_commission_settings scs ON s.seller_id = scs.seller_id AND scs.is_active = 1
                 WHERE s.status = 'confirmed'
                 AND MONTH(s.created_at) = MONTH(CURRENT_DATE())
                 AND YEAR(s.created_at) = YEAR(CURRENT_DATE())";
@@ -106,9 +106,9 @@ try {
         $sql = "SELECT
                     s.seller_id,
                     s.sale_value,
-                    COALESCE(cs.commission_percentage, 1.50) as commission_percentage
+                    COALESCE(scs.commission_percentage, 1.50) as commission_percentage
                 FROM sales s
-                LEFT JOIN commission_settings cs ON s.seller_id = cs.user_id
+                LEFT JOIN seller_commission_settings scs ON s.seller_id = scs.seller_id AND scs.is_active = 1
                 WHERE s.status = 'confirmed'
                 AND s.seller_id = ?
                 AND MONTH(s.created_at) = MONTH(CURRENT_DATE())
