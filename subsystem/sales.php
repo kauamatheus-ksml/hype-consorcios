@@ -1456,7 +1456,7 @@ $currentPage = 'sales';
                 // Mostrar loading nos cards
                 setStatsLoading(true);
 
-                const response = await fetch('api/sales_stats.php');
+                const response = await fetch('api/sales_stats_simple.php');
                 console.log('📡 Response status:', response.status);
 
                 if (!response.ok) {

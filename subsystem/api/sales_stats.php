@@ -68,28 +68,24 @@ try {
         'cancelled' => 0
     ];
     
-    // Query base para contagem
-    $baseQuery = "FROM sales s LEFT JOIN users u ON s.seller_id = u.id WHERE 1=1";
+    // Definir parâmetros baseado no papel do usuário
+    $userFilter = "";
     $params = [];
-    
+
     // Se não é admin/manager, filtrar apenas vendas próprias
     if (!in_array($userRole, ['admin', 'manager'])) {
-        $baseQuery .= " AND s.seller_id = ?";
+        $userFilter = " AND s.seller_id = ?";
         $params[] = $userId;
     }
-    
+
     // Total de vendas
-    $stmt = $conn->prepare("SELECT COUNT(*) as total " . $baseQuery);
+    $stmt = $conn->prepare("SELECT COUNT(*) as total FROM sales s WHERE 1=1" . $userFilter);
     $stmt->execute($params);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     $stats['total'] = (int)($result['total'] ?? 0);
-    
-    // Receita total (apenas vendas confirmadas)
-    $revenueQuery = str_replace("FROM sales s LEFT JOIN users u ON s.seller_id = u.id WHERE 1=1",
-                               "FROM sales s LEFT JOIN users u ON s.seller_id = u.id WHERE s.status = 'confirmed'",
-                               $baseQuery);
 
-    $stmt = $conn->prepare("SELECT SUM(s.sale_value) as total_revenue " . $revenueQuery);
+    // Receita total (apenas vendas confirmadas)
+    $stmt = $conn->prepare("SELECT COALESCE(SUM(s.sale_value), 0) as total_revenue FROM sales s WHERE s.status = 'confirmed'" . $userFilter);
     $stmt->execute($params);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     $stats['revenue'] = (float)($result['total_revenue'] ?? 0);
@@ -125,15 +121,16 @@ try {
     
     // Vendas por status
     $stmt = $conn->prepare("
-        SELECT 
-            status,
+        SELECT
+            s.status,
             COUNT(*) as count
-        " . $baseQuery . "
-        GROUP BY status
+        FROM sales s
+        WHERE 1=1" . $userFilter . "
+        GROUP BY s.status
     ");
     $stmt->execute($params);
     $statusResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     foreach ($statusResults as $row) {
         if (isset($stats[$row['status']])) {
             $stats[$row['status']] = (int)$row['count'];
@@ -238,7 +235,13 @@ try {
         'success' => true,
         'stats' => $stats,
         'additional' => $additionalStats,
-        'user_role' => $userRole
+        'user_role' => $userRole,
+        'debug' => [
+            'user_id' => $userId,
+            'user_filter' => $userFilter,
+            'params_count' => count($params),
+            'current_time' => date('Y-m-d H:i:s')
+        ]
     ], JSON_UNESCAPED_UNICODE);
     
 } catch (Exception $e) {
