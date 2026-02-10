@@ -21,6 +21,14 @@ class Database {
     public function getConnection() {
         $this->conn = null;
 
+        // Detect if running on Vercel or locally
+        if (getenv('VERCEL') || isset($_SERVER['VERCEL'])) {
+            $this->host = 'sql.syncholding.com.br';
+            $this->username = 'u383946504_hypeconsorcio';
+            $this->password = 'Aaku_2004@';
+            // $this->db_name stays the same
+        }
+
         try {
             $dsn = "mysql:host=" . $this->host . ";dbname=" . $this->db_name . ";charset=utf8mb4";
             
