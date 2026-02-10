@@ -8,9 +8,9 @@
 date_default_timezone_set('America/Sao_Paulo');
 
 class Database {
-    private $host = 'srv406.hstgr.io';
+    private $host = '192.168.1.20';
     private $db_name = 'u383946504_hypeconsorcio';
-    private $username = 'u383946504_hypeconsorcio';
+    private $username = 'admin';
     private $password = 'Aaku_2004@';
     private $conn;
 
