@@ -119,8 +119,8 @@ try {
             FROM sales s
             LEFT JOIN seller_commission_settings scs ON s.seller_id = scs.seller_id AND scs.is_active = 1
             WHERE s.status = 'confirmed'
-            AND MONTH(s.created_at) = MONTH(CURRENT_DATE())
-            AND YEAR(s.created_at) = YEAR(CURRENT_DATE())
+            AND EXTRACT(MONTH FROM s.created_at) = EXTRACT(MONTH FROM CURRENT_DATE)
+            AND EXTRACT(YEAR FROM s.created_at) = EXTRACT(YEAR FROM CURRENT_DATE)
             $sellerFilter";
     $stmt = $conn->prepare($sql);
     if ($filterValue) {
@@ -162,7 +162,7 @@ try {
     $stats['total_leads'] = (int)($result['total'] ?? 0);
 
     // Leads este mês
-    $sql = "SELECT COUNT(*) as total FROM leads l WHERE MONTH(l.created_at) = MONTH(CURRENT_DATE()) AND YEAR(l.created_at) = YEAR(CURRENT_DATE()) $leadFilter";
+    $sql = "SELECT COUNT(*) as total FROM leads l WHERE EXTRACT(MONTH FROM l.created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM l.created_at) = EXTRACT(YEAR FROM CURRENT_DATE) $leadFilter";
     $stmt = $conn->prepare($sql);
     if ($filterValue) {
         $stmt->execute([$filterValue]);
@@ -173,7 +173,7 @@ try {
     $stats['leads_this_month'] = (int)($result['total'] ?? 0);
 
     // Vendas este mês
-    $sql = "SELECT COUNT(*) as total FROM sales s WHERE MONTH(s.created_at) = MONTH(CURRENT_DATE()) AND YEAR(s.created_at) = YEAR(CURRENT_DATE()) AND s.status != 'cancelled' $sellerFilter";
+    $sql = "SELECT COUNT(*) as total FROM sales s WHERE EXTRACT(MONTH FROM s.created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM s.created_at) = EXTRACT(YEAR FROM CURRENT_DATE) AND s.status != 'cancelled' $sellerFilter";
     $stmt = $conn->prepare($sql);
     if ($filterValue) {
         $stmt->execute([$filterValue]);
@@ -214,8 +214,8 @@ try {
             COALESCE(SUM(s.commission_value), 0) as total_commission
         FROM users u
         LEFT JOIN sales s ON u.id = s.seller_id 
-            AND MONTH(s.created_at) = MONTH(CURRENT_DATE())
-            AND YEAR(s.created_at) = YEAR(CURRENT_DATE())
+            AND EXTRACT(MONTH FROM s.created_at) = EXTRACT(MONTH FROM CURRENT_DATE)
+            AND EXTRACT(YEAR FROM s.created_at) = EXTRACT(YEAR FROM CURRENT_DATE)
         WHERE u.role IN ('seller', 'manager', 'admin')
         AND u.status = 'active'
         GROUP BY u.id, u.full_name
@@ -231,8 +231,8 @@ try {
             COALESCE(source_page, 'Não informado') as source,
             COUNT(*) as count
         FROM leads 
-        WHERE MONTH(created_at) = MONTH(CURRENT_DATE())
-        AND YEAR(created_at) = YEAR(CURRENT_DATE())
+        WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE)
+        AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)
         GROUP BY source_page
         ORDER BY count DESC
         LIMIT 10
@@ -243,12 +243,12 @@ try {
     // Vendas por mês (últimos 6 meses)
     $stmt = $conn->prepare("
         SELECT 
-            DATE_FORMAT(created_at, '%Y-%m') as month,
+            TO_CHAR(created_at, 'YYYY-MM') as month,
             COUNT(*) as sales_count,
             COALESCE(SUM(sale_value), 0) as total_value
         FROM sales
-        WHERE created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
-        GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+        WHERE created_at >= (CURRENT_DATE - INTERVAL '6 months')
+        GROUP BY TO_CHAR(created_at, 'YYYY-MM')
         ORDER BY month ASC
     ");
     $stmt->execute();
