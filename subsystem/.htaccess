@@ -1,67 +1,53 @@
-# Configuração de acesso para o subsystem
-# Proteger arquivos sensíveis mas permitir funcionamento normal
+# =============================================================
+# SEGURANÇA DO SUBSYSTEM (CORRIGIDO)
+# =============================================================
 
-# Bloquear acesso a arquivos de configuração específicos
+# 1. Segurança Básica
+# Impede que alguém veja a lista de arquivos se digitar apenas o nome da pasta
+Options -Indexes
+
+# Ativar motor de reescrita (Necessário para substituir o <Directory>)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+</IfModule>
+
+# =============================================================
+# BLOQUEIO DE PASTAS SENSÍVEIS
+# Usamos RewriteRule com a flag [F] (Forbidden/Proibido)
+# Isso impede acesso via navegador, mas seus includes PHP continuam funcionando.
+# =============================================================
+
+<IfModule mod_rewrite.c>
+    # Bloquear acesso total à pasta dev-tools
+    RewriteRule ^dev-tools/.*$ - [F,L]
+
+    # Bloquear acesso direto à pasta config (Protege as senhas, mas permite include)
+    RewriteRule ^config/.*$ - [F,L]
+</IfModule>
+
+# =============================================================
+# BLOQUEIO DE ARQUIVOS ESPECÍFICOS
+# =============================================================
+
+# Bloquear database.php
 <Files "database.php">
-    Order deny,allow
-    Deny from all
+    Require all denied
 </Files>
 
-# Bloquear acesso ao diretório dev-tools
-<Directory "dev-tools">
-    Order deny,allow
-    Deny from all
-</Directory>
-
-# Bloquear acesso a arquivos de backup e configuração
+# Bloquear arquivos de backup, logs e SQL dumps
 <FilesMatch "\.(sql|json|bak|backup|log)$">
-    Order deny,allow
-    Deny from all
+    Require all denied
 </FilesMatch>
 
-# Permitir acesso a arquivos PHP do sistema
+# =============================================================
+# PERMISSÕES (PADRÃO)
+# =============================================================
+
+# OBS: Não é necessário criar regras <Allow> para "api", "components", 
+# "classes" ou "includes". O Apache libera o acesso a eles automaticamente 
+# se não houver regra de bloqueio.
+
+# Garantir que scripts PHP normais sejam executáveis
 <FilesMatch "\.php$">
-    Order allow,deny
-    Allow from all
+    Require all granted
 </FilesMatch>
-
-# Permitir acesso a arquivos de API
-<Directory "api">
-    <Files "*.php">
-        Order allow,deny
-        Allow from all
-    </Files>
-</Directory>
-
-# Permitir acesso a componentes
-<Directory "components">
-    <Files "*.php">
-        Order allow,deny
-        Allow from all
-    </Files>
-</Directory>
-
-# Permitir acesso a classes
-<Directory "classes">
-    <Files "*.php">
-        Order allow,deny
-        Allow from all
-    </Files>
-</Directory>
-
-# Permitir acesso a includes
-<Directory "includes">
-    <Files "*.php">
-        Order allow,deny
-        Allow from all
-    </Files>
-</Directory>
-
-# Bloquear acesso direto ao diretório config (mas permitir includes)
-<Directory "config">
-    # Bloquear acesso direto via browser
-    <Files "*.php">
-        Order deny,allow
-        Deny from all
-    </Files>
-</Directory>

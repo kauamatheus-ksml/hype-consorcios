@@ -8,41 +8,40 @@
 date_default_timezone_set('America/Sao_Paulo');
 
 class Database {
-    private $host = '192.168.1.20';
-    private $db_name = 'u383946504_hypeconsorcio';
-    private $username = 'admin';
-    private $password = 'Aaku_2004@';
+    private $host = 'aws-0-us-west-2.pooler.supabase.com';
+    private $db_name = 'postgres';
+    private $username = 'postgres.pnffxphwgqrtwmlrxwky';
+    private $password = 'Idiasiin@kaos_';
+    private $port = '5432';
     private $conn;
 
     /**
-     * Conecta ao banco de dados MySQL
+     * Conecta ao banco de dados PostgreSQL (Supabase)
      * @return PDO|null
      */
     public function getConnection() {
         $this->conn = null;
 
-        // Detect if running on Vercel or locally
-        if (getenv('VERCEL') || isset($_SERVER['VERCEL'])) {
-            $this->host = 'sql.syncholding.com.br';
-            $this->username = 'u383946504_hypeconsorcio';
-            $this->password = 'Aaku_2004@';
-            // $this->db_name stays the same
-        }
+        // Allow environment variables for production (Vercel)
+        $db_host = getenv('DB_HOST') ?: $this->host;
+        $db_name = getenv('DB_NAME') ?: $this->db_name;
+        $db_user = getenv('DB_USER') ?: $this->username;
+        $db_pass = getenv('DB_PASS') ?: $this->password;
+        $db_port = getenv('DB_PORT') ?: $this->port;
 
         try {
-            $dsn = "mysql:host=" . $this->host . ";dbname=" . $this->db_name . ";charset=utf8mb4";
+            $dsn = "pgsql:host=" . $db_host . ";port=" . $db_port . ";dbname=" . $db_name;
             
             $options = [
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES   => false,
-                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
+                PDO::ATTR_EMULATE_PREPARES   => false
             ];
 
-            $this->conn = new PDO($dsn, $this->username, $this->password, $options);
+            $this->conn = new PDO($dsn, $db_user, $db_pass, $options);
             
-            // Configurar fuso horário para -3 horas (Brasil)
-            $this->conn->exec("SET time_zone = '-03:00'");
+            // Configurar fuso horário para Brasil
+            $this->conn->exec("SET timezone TO 'America/Sao_Paulo'");
             
         } catch(PDOException $e) {
             echo "Erro na conexão: " . $e->getMessage();
