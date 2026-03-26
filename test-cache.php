@@ -8,8 +8,8 @@
     <h1>Teste do Sistema de Cache Buster</h1>
     
     <h2>URLs Versionadas:</h2>
-    <p><strong>CSS:</strong> assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?></p>
-    <p><strong>JS:</strong> assets/js/script.js?v=<?php echo filemtime('assets/js/script.js'); ?></p>
+    <p><strong>CSS:</strong> assets/css/style.css</p>
+    <p><strong>JS:</strong> assets/js/script.js</p>
     
     <h2>Status dos Arquivos:</h2>
     <p>CSS existe: <?php echo file_exists('assets/css/style.css') ? 'SIM' : 'NÃO'; ?></p>
