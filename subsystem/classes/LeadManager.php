@@ -23,7 +23,7 @@ class LeadManager {
             // Verificar se já existe lead com mesmo telefone recentemente (últimas 24h)
             $stmt = $this->conn->prepare("
                 SELECT id, created_at FROM leads 
-                WHERE phone = ? AND created_at > DATE_SUB(NOW(), INTERVAL 24 HOUR)
+                WHERE phone = ? AND created_at > CURRENT_TIMESTAMP - INTERVAL '24 hours'
                 ORDER BY created_at DESC LIMIT 1
             ");
             $stmt->execute([$data['phone']]);
@@ -41,6 +41,7 @@ class LeadManager {
                     down_payment_value, source_page, ip_address, user_agent, 
                     status, priority
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                RETURNING id
             ");
             
             $stmt->execute([
@@ -57,7 +58,7 @@ class LeadManager {
                 $data['priority'] ?? 'medium'
             ]);
             
-            $leadId = $this->conn->lastInsertId();
+            $leadId = $stmt->fetchColumn();
             
             // Registrar interação inicial
             $this->addInteraction($leadId, null, 'note', 'Lead capturado via formulário do site');
@@ -395,7 +396,7 @@ class LeadManager {
                     DATE(created_at) as date,
                     COUNT(*) as count
                 FROM leads 
-                WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                WHERE created_at >= CURRENT_TIMESTAMP - INTERVAL '30 days'
                 GROUP BY DATE(created_at)
                 ORDER BY date
             ";

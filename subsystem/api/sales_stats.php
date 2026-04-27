@@ -97,7 +97,7 @@ try {
             s.sale_value,
             COALESCE(scs.commission_percentage, 1.50) as commission_percentage
         FROM sales s
-        LEFT JOIN seller_commission_settings scs ON s.seller_id = scs.seller_id AND scs.is_active = 1
+        LEFT JOIN seller_commission_settings scs ON s.seller_id = scs.seller_id AND COALESCE(scs.is_active::text, '1') IN ('1', 'true', 't')
         WHERE s.status = 'confirmed'";
 
     if (!in_array($userRole, ['admin', 'manager'])) {
@@ -148,7 +148,7 @@ try {
                 COUNT(*) as count,
                 SUM(sale_value) as revenue
             FROM sales 
-            WHERE sale_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+            WHERE sale_date >= CURRENT_DATE - INTERVAL '7 days'
             GROUP BY DATE(sale_date)
             ORDER BY date DESC
         ");
@@ -164,7 +164,7 @@ try {
                 SUM(s.commission_value) as total_commission
             FROM sales s
             LEFT JOIN users u ON s.seller_id = u.id
-            WHERE s.sale_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+            WHERE s.sale_date >= CURRENT_DATE - INTERVAL '30 days'
             GROUP BY s.seller_id, u.full_name
             ORDER BY total_revenue DESC
             LIMIT 10
@@ -181,7 +181,7 @@ try {
             FROM sales 
             WHERE vehicle_sold IS NOT NULL 
             AND vehicle_sold != ''
-            AND sale_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+            AND sale_date >= CURRENT_DATE - INTERVAL '30 days'
             GROUP BY vehicle_sold
             ORDER BY count DESC
             LIMIT 10
@@ -193,7 +193,7 @@ try {
         $stmt = $conn->prepare("
             SELECT COUNT(*) as today_sales, SUM(sale_value) as today_revenue
             FROM sales 
-            WHERE DATE(sale_date) = CURRENT_DATE()
+            WHERE DATE(sale_date) = CURRENT_DATE
         ");
         $stmt->execute();
         $todayData = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -204,7 +204,7 @@ try {
         $stmt = $conn->prepare("
             SELECT COUNT(*) as week_sales, SUM(sale_value) as week_revenue
             FROM sales 
-            WHERE sale_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+            WHERE sale_date >= CURRENT_DATE - INTERVAL '7 days'
         ");
         $stmt->execute();
         $weekData = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -215,8 +215,8 @@ try {
         $stmt = $conn->prepare("
             SELECT COUNT(*) as month_sales, SUM(sale_value) as month_revenue
             FROM sales 
-            WHERE MONTH(sale_date) = MONTH(CURRENT_DATE())
-            AND YEAR(sale_date) = YEAR(CURRENT_DATE())
+            WHERE sale_date >= DATE_TRUNC('month', CURRENT_DATE)
+            AND sale_date < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'
         ");
         $stmt->execute();
         $monthData = $stmt->fetch(PDO::FETCH_ASSOC);

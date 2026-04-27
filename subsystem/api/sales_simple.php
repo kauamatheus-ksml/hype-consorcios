@@ -264,7 +264,7 @@ function handleCreateSale($conn, $userId) {
 
     // Buscar configuração de comissão do vendedor
     $sellerId = $input['seller_id'] ?? $userId;
-    $stmt = $conn->prepare("SELECT * FROM seller_commission_settings WHERE seller_id = ? AND is_active = 1");
+    $stmt = $conn->prepare("SELECT * FROM seller_commission_settings WHERE seller_id = ? AND COALESCE(is_active::text, '1') IN ('1', 'true', 't')");
     $stmt->execute([$sellerId]);
     $sellerConfig = $stmt->fetch();
 
@@ -304,14 +304,15 @@ function handleCreateSale($conn, $userId) {
         // Criar um lead temporário para armazenar as informações do cliente
         $stmt = $conn->prepare("
             INSERT INTO leads (name, email, phone, status, created_at)
-            VALUES (?, ?, ?, 'converted', NOW())
+            VALUES (?, ?, ?, 'converted', CURRENT_TIMESTAMP)
+            RETURNING id
         ");
         $stmt->execute([
             $input['customer_name'],
             $input['email'] ?? null,
             $input['phone'] ?? null
         ]);
-        $leadId = $conn->lastInsertId();
+        $leadId = $stmt->fetchColumn();
     }
     
     // Calcular comissão com base na configuração do vendedor
@@ -353,11 +354,12 @@ function handleCreateSale($conn, $userId) {
             financing_months, monthly_payment, contract_number,
             notes, status, sale_date
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        RETURNING id
     ");
     
     $saleDate = !empty($input['sale_date']) ? $input['sale_date'] : date('Y-m-d');
     
-    $result = $stmt->execute([
+    $stmt->execute([
         $leadId,
         $input['seller_id'] ?? $userId,
         $input['sale_value'],
@@ -376,9 +378,9 @@ function handleCreateSale($conn, $userId) {
         $saleDate
     ]);
     
-    if ($result) {
-        $saleId = $conn->lastInsertId();
-        
+    $saleId = $stmt->fetchColumn();
+
+    if ($saleId) {
         // Atualizar status do lead para convertido e registrar interação
         $stmt = $conn->prepare("UPDATE leads SET status = 'converted' WHERE id = ?");
         $stmt->execute([$leadId]);

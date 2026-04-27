@@ -111,7 +111,7 @@ try {
                 DATE(created_at) as date,
                 COUNT(*) as count
             FROM leads 
-            WHERE created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+            WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'
             GROUP BY DATE(created_at)
             ORDER BY date DESC
         ");
@@ -124,7 +124,7 @@ try {
                 COALESCE(source_page, 'Não informado') as source,
                 COUNT(*) as count
             FROM leads 
-            WHERE created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+            WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
             GROUP BY source_page
             ORDER BY count DESC
             LIMIT 10
@@ -158,7 +158,7 @@ try {
                 COUNT(*) as count
             FROM leads l
             LEFT JOIN users u ON l.assigned_to = u.id
-            WHERE l.created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+            WHERE l.created_at >= CURRENT_DATE - INTERVAL '30 days'
             GROUP BY l.assigned_to, u.full_name
             ORDER BY count DESC
             LIMIT 10
@@ -177,7 +177,7 @@ try {
                     ELSE 0 
                 END as conversion_rate
             FROM leads 
-            WHERE created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+            WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
         ");
         $stmt->execute();
         $conversionData = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -191,7 +191,7 @@ try {
         $stmt = $conn->prepare("
             SELECT COUNT(*) as today_leads
             FROM leads 
-            WHERE DATE(created_at) = CURRENT_DATE()
+            WHERE DATE(created_at) = CURRENT_DATE
         ");
         $stmt->execute();
         $todayData = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -201,7 +201,7 @@ try {
         $stmt = $conn->prepare("
             SELECT COUNT(*) as week_leads
             FROM leads 
-            WHERE created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+            WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'
         ");
         $stmt->execute();
         $weekData = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -211,8 +211,8 @@ try {
         $stmt = $conn->prepare("
             SELECT COUNT(*) as month_leads
             FROM leads 
-            WHERE MONTH(created_at) = MONTH(CURRENT_DATE())
-            AND YEAR(created_at) = YEAR(CURRENT_DATE())
+            WHERE created_at >= DATE_TRUNC('month', CURRENT_DATE)
+            AND created_at < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'
         ");
         $stmt->execute();
         $monthData = $stmt->fetch(PDO::FETCH_ASSOC);

@@ -146,7 +146,7 @@ class AuditLogger {
         try {
             $stmt = $this->conn->prepare("
                 DELETE FROM audit_logs 
-                WHERE created_at < DATE_SUB(NOW(), INTERVAL ? DAY)
+                WHERE created_at < CURRENT_TIMESTAMP - (? * INTERVAL '1 day')
             ");
             $stmt->execute([$daysToKeep]);
             return $stmt->rowCount();

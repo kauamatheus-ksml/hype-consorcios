@@ -78,7 +78,8 @@ switch ($userData['role']) {
         $stmt = $conn->prepare("
             SELECT COUNT(*) as total, COALESCE(SUM(sale_value), 0) as total_value 
             FROM sales 
-            WHERE MONTH(sale_date) = MONTH(CURRENT_DATE()) AND YEAR(sale_date) = YEAR(CURRENT_DATE())
+            WHERE sale_date >= DATE_TRUNC('month', CURRENT_DATE)
+            AND sale_date < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'
         ");
         $stmt->execute();
         $monthlySales = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -109,7 +110,8 @@ switch ($userData['role']) {
         $stmt = $conn->prepare("
             SELECT COUNT(*) as total, COALESCE(SUM(sale_value), 0) as total_value 
             FROM sales 
-            WHERE MONTH(sale_date) = MONTH(CURRENT_DATE()) AND YEAR(sale_date) = YEAR(CURRENT_DATE())
+            WHERE sale_date >= DATE_TRUNC('month', CURRENT_DATE)
+            AND sale_date < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'
         ");
         $stmt->execute();
         $monthlySales = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -138,7 +140,9 @@ switch ($userData['role']) {
         $stmt = $conn->prepare("
             SELECT COUNT(*) as total, COALESCE(SUM(sale_value), 0) as total_value 
             FROM sales 
-            WHERE seller_id = ? AND MONTH(sale_date) = MONTH(CURRENT_DATE()) AND YEAR(sale_date) = YEAR(CURRENT_DATE())
+            WHERE seller_id = ?
+            AND sale_date >= DATE_TRUNC('month', CURRENT_DATE)
+            AND sale_date < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'
         ");
         $stmt->execute([$user['id']]);
         $monthlySales = $stmt->fetch(PDO::FETCH_ASSOC);

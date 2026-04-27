@@ -1304,12 +1304,23 @@ $currentPage = 'sales';
         let totalPages = 1;
         let currentFilters = {};
 
+        async function parseApiJson(response) {
+            const text = await response.text();
+
+            try {
+                return JSON.parse(text);
+            } catch (error) {
+                const message = text.trim() || `HTTP ${response.status}: ${response.statusText}`;
+                throw new Error(message.substring(0, 300));
+            }
+        }
+
         // Função para carregar estatísticas da página de vendas
         async function loadSalesStats() {
             try {
                 console.log('📊 Carregando estatísticas de vendas...');
                 const response = await fetch('api/dashboard_stats_simple.php');
-                const data = await response.json();
+                const data = await parseApiJson(response);
 
                 if (data.success) {
                     // Atualizar indicador de visualização
@@ -1463,7 +1474,7 @@ $currentPage = 'sales';
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
-                const data = await response.json();
+                const data = await parseApiJson(response);
                 console.log('📦 Data received:', data);
 
                 if (data.success) {
@@ -1554,7 +1565,7 @@ $currentPage = 'sales';
         async function loadSellers() {
             try {
                 const response = await fetch('api/users.php?role=seller,manager,admin');
-                const data = await response.json();
+                const data = await parseApiJson(response);
                 
                 if (data.success && data.users) {
                     const sellerFilter = document.getElementById('sellerFilter');
@@ -1585,7 +1596,7 @@ $currentPage = 'sales';
                 });
                 
                 const response = await fetch(`api/sales_simple.php?${params}`);
-                const data = await response.json();
+                const data = await parseApiJson(response);
                 
                 if (data.success) {
                     renderSalesTable(data.sales || []);
@@ -1904,7 +1915,7 @@ $currentPage = 'sales';
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
-                const data = await response.json();
+                const data = await parseApiJson(response);
                 console.log('📋 Resposta completa da API de leads:', data);
                 
                 const leadSelect = document.getElementById('leadSelect');
@@ -2120,7 +2131,7 @@ $currentPage = 'sales';
                     body: JSON.stringify(data)
                 });
 
-                const result = await response.json();
+                const result = await parseApiJson(response);
 
                 if (result.success) {
                     // Sucesso
@@ -2299,7 +2310,7 @@ $currentPage = 'sales';
                 // Buscar configuração específica do vendedor
                 const response = await fetch(`api/seller_commission.php?action=get&seller_id=${currentUser.id}`);
                 if (response.ok) {
-                    const result = await response.json();
+                    const result = await parseApiJson(response);
                     if (result.success && result.config) {
                         const config = result.config;
 
@@ -2370,7 +2381,7 @@ $currentPage = 'sales';
                 // Buscar taxa padrão do sistema
                 const response = await fetch('api/system_settings.php?setting=default_commission_rate');
                 if (response.ok) {
-                    const result = await response.json();
+                    const result = await parseApiJson(response);
                     if (result.success && result.value) {
                         document.querySelector('input[name="commission_percentage"]').value = result.value;
                         document.querySelector('select[name="commission_installments"]').value = 5;
@@ -2516,7 +2527,7 @@ $currentPage = 'sales';
                     })
                 });
 
-                const result = await response.json();
+                const result = await parseApiJson(response);
 
                 if (result.success) {
                     // Atualizar campo no formulário principal
@@ -2713,7 +2724,7 @@ $currentPage = 'sales';
                 const response = await fetch(`api/sales_simple.php?action=details&id=${id}`);
                 console.log('API response status:', response.status);
                 
-                const data = await response.json();
+                const data = await parseApiJson(response);
                 console.log('API response data:', data);
 
                 if (data.success) {
@@ -2776,7 +2787,7 @@ $currentPage = 'sales';
                 
                 // Fetch sale details
                 const response = await fetch(`api/sales_simple.php?action=details&id=${id}`);
-                const data = await response.json();
+                const data = await parseApiJson(response);
                 
                 if (!data.success) {
                     throw new Error(data.message || 'Erro ao carregar dados da venda');
@@ -3038,7 +3049,7 @@ $currentPage = 'sales';
                     body: JSON.stringify(data)
                 });
                 
-                const result = await response.json();
+                const result = await parseApiJson(response);
                 console.log('API response:', result);
                 
                 if (result.success) {

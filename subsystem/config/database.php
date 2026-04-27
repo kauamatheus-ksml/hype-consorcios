@@ -44,8 +44,8 @@ class Database {
             $this->conn->exec("SET timezone TO 'America/Sao_Paulo'");
             
         } catch(PDOException $e) {
-            echo "Erro na conexão: " . $e->getMessage();
-            return null;
+            error_log("Erro na conexão: " . $e->getMessage());
+            throw new RuntimeException("Erro na conexão com o banco de dados: " . $e->getMessage(), 0, $e);
         }
 
         return $this->conn;

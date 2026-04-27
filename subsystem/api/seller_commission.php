@@ -171,7 +171,7 @@ try {
             $maxSaleValue = !empty($input['max_sale_value']) ? floatval($input['max_sale_value']) : null;
             $bonusPercentage = floatval($input['bonus_percentage'] ?? 0);
             $bonusThreshold = !empty($input['bonus_threshold']) ? floatval($input['bonus_threshold']) : null;
-            $isActive = isset($input['is_active']) ? (bool)$input['is_active'] : true;
+            $isActive = !isset($input['is_active']) || filter_var($input['is_active'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
             $notes = $input['notes'] ?? '';
 
             // Validações
@@ -198,16 +198,16 @@ try {
                     min_sale_value, max_sale_value, bonus_percentage, bonus_threshold,
                     is_active, notes, created_by, updated_by
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                commission_percentage = VALUES(commission_percentage),
-                commission_installments = VALUES(commission_installments),
-                min_sale_value = VALUES(min_sale_value),
-                max_sale_value = VALUES(max_sale_value),
-                bonus_percentage = VALUES(bonus_percentage),
-                bonus_threshold = VALUES(bonus_threshold),
-                is_active = VALUES(is_active),
-                notes = VALUES(notes),
-                updated_by = VALUES(updated_by),
+                ON CONFLICT (seller_id) DO UPDATE SET
+                commission_percentage = EXCLUDED.commission_percentage,
+                commission_installments = EXCLUDED.commission_installments,
+                min_sale_value = EXCLUDED.min_sale_value,
+                max_sale_value = EXCLUDED.max_sale_value,
+                bonus_percentage = EXCLUDED.bonus_percentage,
+                bonus_threshold = EXCLUDED.bonus_threshold,
+                is_active = EXCLUDED.is_active,
+                notes = EXCLUDED.notes,
+                updated_by = EXCLUDED.updated_by,
                 updated_at = CURRENT_TIMESTAMP
             ");
 

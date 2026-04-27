@@ -224,9 +224,10 @@ function handleCreateLead($conn, $userId) {
             down_payment_value, source_page, status, priority, 
             notes, assigned_to, ip_address, user_agent
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        RETURNING id
     ");
     
-    $result = $stmt->execute([
+    $stmt->execute([
         $input['name'],
         $input['email'] ?? null,
         $input['phone'],
@@ -242,9 +243,9 @@ function handleCreateLead($conn, $userId) {
         $_SERVER['HTTP_USER_AGENT'] ?? null
     ]);
     
-    if ($result) {
-        $leadId = $conn->lastInsertId();
-        
+    $leadId = $stmt->fetchColumn();
+
+    if ($leadId) {
         // Registrar interação de criação
         $stmt = $conn->prepare("
             INSERT INTO lead_interactions (lead_id, user_id, interaction_type, description)

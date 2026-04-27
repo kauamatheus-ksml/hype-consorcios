@@ -100,10 +100,10 @@ try {
             $stmt = $conn->prepare("
                 INSERT INTO system_settings (setting_key, setting_value, description, updated_by)
                 VALUES (?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                setting_value = VALUES(setting_value),
-                description = VALUES(description),
-                updated_by = VALUES(updated_by),
+                ON CONFLICT (setting_key) DO UPDATE SET
+                setting_value = EXCLUDED.setting_value,
+                description = EXCLUDED.description,
+                updated_by = EXCLUDED.updated_by,
                 updated_at = CURRENT_TIMESTAMP
             ");
 

@@ -58,12 +58,12 @@ try {
     }
 
     // Filtro por ano
-    $whereConditions[] = "YEAR(s.sale_date) = ?";
+    $whereConditions[] = "EXTRACT(YEAR FROM s.sale_date) = ?";
     $params[] = $year;
 
     // Filtro por mês específico (opcional)
     if ($month) {
-        $whereConditions[] = "MONTH(s.sale_date) = ?";
+        $whereConditions[] = "EXTRACT(MONTH FROM s.sale_date) = ?";
         $params[] = $month;
     }
 
@@ -124,9 +124,9 @@ try {
         // Relatório resumido por mês do ano
         $stmt = $conn->prepare("
             SELECT
-                YEAR(s.sale_date) as year,
-                MONTH(s.sale_date) as month,
-                MONTHNAME(s.sale_date) as month_name,
+                EXTRACT(YEAR FROM s.sale_date)::int as year,
+                EXTRACT(MONTH FROM s.sale_date)::int as month,
+                TO_CHAR(s.sale_date, 'FMMonth') as month_name,
                 u.id as seller_id,
                 u.full_name as seller_name,
                 COUNT(s.id) as sales_count,
@@ -138,8 +138,8 @@ try {
             JOIN users u ON s.seller_id = u.id
             JOIN leads l ON s.lead_id = l.id
             WHERE {$whereClause}
-            GROUP BY YEAR(s.sale_date), MONTH(s.sale_date), u.id
-            ORDER BY YEAR(s.sale_date) DESC, MONTH(s.sale_date) DESC, u.full_name
+            GROUP BY EXTRACT(YEAR FROM s.sale_date), EXTRACT(MONTH FROM s.sale_date), TO_CHAR(s.sale_date, 'FMMonth'), u.id
+            ORDER BY EXTRACT(YEAR FROM s.sale_date) DESC, EXTRACT(MONTH FROM s.sale_date) DESC, u.full_name
         ");
         $stmt->execute($params);
         $monthlyReport = $stmt->fetchAll(PDO::FETCH_ASSOC);

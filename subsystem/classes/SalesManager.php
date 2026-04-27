@@ -63,6 +63,7 @@ class SalesManager {
                     financing_months, monthly_payment, contract_number, notes,
                     status, created_by
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                RETURNING id
             ");
             
             $stmt->execute([
@@ -82,7 +83,7 @@ class SalesManager {
                 $createdBy
             ]);
             
-            $saleId = $this->conn->lastInsertId();
+            $saleId = $stmt->fetchColumn();
             
             // Atualizar status do lead para "converted"
             $this->conn->prepare("UPDATE leads SET status = 'converted' WHERE id = ?")
@@ -434,7 +435,7 @@ class SalesManager {
                     COUNT(*) as count,
                     SUM(sale_value) as total_value
                 FROM sales 
-                WHERE sale_date >= DATE_SUB(NOW(), INTERVAL ? DAY)
+                WHERE sale_date >= CURRENT_TIMESTAMP - (? * INTERVAL '1 day')
                 GROUP BY status
             ");
             $stmt->execute([$period]);
@@ -448,7 +449,7 @@ class SalesManager {
                     SUM(s.sale_value) as total_value
                 FROM sales s
                 JOIN users u ON s.seller_id = u.id
-                WHERE s.sale_date >= DATE_SUB(NOW(), INTERVAL ? DAY)
+                WHERE s.sale_date >= CURRENT_TIMESTAMP - (? * INTERVAL '1 day')
                   AND s.status = 'confirmed'
                 GROUP BY u.id, u.full_name
                 ORDER BY total_value DESC
@@ -464,7 +465,7 @@ class SalesManager {
                     COUNT(*) as sales_count,
                     SUM(sale_value) as total_value
                 FROM sales 
-                WHERE sale_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                WHERE sale_date >= CURRENT_TIMESTAMP - INTERVAL '30 days'
                 GROUP BY DATE(sale_date)
                 ORDER BY date
             ");

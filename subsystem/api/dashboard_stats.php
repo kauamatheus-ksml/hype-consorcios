@@ -127,11 +127,11 @@ try {
             SELECT 
                 u.full_name,
                 COUNT(s.id) as sales_count,
-                COALESCE(SUM(s.commission_amount), 0) as total_commission
+                COALESCE(SUM(s.commission_value), 0) as total_commission
             FROM users u
             LEFT JOIN sales s ON u.id = s.seller_id 
-                AND MONTH(s.created_at) = MONTH(CURRENT_DATE())
-                AND YEAR(s.created_at) = YEAR(CURRENT_DATE())
+                AND s.created_at >= DATE_TRUNC('month', CURRENT_DATE)
+                AND s.created_at < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'
             WHERE u.role IN ('seller', 'manager', 'admin')
             AND u.status = 'active'
             GROUP BY u.id, u.full_name
@@ -146,12 +146,12 @@ try {
         // Leads por fonte
         $sourceQuery = "
             SELECT 
-                source,
+                source_page as source,
                 COUNT(*) as count
             FROM leads 
-            WHERE MONTH(created_at) = MONTH(CURRENT_DATE())
-            AND YEAR(created_at) = YEAR(CURRENT_DATE())
-            GROUP BY source
+            WHERE created_at >= DATE_TRUNC('month', CURRENT_DATE)
+            AND created_at < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'
+            GROUP BY source_page
             ORDER BY count DESC
         ";
         
@@ -162,12 +162,12 @@ try {
         // Vendas por mês (últimos 6 meses)
         $monthlyQuery = "
             SELECT 
-                DATE_FORMAT(created_at, '%Y-%m') as month,
+                TO_CHAR(created_at, 'YYYY-MM') as month,
                 COUNT(*) as sales_count,
                 COALESCE(SUM(sale_value), 0) as total_value
             FROM sales
-            WHERE created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
-            GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+            WHERE created_at >= CURRENT_DATE - INTERVAL '6 months'
+            GROUP BY TO_CHAR(created_at, 'YYYY-MM')
             ORDER BY month ASC
         ";
         

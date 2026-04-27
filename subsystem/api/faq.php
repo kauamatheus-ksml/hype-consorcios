@@ -141,9 +141,10 @@ try {
                         $stmt = $conn->prepare("
                             INSERT INTO faqs (question, answer, display_order, is_active)
                             VALUES (?, ?, ?, ?)
+                            RETURNING id
                         ");
                         $stmt->execute([$question, $answer, $display_order, $is_active]);
-                        $newId = $conn->lastInsertId();
+                        $newId = $stmt->fetchColumn();
 
                         // Reordenar todas as FAQs para garantir sequência contínua
                         $stmt = $conn->query("

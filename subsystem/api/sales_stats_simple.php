@@ -80,7 +80,7 @@ try {
                 s.sale_value,
                 COALESCE(scs.commission_percentage, 1.50) as commission_percentage
             FROM sales s
-            LEFT JOIN seller_commission_settings scs ON s.seller_id = scs.seller_id AND scs.is_active = 1
+            LEFT JOIN seller_commission_settings scs ON s.seller_id = scs.seller_id AND COALESCE(scs.is_active::text, '1') IN ('1', 'true', 't')
             WHERE s.status = 'confirmed'
         ");
         $commissionResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -118,7 +118,7 @@ try {
                 s.sale_value,
                 COALESCE(scs.commission_percentage, 1.50) as commission_percentage
             FROM sales s
-            LEFT JOIN seller_commission_settings scs ON s.seller_id = scs.seller_id AND scs.is_active = 1
+            LEFT JOIN seller_commission_settings scs ON s.seller_id = scs.seller_id AND COALESCE(scs.is_active::text, '1') IN ('1', 'true', 't')
             WHERE s.seller_id = ? AND s.status = 'confirmed'
         ");
         $stmt->execute([$userId]);

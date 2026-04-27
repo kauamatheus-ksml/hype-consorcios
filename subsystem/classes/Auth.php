@@ -182,6 +182,7 @@ class Auth {
             $stmt = $this->conn->prepare("
                 INSERT INTO users (username, email, password_hash, full_name, role, status, created_by) 
                 VALUES (?, ?, ?, ?, ?, ?, ?)
+                RETURNING id
             ");
             
             $stmt->execute([
@@ -194,7 +195,7 @@ class Auth {
                 $createdBy
             ]);
             
-            $userId = $this->conn->lastInsertId();
+            $userId = $stmt->fetchColumn();
             
             return [
                 'success' => true,
