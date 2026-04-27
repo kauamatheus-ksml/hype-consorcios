@@ -154,16 +154,16 @@ function handleGetSales($conn, $userRole, $userId) {
     if ($period) {
         switch ($period) {
             case 'today':
-                $baseQuery .= " AND DATE(s.sale_date) = CURRENT_DATE()";
+                $baseQuery .= " AND DATE(s.sale_date) = CURRENT_DATE";
                 break;
             case 'week':
-                $baseQuery .= " AND s.sale_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)";
+                $baseQuery .= " AND s.sale_date >= CURRENT_DATE - INTERVAL '7 days'";
                 break;
             case 'month':
-                $baseQuery .= " AND MONTH(s.sale_date) = MONTH(CURRENT_DATE()) AND YEAR(s.sale_date) = YEAR(CURRENT_DATE())";
+                $baseQuery .= " AND s.sale_date >= DATE_TRUNC('month', CURRENT_DATE) AND s.sale_date < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'";
                 break;
             case 'quarter':
-                $baseQuery .= " AND s.sale_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 3 MONTH)";
+                $baseQuery .= " AND s.sale_date >= CURRENT_DATE - INTERVAL '3 months'";
                 break;
         }
     }
@@ -181,9 +181,9 @@ function handleGetSales($conn, $userRole, $userId) {
             u.full_name as seller_name,
             l.name as customer_name,
             l.name as lead_name,
-            YEAR(s.sale_date) as sale_year,
-            MONTH(s.sale_date) as sale_month,
-            MONTHNAME(s.sale_date) as sale_month_name
+            EXTRACT(YEAR FROM s.sale_date)::int as sale_year,
+            EXTRACT(MONTH FROM s.sale_date)::int as sale_month,
+            TO_CHAR(s.sale_date, 'FMMonth') as sale_month_name
         " . $baseQuery . "
         ORDER BY s.sale_date DESC
         LIMIT {$limit} OFFSET {$offset}
