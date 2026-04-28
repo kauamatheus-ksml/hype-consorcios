@@ -804,6 +804,10 @@ $configs = getAllSiteConfigs();
     <script src="assets/js/script.js"></script>
     
     <script>
+        function getLeadCaptureEndpoint() {
+            return window.HYPE_CRM_CAPTURE_ENDPOINT || 'subsystem/api/capture_lead.php';
+        }
+
         // Função para enviar dados do lead
         async function submitLeadForm(event) {
             event.preventDefault();
@@ -832,7 +836,7 @@ $configs = getAllSiteConfigs();
                 };
                 
                 // Enviar para API
-                const response = await fetch('subsystem/api/capture_lead.php', {
+                const response = await fetch(getLeadCaptureEndpoint(), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

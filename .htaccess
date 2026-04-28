@@ -7,6 +7,13 @@
 
 RewriteEngine On
 
+# Bloquear scripts de instalacao, debug e testes do subsystem
+RewriteRule ^subsystem/(activate_commission_system|add_client_images_config|backup_configs|commission_auth_debug|commission_settings_debug|create_faq_table|create_site_config_table|debug_session|fix_admin|fix_career_image|init_audit_system|install_database|restore_configs|test-api-direct|test-faq-api|test_access|test_cards_static|test_dashboard_api|update_video_config)\.php$ - [F,L]
+RewriteRule ^subsystem/api/(capture_lead_debug|site-config-debug)\.php$ - [F,L]
+RewriteRule ^subsystem/(config|classes|dev-tools)/ - [F,L]
+
+# Regra mantida para paginas operacionais do legado; bloqueios sensiveis ficam acima.
+
 # Permitir acesso completo ao subsystem (TEMPORÁRIO PARA DEBUG)
 RewriteCond %{REQUEST_URI} ^/subsystem/
 RewriteRule . - [L]

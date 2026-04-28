@@ -1,0 +1,19 @@
+import { requireCurrentUser } from "@/lib/current-user";
+import { apiError, apiSuccess } from "@/lib/http";
+import { getSaleStats } from "@/lib/sale-queries";
+
+export const runtime = "nodejs";
+
+export async function GET() {
+  try {
+    const currentUser = await requireCurrentUser();
+    const result = await getSaleStats(currentUser);
+
+    return apiSuccess({
+      ...result,
+      user_role: currentUser.role,
+    });
+  } catch (error) {
+    return apiError(error);
+  }
+}
