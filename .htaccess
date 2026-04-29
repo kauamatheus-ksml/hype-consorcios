@@ -13,8 +13,8 @@ RewriteRule ^subsystem/api/(capture_lead_debug|site-config-debug)\.php$ - [F,L]
 RewriteRule ^subsystem/(config|classes|dev-tools)/ - [F,L]
 
 # Login administrativo no CRM Next.js publicado na Vercel.
-RewriteRule ^login/?$ https://hype-consorcios-crm.vercel.app/login [R=302,L,NE]
-RewriteRule ^subsystem/login\.php$ https://hype-consorcios-crm.vercel.app/login [R=302,L,NE]
+RewriteRule ^login/?$ https://crm.hypeconsorcios.com.br/login [R=302,L,NE]
+RewriteRule ^subsystem/login\.php$ https://crm.hypeconsorcios.com.br/login [R=302,L,NE]
 
 # Regra mantida para paginas operacionais do legado; bloqueios sensiveis ficam acima.
 
