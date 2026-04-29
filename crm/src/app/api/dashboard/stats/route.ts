@@ -102,7 +102,7 @@ export async function GET(request: Request) {
          FROM sales s
          LEFT JOIN seller_commission_settings scs
            ON s.seller_id = scs.seller_id
-          AND COALESCE(scs.is_active, 1) = 1
+          AND COALESCE(scs.is_active::text, '1') IN ('1', 'true', 't')
          WHERE s.status = 'confirmed'
            AND s.created_at >= DATE_TRUNC('month', CURRENT_DATE)
            AND s.created_at < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'

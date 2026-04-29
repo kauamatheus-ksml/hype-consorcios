@@ -12,7 +12,11 @@ export function getPgPool(): Pool {
   }
 
   pool = new Pool({
+    allowExitOnIdle: true,
+    connectionTimeoutMillis: Number(getOptionalEnv("DB_CONNECTION_TIMEOUT_MS", "10000")),
     host: getRequiredEnv("DB_HOST"),
+    idleTimeoutMillis: Number(getOptionalEnv("DB_IDLE_TIMEOUT_MS", "10000")),
+    max: Number(getOptionalEnv("DB_POOL_MAX", "1")),
     database: getRequiredEnv("DB_NAME"),
     user: getRequiredEnv("DB_USER"),
     password: getRequiredEnv("DB_PASS"),
