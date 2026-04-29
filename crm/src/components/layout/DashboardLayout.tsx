@@ -89,7 +89,7 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950">
       <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-slate-200 bg-[#242328] px-4 py-5 text-white lg:block">
-        <Link className="flex items-center gap-3" href="/dashboard">
+        <Link className="flex items-center gap-3" href="/dashboard" prefetch={false}>
           <span className="flex h-10 w-10 items-center justify-center rounded-[8px] bg-[#3be1c9] text-[#242328]">
             <BarChart3 className="h-5 w-5" aria-hidden />
           </span>
@@ -105,6 +105,7 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
               className="hype-focus flex h-10 items-center gap-3 rounded-[8px] px-3 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white"
               href={item.href}
               key={item.href}
+              prefetch={false}
             >
               <item.icon className="h-4 w-4 text-[#3be1c9]" aria-hidden />
               {item.label}
@@ -133,6 +134,7 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
                 className="hype-focus inline-flex h-9 shrink-0 items-center gap-2 rounded-[8px] border border-slate-200 px-3 text-xs font-semibold text-slate-700"
                 href={item.href}
                 key={item.href}
+                prefetch={false}
               >
                 <item.icon className="h-4 w-4 text-[#0f8f80]" aria-hidden />
                 {item.label}

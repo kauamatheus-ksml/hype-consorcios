@@ -1,9 +1,21 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { HttpError } from "@/lib/http";
 import { getSessionFromCookies } from "@/lib/session";
 import { findActiveUserById, toPublicUserFromUser } from "@/lib/user-queries";
 import type { PublicUser } from "@/types";
+
+const findCurrentPublicUserById = cache(async (userId: PublicUser["id"]) => {
+  const user = await findActiveUserById(userId);
+
+  if (!user) {
+    return null;
+  }
+
+  return toPublicUserFromUser(user);
+});
 
 export async function getCurrentUser(): Promise<PublicUser | null> {
   const session = await getSessionFromCookies();
@@ -12,13 +24,7 @@ export async function getCurrentUser(): Promise<PublicUser | null> {
     return null;
   }
 
-  const user = await findActiveUserById(session.userId);
-
-  if (!user) {
-    return null;
-  }
-
-  return toPublicUserFromUser(user);
+  return findCurrentPublicUserById(session.userId);
 }
 
 export async function requireCurrentUser(): Promise<PublicUser> {
