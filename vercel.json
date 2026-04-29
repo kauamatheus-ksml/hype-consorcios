@@ -19,6 +19,20 @@
     ],
     "routes": [
         {
+            "src": "/login/?",
+            "status": 302,
+            "headers": {
+                "Location": "https://hype-consorcios-crm.vercel.app/login"
+            }
+        },
+        {
+            "src": "/subsystem/login\\.php",
+            "status": 302,
+            "headers": {
+                "Location": "https://hype-consorcios-crm.vercel.app/login"
+            }
+        },
+        {
             "src": "/",
             "dest": "/index.php"
         },
